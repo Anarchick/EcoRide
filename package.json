@@ -7,8 +7,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "browser-sync start --proxy localhost:8000 --files \"templates/**/*.twig,assets/**/*.{css,js,ts},src/**/*.php\" --reload-delay 1000",
-    "watch": "browser-sync start --proxy localhost:8000 --files \"templates/**/*.twig,assets/**/*.{css,js,ts},src/**/*.php\" --no-open"
+    "dev": "browser-sync start --proxy localhost:8000 --files \"templates/**/*.twig,assets/**/*.{css,scss,js,ts},src/**/*.php\" --reload-delay 1000",
+    "watch": "browser-sync start --proxy localhost:8000 --files \"templates/**/*.twig,assets/**/*.{css,scss,js,ts},src/**/*.php\" --no-open"
   },
   "keywords": [],
   "author": "",
