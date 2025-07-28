@@ -1,0 +1,20 @@
+<container>
+    <header class="text-center bg-success text-white p-3 mb-4">
+        <h1>{{ title }}</h1>
+    </header>
+
+    <div class="container">
+        {{ form_start(form) }}
+
+        {% for field_name, field in form %}
+            {% if field_name != 'submit' and field_name != '_token'%}
+                {{ form_row(field, {'label': labels[field_name] ~ ' :', 'label_attr': {'class': 'eco-bold-text'}}) }}
+            {% endif %}
+        {% endfor %}
+
+        {{ form_row(form.submit, {'label': submit_label, 'attr': {'class': 'btn btn-success'}}) }}
+        {{ form_errors(form) }}
+        {{ form_end(form) }}
+    </div>
+    
+</container>

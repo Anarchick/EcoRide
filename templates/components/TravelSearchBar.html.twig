@@ -1,0 +1,56 @@
+{# 
+    Use the form TravelSearchType
+#}
+<section class="container">
+    {{ form_start(form, {
+            'method': 'GET',
+            'action': path('app_travel'), 
+            'attr': {
+                'class': 'travel-search-bar'
+            }
+    }) }}
+        <div class="travel-search-inputs">
+            <div class="travel-search-input">
+                {{ ux_icon('ion:location-outline', {class: 'travel-search-icon'}) }}
+                {{ form_widget(form.from, {
+                    'attr': {
+                        'class': 'travel-search-field',
+                        'placeholder': 'Départ'
+                    }
+                }) }}
+            </div>
+
+            <div class="travel-search-input">
+                {{ ux_icon('ion:location', {class: 'travel-search-icon'})}}
+                {{ form_widget(form.to, {
+                    'attr': {
+                        'class': 'travel-search-field',
+                        'placeholder': 'Destination'
+                    }
+                }) }}
+            </div>
+            
+            <div class="travel-search-input">
+                {{ ux_icon('ion:calendar', {class: 'travel-search-icon'})}}
+                {{ form_widget(form.date, {
+                    'attr': {
+                        'class': 'travel-search-field',
+                        'placeholder': 'Date'
+                    }
+                }) }}
+            </div>
+            
+            <div class="travel-search-input">
+                {{ ux_icon('ion:people', {class: 'travel-search-icon'})}}
+                {{ form_widget(form.passengers, {
+                    'attr': {
+                        'class': 'travel-search-field',
+                        'placeholder': 'Passager(s)'
+                    }
+                }) }}
+            </div>
+            
+        </div>
+        {{ form_errors(form) }}
+    {{ form_end(form) }}
+</section>

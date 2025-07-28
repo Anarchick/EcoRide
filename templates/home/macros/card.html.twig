@@ -1,0 +1,9 @@
+{% macro card(image, title, text) %}
+<section class="eco-card">
+    <img src="{{ asset(image) }}" alt="{{ title }}" class="eco-card-img">
+    <div class="eco-card-text text-center">
+        <h3 class="eco-title-text mb-1">{{ title }}</h3>
+        <p class="m-0">{{ text|raw }}</p>
+    </div>
+</section>
+{% endmacro %}
