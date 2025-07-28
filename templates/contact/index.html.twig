@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}EcoRide - Contact{% endblock %}
+
+{% block main %}
+{% include 'partials/_base_form.html.twig' with {
+    'title': 'Contactez-nous',
+    'form': contactForm,
+    'labels': {
+        'name': 'Votre nom',
+        'email': 'Votre email',
+        'message': 'Votre message'
+    },
+    'submit_label': 'Envoyer le message'
+} %}
+{% endblock %}
