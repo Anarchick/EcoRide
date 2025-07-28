@@ -7,7 +7,7 @@
 /public/bundles/
 /var/
 /vendor/
-node_modules/
+/node_modules/
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###
@@ -19,3 +19,9 @@ node_modules/
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+
+###> Sass compiled files ###
+public/build/
+*.css.map
+assets/**/*.css
+###< Sass compiled files ###

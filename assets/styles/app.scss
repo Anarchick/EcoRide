@@ -1,0 +1,49 @@
+@use './_utils' as utils;
+@use './_variables' as vars;
+@use './_nav-bar';
+
+
+// Police personnalisée EcoRide
+@font-face {
+    font-family: 'RymanEco';
+    src: url('../fonts/RymanEco-Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+// Mixins
+
+// Styles globaux EcoRide
+body {
+    color: vars.$text-color;
+    background-color: vars.$background-color;
+}
+
+html, body {
+    height: 100%;
+}
+
+// Typography
+.eco-small-text {
+    font-size: utils.rem(12);
+}
+
+.eco-normal-text {
+    font-size: utils.rem(16);
+}
+
+.eco-bold-text {
+    font-weight: 600;
+}
+
+.eco-title-text {
+    font-family: vars.$eco-title-font-family;
+    color: vars.$title-color;
+    font-size: utils.rem(24);
+}
+
+// S'assurer que le footer reste en bas
+.min-vh-100 {
+    min-height: 100vh !important;
+}

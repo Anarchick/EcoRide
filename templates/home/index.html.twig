@@ -1,20 +1,32 @@
 {% extends 'base.html.twig' %}
+{% import 'home/macros/card.html.twig' as card %}
 
-{% block title %}Hello HomeController!{% endblock %}
+{% block title %}EcoRide{% endblock %}
 
-{% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+{% block main %}
+<header class="hero position-relative overflow-hidden">
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    <div class="up-decoration">
+        <img src="{{ asset('svg/up-front.svg') }}" alt="Décoration avant haut" class="decor up-front">
+        <img src="{{ asset('svg/up-back.svg') }}" alt="Décoration arrière haut" class="decor up-back">
+    </div>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>D:/xampp/htdocs/EcoRide/src/Controller/HomeController.php</code></li>
-        <li>Your template at <code>D:/xampp/htdocs/EcoRide/templates/home/index.html.twig</code></li>
-    </ul>
-</div>
+    <img src="{{ asset('images/logos/ecoride-logo-text.svg') }}" alt="Logo EcoRide" class="ecoride-logo-text">
+
+    <div class="bottom-decoration">
+        <img src="{{ asset('svg/bottom-front.svg') }}" alt="Décoration avant bas" class="decor bottom-front">
+        <img src="{{ asset('svg/bottom-back.svg') }}" alt="Décoration arrière bas" class="decor bottom-back">
+    </div>
+
+</header>
+
+<twig:TravelSearchBar :form="search_form" />
+
+<section class="container align-self-stretch d-flex flex-column gap-5 mt-5">
+    {{ card.card('images/ui/card-4words.png', 'En quatres mots ?', "Covoiturage,<br>Ecologique,<br>Economique,<br>Sourire!") }}
+    {{ card.card('images/ui/card-ecologic.jpg', 'Notre mission écologique', "Nos EcoRiders émèttent en moyenne  2,3 tonnes de CO2 en moins par an ! Ensemble, nous pouvons créer un impact environnemental positif significatif !") }}
+    {{ card.card('images/ui/card-economy.jpg', 'Economies garanties', "Fini les pleins d'essence qui font mal au portefeuille!<br><br>Jusqu'à 70% d'économies pour les conducteurs et 60% pour les passagers.") }}
+    {{ card.card('images/ui/card-community.png', 'Une communauté de confiance', "Sécurité et convivialité sont au coeur de EcoRide. Tous nos membres sont vérifiés et évalués par la communauté.<br><br>Plus qu'un simple transport, c'est l'occasion de créer des liens authentiques") }}
+</section>
+
 {% endblock %}
