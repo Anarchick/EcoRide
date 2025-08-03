@@ -1,0 +1,30 @@
+# Éviter de copier ces fichiers dans l'image Docker
+
+# Dépendances (installées via Dockerfile)
+/vendor/
+/node_modules/
+
+# Cache et logs
+/var/cache/
+/var/log/
+/var/sessions/
+
+# Fichiers de développement
+/.env.local
+/.env.*.local
+
+# IDE
+/.idea/
+/.vscode/
+
+# Git
+/.git/
+/.gitignore
+
+# Tests
+/tests/
+/phpunit.xml
+
+# Documentation
+/README.md
+/docs/

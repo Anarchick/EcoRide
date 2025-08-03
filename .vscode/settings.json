@@ -1,0 +1,70 @@
+{
+    "intelephense.stubs": [
+        "apache",
+        "bcmath",
+        "Core",
+        "ctype",
+        "curl",
+        "date",
+        "dom",
+        "fileinfo",
+        "filter",
+        "ftp",
+        "gd",
+        "gettext",
+        "hash",
+        "iconv",
+        "json",
+        "libxml",
+        "mbstring",
+        "mcrypt",
+        "mysql",
+        "mysqli",
+        "openssl",
+        "pcntl",
+        "pcre",
+        "PDO",
+        "mysql_xdevapi",
+        "Phar",
+        "posix",
+        "readline",
+        "Reflection",
+        "session",
+        "SimpleXML",
+        "soap",
+        "sockets",
+        "sodium",
+        "SPL",
+        "sqlite3",
+        "standard",
+        "tokenizer",
+        "xml",
+        "xmlreader",
+        "xmlwriter",
+        "zip",
+        "zlib"
+    ],
+    "intelephense.environment.phpVersion": "8.2.12",
+    "intelephense.environment.includePaths": [
+        "d:\\xampp\\htdocs\\ecoride\\vendor"
+    ],
+    "intelephense.files.associations": [
+        "*.php",
+        "*.phtml"
+    ],
+    "intelephense.completion.insertUseDeclaration": true,
+    "intelephense.completion.fullyQualifyGlobalConstantsAndFunctions": false,
+    "intelephense.format.enable": true,
+    "intelephense.phpdoc.useFullyQualifiedNames": false,
+    "intelephense.diagnostics.enable": true,
+    "intelephense.diagnostics.run": "onSave",
+    "intelephense.diagnostics.embeddedLanguages": false,
+    "intelephense.references.exclude": [
+        "**/vendor/**"
+    ],
+    "php.suggest.basic": false,
+    "php.validate.enable": false,
+    "files.associations": {
+        "*.twig": "twig"
+    }
+}

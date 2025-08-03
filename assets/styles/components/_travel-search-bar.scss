@@ -1,0 +1,71 @@
+@use '../_utils' as utils;
+@use '../_variables' as vars;
+
+.travel-search-bar {
+    padding: utils.px-size(3) utils.px-size(4);
+    margin-top: utils.px-size(4);
+    border-radius: vars.$border-radius;
+    background: vars.$third-background-color;
+}
+
+.travel-search-inputs {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+    background: vars.$interactive-color;
+}
+
+@media (max-width: 767px) {
+    .travel-search-inputs {
+        flex-direction: column;
+    }
+}
+
+.travel-search-input {
+    width: 100%;
+    border: 0;
+    border-radius: 0;
+    color: vars.$interactive-color;
+    display: inline-flex;
+    align-items: center;
+}
+
+.travel-search-icon {
+    padding: 0 2px;
+    background: vars.$third-background-color;
+    height: 1.5rem;
+}
+
+.travel-search-field {
+    padding: 0 8px;
+    border: 0;
+    border-radius: 0;
+    background: vars.$third-background-color;
+    box-shadow: none !important;
+    position: relative;
+
+    // https://stackoverflow.com/questions/14946091/are-there-any-style-options-for-the-html5-date-picker
+    &::-webkit-calendar-picker-indicator {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+    }
+
+    &:focus {
+        background: vars.$third-background-color;
+        outline: 2px solid vars.$interactive-color;
+    }
+
+    &::placeholder {
+        box-shadow: none;
+        color: vars.$interactive-color;
+        opacity: 0.6;
+    }
+}

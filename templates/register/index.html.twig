@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}EcoRide - Inscription{% endblock %}
+
+{% block main %}
+{% include 'partials/_base_form.html.twig' with {
+    'title': "Inscription",
+    'form': registrationForm,
+    'labels': {
+        'firstname': 'Prénom',
+        'lastname': 'Nom',
+        'username': 'Nom d\'utilisateur',
+        'phone': 'Numéro de téléphone portable',
+        'email': 'Votre email',
+        'password': 'Votre mot de passe',
+        'confirm_password': 'Confirmer le mot de passe'
+    },
+    'submit_label': "S'inscrire"
+} %}
+{% endblock %}
