@@ -16,8 +16,9 @@
 ###< phpunit/phpunit ###
 
 ###> symfony/asset-mapper ###
-/public/assets/
+assets/build/
 /assets/vendor/
+!/public/assets/
 ###< symfony/asset-mapper ###
 
 ###> Sass compiled files ###

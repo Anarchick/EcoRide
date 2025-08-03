@@ -1,0 +1,25 @@
+@use './_utils' as utils;
+@use './_variables' as vars;
+
+.navbar-toggler:focus {
+    box-shadow: none !important;
+}
+
+.eco-nav-link {
+    display: block;
+    width: fit-content;
+    padding: utils.px-size(3) 0;
+    color: vars.$interactive-color;
+    text-decoration: none;
+}
+
+.eco-nav-active {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+@media (min-width: 992px) {
+    .eco-nav-link {
+        margin: 0 utils.px-size(3);
+    }
+}
