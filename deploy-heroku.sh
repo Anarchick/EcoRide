@@ -30,7 +30,7 @@ heroku config:set APP_SECRET=$(php -r 'echo bin2hex(random_bytes(16));')
 # Déployer
 git add .
 git commit -m "Deploy to Heroku"
-git push heroku main
+git push heroku master
 
 # Installer les dépendances
 heroku run composer require symfony/requirements-checker
