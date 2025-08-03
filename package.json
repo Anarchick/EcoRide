@@ -11,7 +11,7 @@
     "watch": "browser-sync start --proxy localhost:8000 --files \"templates/**/*.twig,assets/**/*.{css,scss,js,ts},src/**/*.php\" --no-open"
   },
   "keywords": [],
-  "author": "",
+  "author": "Anarchick",
   "license": "ISC",
   "description": "",
   "devDependencies": {
