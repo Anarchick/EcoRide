@@ -1,5 +1,8 @@
 doctrine:
     dbal:
+        platform_service: App\Doctrine\Platform\MariaDBUuidPlatform
+        types:
+            uuid: Symfony\Bridge\Doctrine\Types\UuidType
         url: '%env(resolve:DATABASE_URL)%'
 
         # IMPORTANT: You MUST configure your server version,
