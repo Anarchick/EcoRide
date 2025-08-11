@@ -101,6 +101,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var Collection<int, Travel>
      */
     #[ORM\ManyToMany(targetEntity: Travel::class, inversedBy: 'carpoolers')]
+    #[ORM\JoinTable(name: 'user_travel')]
+    #[ORM\JoinColumn(name: 'user_uuid', referencedColumnName: 'uuid')]
+    #[ORM\InverseJoinColumn(name: 'travel_uuid', referencedColumnName: 'uuid')]
     private Collection $carpools;
 
     public function __construct()

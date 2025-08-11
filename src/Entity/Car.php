@@ -27,6 +27,9 @@ class Car
      * @var Collection<int, User>
      */
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'cars')]
+    #[ORM\JoinTable(name: 'car_user')]
+    #[ORM\JoinColumn(name: 'car_uuid', referencedColumnName: 'uuid')]
+    #[ORM\InverseJoinColumn(name: 'user_uuid', referencedColumnName: 'uuid')]
     private Collection $user;
 
     #[ORM\Column(length: 10, unique: true)]

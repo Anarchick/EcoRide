@@ -17,10 +17,11 @@ class Review
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'ownReviews')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(name: 'author_uuid', referencedColumnName: 'uuid', nullable: false)]
     private ?User $author = null;
 
     #[ORM\ManyToOne(inversedBy: 'reviews')]
+    #[ORM\JoinColumn(name: 'user_uuid', referencedColumnName: 'uuid')]
     private ?User $user = null;
 
     #[ORM\Column(type: Types::SMALLINT)]

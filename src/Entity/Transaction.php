@@ -18,7 +18,7 @@ class Transaction
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'transactions')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, name: 'user_uuid', referencedColumnName: 'uuid')]
     private ?User $user = null;
 
     #[ORM\Column]
