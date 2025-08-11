@@ -12,14 +12,8 @@ use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
-#[ORM\Table(name: 'travels',
-    indexes: [
-        new ORM\Index(
-            name: 'idx_search_criteria',
-            columns: ['origin', 'destination', 'date', 'passengers_max']
-        )
-    ]
-)]
+#[ORM\Table(name: 'travels')]
+#[ORM\Index(name: 'idx_search_criteria', columns: ['origin', 'destination', 'date', 'passengers_max'])]
 #[ORM\Entity(repositoryClass: TravelRepository::class)]
 class Travel
 {
@@ -30,11 +24,11 @@ class Travel
     private ?Uuid $uuid;
 
     #[ORM\ManyToOne(inversedBy: 'travels')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, name: 'driver_uuid', referencedColumnName: 'uuid')]
     private ?User $driver = null;
 
     #[ORM\ManyToOne(inversedBy: 'travels')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, name: 'car_uuid', referencedColumnName: 'uuid')]
     private ?Car $car = null;
 
     #[ORM\Column(length: 90)] // No index Needed
