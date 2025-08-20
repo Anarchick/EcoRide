@@ -12,7 +12,6 @@
 - TypeScript
 - Sass (via extension VS Code)
 - Bootstrap v5.3.7
-- PHPUnit
 - Doctrine
 - DoctrineExtensionsBundle
 - Symfony/mailer
@@ -26,4 +25,6 @@
 - Git (remote Github)
 - BrowserSync
 - EsLint
+- PHPUnit
+- doctrine-fixtures-bundle
 
