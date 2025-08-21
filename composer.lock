@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3759c2101c5f0daa904e75dc73018d0e",
+    "content-hash": "efa00db39d85a7046e4116b0d4a3f688",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -2181,6 +2181,68 @@
                 "source": "https://github.com/php-fig/log/tree/3.0.2"
             },
             "time": "2024-09-11T13:17:53+00:00"
+        },
+        {
+            "name": "specshaper/encrypt-bundle",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mogilvie/EncryptBundle.git",
+                "reference": "e9918159ffaff8c61bb2f21fc0374a32063ca9a2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mogilvie/EncryptBundle/zipball/e9918159ffaff8c61bb2f21fc0374a32063ca9a2",
+                "reference": "e9918159ffaff8c61bb2f21fc0374a32063ca9a2",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/doctrine-bundle": "^2.12",
+                "doctrine/orm": "^2.12||^3.2",
+                "ext-mbstring": "*",
+                "ext-openssl": "*",
+                "ext-sodium": "*",
+                "php": ">=8.2",
+                "symfony/console": "^6.4||^7.0",
+                "symfony/framework-bundle": "^6.4||^7.0",
+                "symfony/monolog-bundle": "^3.7"
+            },
+            "require-dev": {
+                "symfony/phpunit-bridge": "^6.0"
+            },
+            "default-branch": true,
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "SpecShaper\\EncryptBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mark Ogilvie",
+                    "email": "mark.ogilvie@parolla.ie"
+                }
+            ],
+            "description": "Bundle provides a service for encrypting values via attribute.",
+            "homepage": "https://github.com/mogilvie/EncryptBundle",
+            "keywords": [
+                "encrypt bundle"
+            ],
+            "support": {
+                "issues": "https://github.com/mogilvie/EncryptBundle/issues",
+                "source": "https://github.com/mogilvie/EncryptBundle/tree/master"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/mogilvie",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-05-01T14:49:42+00:00"
         },
         {
             "name": "stof/doctrine-extensions-bundle",
@@ -10657,7 +10719,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "specshaper/encrypt-bundle": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

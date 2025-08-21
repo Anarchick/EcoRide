@@ -62,6 +62,9 @@
             "./bin/phpunit"
         ]
     },
+    "specshaper/encrypt-bundle": {
+        "version": "dev-master"
+    },
     "stof/doctrine-extensions-bundle": {
         "version": "1.14",
         "recipe": {
