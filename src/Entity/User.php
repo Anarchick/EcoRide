@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\RoleEnum;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -23,12 +24,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     private ?Uuid $uuid;
-
-    /**
-     * @var list<string> The user roles
-     */
-    #[ORM\Column]
-    private array $roles = [];
 
     /**
      * @var string The hashed password
@@ -106,6 +101,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\InverseJoinColumn(name: 'travel_uuid', referencedColumnName: 'uuid')]
     private Collection $carpools;
 
+    /**
+     * @var Collection<int, Role>
+     */
+    #[ORM\OneToMany(targetEntity: Role::class, mappedBy: 'user', orphanRemoval: true, cascade: ['persist'])]
+    private Collection $roles;
+
     public function __construct()
     {
         $this->ownReviews = new ArrayCollection();
@@ -114,6 +115,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->transactions = new ArrayCollection();
         $this->travels = new ArrayCollection();
         $this->carpools = new ArrayCollection();
+        $this->roles = new ArrayCollection();
     }
 
     public function getUuid(): ?Uuid
@@ -136,28 +138,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getUserIdentifier(): string
     {
         return $this->uuid->toString();
-    }
-
-    /**
-     * @see UserInterface
-     */
-    public function getRoles(): array
-    {
-        $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
-
-        return array_unique($roles);
-    }
-
-    /**
-     * @param list<string> $roles
-     */
-    public function setRoles(array $roles): static
-    {
-        $this->roles = $roles;
-
-        return $this;
     }
 
     /**
@@ -479,6 +459,44 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeCarpool(Travel $carpool): static
     {
         $this->carpools->removeElement($carpool);
+
+        return $this;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = array_map(
+            fn($roleEntity) => $roleEntity->getRole()->value,
+            $this->roles->toArray()
+        );
+
+        // guarantee every user at least has ROLE_USER
+        $roles[] = RoleEnum::USER->value;
+
+        return array_unique($roles);
+    }
+
+    public function addRole(Role $role): static
+    {
+        if (!$this->roles->contains($role)) {
+            $this->roles->add($role);
+            $role->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRole(Role $role): static
+    {
+        if ($this->roles->removeElement($role)) {
+            // set the owning side to null (unless already changed)
+            if ($role->getUser() === $this) {
+                $role->setUser(null);
+            }
+        }
 
         return $this;
     }

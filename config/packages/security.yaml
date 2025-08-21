@@ -28,6 +28,10 @@ security:
     access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
+    role_hierarchy:
+        # https://symfony.com/doc/current/security.html#hierarchical-roles
+        ROLE_ADMIN: ROLE_MODERATOR
+        ROLE_DRIVER: ROLE_USER
 
 when@test:
     security:
