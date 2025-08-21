@@ -9,11 +9,13 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use SpecShaper\EncryptBundle\Annotations\Encrypted;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'users')]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -35,19 +37,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Gedmo\Timestampable(on: 'create')]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(length: 20)]
+    #[Encrypted]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 20)]
+    #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 25)]
+    #[Encrypted]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 25)]
+    #[ORM\Column(length: 255)]
     private ?string $lastName = null;
 
-    #[ORM\Column(length: 20)]
+    #[Encrypted]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 20)]
+    #[ORM\Column(length: 255)]
     private ?string $username = null;
 
-    #[ORM\Column(length: 128, unique: true)]
+    #[Encrypted]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 128)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $email = null;
 
-    #[ORM\Column(length: 15, unique: true)]
+    #[Encrypted]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 15)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $phone = null;
 
     #[ORM\Column]

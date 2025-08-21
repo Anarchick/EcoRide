@@ -9,9 +9,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use SpecShaper\EncryptBundle\Annotations\Encrypted;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'cars')]
 #[ORM\Entity(repositoryClass: CarRepository::class)]
@@ -32,7 +34,10 @@ class Car
     #[ORM\InverseJoinColumn(name: 'user_uuid', referencedColumnName: 'uuid')]
     private Collection $user;
 
-    #[ORM\Column(length: 10, unique: true)]
+    #[Encrypted]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 10)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $plate = null;
 
     #[ORM\Column(enumType: FuelTypeEnum::class)]

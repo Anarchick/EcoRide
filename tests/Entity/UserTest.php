@@ -96,4 +96,25 @@ class UserTest extends KernelTestCase
         $security = static::getContainer()->get('security.authorization_checker');
         $this->assertTrue($security->isGranted(RoleEnum::MODERATOR->value), 'User should have ROLE_MODERATOR granted due to role hierarchy');
     }
+
+    public function testEncrypted(): void
+    {
+        $user = $this->fakeUser();
+        $repo = $this->em->getRepository(User::class);
+        $found = $repo->findOneBy(['uuid' => $user->getUuid()]);
+
+        $this->assertEquals($user->getName(), 'Test', 'Name should match before decryption');
+        $this->assertEquals($user->getName(), $found->getName(), 'Name should match after decryption');
+
+        // Check if encrypted field in DB
+        $result = $this->em->createQueryBuilder()
+            ->select('u.name')
+            ->from(User::class, 'u')
+            ->where('u.uuid = :uuid')
+            ->setParameter('uuid', $user->getUuid())
+            ->getQuery()
+            ->getSingleScalarResult();
+            
+        $this->assertNotEquals($user->getName(), $result, 'Name should be encrypted in the database');
+    }
 }
