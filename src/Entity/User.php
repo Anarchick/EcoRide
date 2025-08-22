@@ -61,6 +61,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, unique: true)]
     private ?string $email = null;
 
+    #[ORM\Column(length: 64, unique: true, index: true)]
+    private ?string $emailHash = null;
+
     #[Encrypted]
     #[Assert\NotBlank()]
     #[Assert\Length(max: 15)]
@@ -514,6 +517,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $role->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getEmailHash(): ?string
+    {
+        return $this->emailHash;
+    }
+
+    public function setEmailHash(string $emailHash): static
+    {
+        $this->emailHash = $emailHash;
 
         return $this;
     }
