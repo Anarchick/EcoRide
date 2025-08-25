@@ -18,7 +18,7 @@ class RegistrationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('firstname', TextType::class, [
+            ->add('first_name', TextType::class, [
                 'constraints' => [
                     new NotBlank(['message' => 'Votre prénom est requis']),
                     new Regex([
@@ -27,7 +27,7 @@ class RegistrationType extends AbstractType
                     ])
                 ]
             ])
-            ->add('lastname', TextType::class, [
+            ->add('last_name', TextType::class, [
                 'constraints' => [
                     new NotBlank(['message' => 'Votre nom est requis']),
                     new Regex([

@@ -1,0 +1,535 @@
+<?php
+
+namespace App\Entity;
+
+use App\Enum\RoleEnum;
+use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use SpecShaper\EncryptBundle\Annotations\Encrypted;
+use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
+use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints as Assert;
+
+#[ORM\Table(name: 'users')]
+#[ORM\Entity(repositoryClass: UserRepository::class)]
+class User implements UserInterface, PasswordAuthenticatedUserInterface
+{
+    #[ORM\Id]
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
+    private ?Uuid $uuid;
+
+    /**
+     * @var string The hashed password
+     */
+    #[ORM\Column]
+    private ?string $password = null;
+
+    #[ORM\Column]
+    #[Gedmo\Timestampable(on: 'create')]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[Encrypted]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 20)]
+    #[ORM\Column(length: 255)]
+    private ?string $name = null;
+
+    #[Encrypted]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 25)]
+    #[ORM\Column(length: 255)]
+    private ?string $lastName = null;
+
+    #[Encrypted]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 20)]
+    #[ORM\Column(length: 255)]
+    private ?string $username = null;
+
+    #[Encrypted]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 128)]
+    #[ORM\Column(length: 255, unique: true)]
+    private ?string $email = null;
+
+    #[ORM\Column(length: 64, unique: true, index: true)]
+    private ?string $emailHash = null;
+
+    #[Encrypted]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 15)]
+    #[ORM\Column(length: 255, unique: true)]
+    private ?string $phone = null;
+
+    #[ORM\Column]
+    private ?int $credits = 0;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $bio = null;
+
+    #[ORM\Column]
+    private ?bool $isVerified = false;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 3, scale: 2, nullable: true)]
+    private ?string $ratingAverage = null;
+
+    /**
+     * @var Collection<int, Review>
+     */
+    #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'author', orphanRemoval: true)]
+    private Collection $ownReviews;
+
+    /**
+     * @var Collection<int, Review>
+     */
+    #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'user')]
+    private Collection $reviews;
+
+    /**
+     * @var Collection<int, Car>
+     */
+    #[ORM\ManyToMany(targetEntity: Car::class, mappedBy: 'user')]
+    private Collection $cars;
+
+    /**
+     * @var Collection<int, Transaction>
+     */
+    #[ORM\OneToMany(targetEntity: Transaction::class, mappedBy: 'user')]
+    private Collection $transactions;
+
+    /**
+     * @var Collection<int, Travel>
+     */
+    #[ORM\OneToMany(targetEntity: Travel::class, mappedBy: 'driver', orphanRemoval: true)]
+    private Collection $travels;
+
+    /**
+     * @var Collection<int, Travel>
+     */
+    #[ORM\ManyToMany(targetEntity: Travel::class, inversedBy: 'carpoolers')]
+    #[ORM\JoinTable(name: 'user_travel')]
+    #[ORM\JoinColumn(name: 'user_uuid', referencedColumnName: 'uuid')]
+    #[ORM\InverseJoinColumn(name: 'travel_uuid', referencedColumnName: 'uuid')]
+    private Collection $carpools;
+
+    /**
+     * @var Collection<int, Role>
+     */
+    #[ORM\OneToMany(targetEntity: Role::class, mappedBy: 'user', orphanRemoval: true, cascade: ['persist'])]
+    private Collection $roles;
+
+    public function __construct()
+    {
+        $this->ownReviews = new ArrayCollection();
+        $this->reviews = new ArrayCollection();
+        $this->cars = new ArrayCollection();
+        $this->transactions = new ArrayCollection();
+        $this->travels = new ArrayCollection();
+        $this->carpools = new ArrayCollection();
+        $this->roles = new ArrayCollection();
+    }
+
+    public function getUuid(): ?Uuid
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid(Uuid $uuid): static
+    {
+        $this->uuid = $uuid;
+
+        return $this;
+    }
+
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+        return $this->uuid->toString();
+    }
+
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): static
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * Ensure the session doesn't contain actual password hashes by CRC32C-hashing them, as supported since Symfony 7.3.
+     */
+    public function __serialize(): array
+    {
+        $data = (array) $this;
+        $data["\0".self::class."\0password"] = hash('crc32c', $this->password);
+
+        return $data;
+    }
+
+    #[\Deprecated]
+    public function eraseCredentials(): void
+    {
+        // @deprecated, to be removed when upgrading to Symfony 8
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getLastName(): ?string
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName(string $lastName): static
+    {
+        $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    public function getUsername(): ?string
+    {
+        return $this->username;
+    }
+
+    public function setUsername(string $username): static
+    {
+        $this->username = $username;
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): static
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(string $phone): static
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function getCredits(): ?int
+    {
+        return $this->credits;
+    }
+
+    public function setCredits(int $credits): static
+    {
+        $this->credits = $credits;
+
+        return $this;
+    }
+
+    public function getBio(): ?string
+    {
+        return $this->bio;
+    }
+
+    public function setBio(?string $bio): static
+    {
+        $this->bio = $bio;
+
+        return $this;
+    }
+
+    public function isVerified(): ?bool
+    {
+        return $this->isVerified;
+    }
+
+    public function setIsVerified(bool $isVerified): static
+    {
+        $this->isVerified = $isVerified;
+
+        return $this;
+    }
+
+    public function getRatingAverage(): ?string
+    {
+        return $this->ratingAverage;
+    }
+
+    public function setRatingAverage(?string $ratingAverage): static
+    {
+        $this->ratingAverage = $ratingAverage;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Review>
+     */
+    public function getOwnReviews(): Collection
+    {
+        return $this->ownReviews;
+    }
+
+    public function addOwnReview(Review $ownReview): static
+    {
+        if (!$this->ownReviews->contains($ownReview)) {
+            $this->ownReviews->add($ownReview);
+            $ownReview->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOwnReview(Review $ownReview): static
+    {
+        if ($this->ownReviews->removeElement($ownReview)) {
+            // set the owning side to null (unless already changed)
+            if ($ownReview->getAuthor() === $this) {
+                $ownReview->setAuthor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Review>
+     */
+    public function getReviews(): Collection
+    {
+        return $this->reviews;
+    }
+
+    public function addReview(Review $review): static
+    {
+        if (!$this->reviews->contains($review)) {
+            $this->reviews->add($review);
+            $review->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReview(Review $review): static
+    {
+        if ($this->reviews->removeElement($review)) {
+            // set the owning side to null (unless already changed)
+            if ($review->getUser() === $this) {
+                $review->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Car>
+     */
+    public function getCars(): Collection
+    {
+        return $this->cars;
+    }
+
+    public function addCar(Car $car): static
+    {
+        if (!$this->cars->contains($car)) {
+            $this->cars->add($car);
+            $car->addUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCar(Car $car): static
+    {
+        if ($this->cars->removeElement($car)) {
+            $car->removeUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Transaction>
+     */
+    public function getTransactions(): Collection
+    {
+        return $this->transactions;
+    }
+
+    public function addTransaction(Transaction $transaction): static
+    {
+        if (!$this->transactions->contains($transaction)) {
+            $this->transactions->add($transaction);
+            $transaction->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTransaction(Transaction $transaction): static
+    {
+        if ($this->transactions->removeElement($transaction)) {
+            // set the owning side to null (unless already changed)
+            if ($transaction->getUser() === $this) {
+                $transaction->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Travel>
+     */
+    public function getTravels(): Collection
+    {
+        return $this->travels;
+    }
+
+    public function addTravel(Travel $travel): static
+    {
+        if (!$this->travels->contains($travel)) {
+            $this->travels->add($travel);
+            $travel->setDriver($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTravel(Travel $travel): static
+    {
+        if ($this->travels->removeElement($travel)) {
+            // set the owning side to null (unless already changed)
+            if ($travel->getDriver() === $this) {
+                $travel->setDriver(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Travel>
+     */
+    public function getCarpools(): Collection
+    {
+        return $this->carpools;
+    }
+
+    public function addCarpool(Travel $carpool): static
+    {
+        if (!$this->carpools->contains($carpool)) {
+            $this->carpools->add($carpool);
+        }
+
+        return $this;
+    }
+
+    public function removeCarpool(Travel $carpool): static
+    {
+        $this->carpools->removeElement($carpool);
+
+        return $this;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = array_map(
+            fn($roleEntity) => $roleEntity->getRole()->value,
+            $this->roles->toArray()
+        );
+
+        // guarantee every user at least has ROLE_USER
+        $roles[] = RoleEnum::USER->value;
+
+        return array_unique($roles);
+    }
+
+    public function addRole(Role $role): static
+    {
+        if (!$this->roles->contains($role)) {
+            $this->roles->add($role);
+            $role->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRole(Role $role): static
+    {
+        if ($this->roles->removeElement($role)) {
+            // set the owning side to null (unless already changed)
+            if ($role->getUser() === $this) {
+                $role->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getEmailHash(): ?string
+    {
+        return $this->emailHash;
+    }
+
+    public function setEmailHash(string $emailHash): static
+    {
+        $this->emailHash = $emailHash;
+
+        return $this;
+    }
+}
