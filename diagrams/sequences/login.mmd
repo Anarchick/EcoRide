@@ -1,0 +1,45 @@
+%%{init: {"theme": "redux-dark-color"}}%%
+sequenceDiagram
+actor U as Utilisateur
+participant F as Frontend
+
+U ->> F: Renseigner mail et mot de passe
+activate F
+create participant B as Backend
+F ->> B: Appel /login
+activate B
+B ->> B: hash mail et mot de passe
+create participant D as Doctrine
+B ->> D: Vérifier mail et mot de passe
+activate D
+alt informations valides
+    D ->> D: Dechiffrement
+    D -->> B: new User
+    activate B
+    opt 2FA est activé
+        B -->> F: Form /login/2fa
+        F -->> U: Afficher formulaire 2FA
+        U ->> F: Renseigner code 2FA
+        F ->> B: Appel /login/2fa
+        B ->> B: Vérifier code 2FA
+        Note right of B: Vérification depuis entité User
+        opt code 2FA invalide
+            B -->> F: Form /login/2fa avec erreur
+            deactivate B
+            F -->> U: Redemander code 2FA
+        end
+    end
+    B ->> B: Création session
+    B -->> F: User connecté
+    F -->> U: Redirection /travels
+
+else informations invalides
+    deactivate D
+    destroy D
+    D -->> B: Aucun résultat
+    deactivate B
+    destroy B
+    B -->> F: Erreur
+    F -->> U: Afficher message d'erreur
+    deactivate F
+end

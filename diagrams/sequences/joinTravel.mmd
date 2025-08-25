@@ -1,0 +1,33 @@
+%%{init: {"theme": "redux-dark-color"}}%%
+sequenceDiagram
+actor U as Utilisateur
+participant F as Frontend
+
+U ->> F: Rejoindre un voyage
+activate F
+create participant B as Backend
+F ->> B: Appel /travels/join
+activate B
+create participant D as Doctrine
+B ->>+ D: Vérifier données
+Note right of B: -Reste assez de place<br>-Utilisateur à les crédits
+alt données valides
+    D -->>- B: Données valides
+    B ->>+ D: Enregistrer passager
+    D -->>- B: Passager enregistré
+    B ->>+ D: Soustraitre crédits
+    D -->>- B: Crédits soustraits
+    B ->> B: Envoyer mails de confirmation
+    B -->> F: Voyage rejoint
+    F -->> U: Afficher confirmation
+activate D
+else données invalides
+    deactivate D
+    destroy D
+    D -->> B: Données invalides
+    deactivate B
+    destroy B
+    B -->> F: Erreur
+    F -->> U: Afficher message d'erreur
+    deactivate F
+end
