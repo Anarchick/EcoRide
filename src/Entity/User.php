@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Enum\RoleEnum;
 use App\Repository\UserRepository;
+use App\Validator\Constraints\UniqueEmail;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -12,6 +13,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use SpecShaper\EncryptBundle\Annotations\Encrypted;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Uuid;
@@ -19,6 +21,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'users')]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[UniqueEntity(fields: ['uuid'], message: 'There is already an account with this uuid')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -39,25 +42,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Encrypted]
     #[Assert\NotBlank()]
-    #[Assert\Length(max: 20)]
+    #[Assert\Length(min: 2, max: 20)]
+    #[Assert\Regex(pattern: '/^[a-zA-ZÀ-ÿ\s\'\-]+$/', message: 'Votre nom ne doit contenir que des lettres, des espaces ou des tirets.')]
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    private ?string $firstName = null;
 
     #[Encrypted]
     #[Assert\NotBlank()]
-    #[Assert\Length(max: 25)]
+    #[Assert\Length(min: 2, max: 25)]
+    #[Assert\Regex(pattern: '/^[a-zA-ZÀ-ÿ\s\'\-]+$/', message: 'Votre nom ne doit contenir que des lettres, des espaces ou des tirets.')]
     #[ORM\Column(length: 255)]
     private ?string $lastName = null;
 
     #[Encrypted]
     #[Assert\NotBlank()]
-    #[Assert\Length(max: 20)]
+    #[Assert\Length(min:3, max: 20)]
+    #[Assert\Regex(pattern: '/^[a-zA-ZÀ-ÿ\s\'\-]+$/', message: 'Votre pseudonyme ne doit contenir que des lettres, des chiffres, des tirets ou des underscores.')]
     #[ORM\Column(length: 255)]
     private ?string $username = null;
 
     #[Encrypted]
     #[Assert\NotBlank()]
     #[Assert\Length(max: 128)]
+    #[UniqueEmail]
     #[ORM\Column(length: 255, unique: true)]
     private ?string $email = null;
 
@@ -66,12 +73,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Encrypted]
     #[Assert\NotBlank()]
-    #[Assert\Length(max: 15)]
+    // #[Assert\Length(min: 10, max: 15)]
+    #[Assert\Regex(pattern:'/^\+33 [67](?: \d{2}){4}$/', message: 'Votre numéro de téléphone portable doit être au format +33 6 12 34 56 78')]
     #[ORM\Column(length: 255, unique: true)]
     private ?string $phone = null;
 
     #[ORM\Column]
-    private ?int $credits = 0;
+    private ?int $credits = 20; // 20 credits offer at the account creation
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $bio = null;
@@ -204,14 +212,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getName(): ?string
+    public function getFirstName(): ?string
     {
-        return $this->name;
+        return $this->firstName;
     }
 
-    public function setName(string $name): static
+    public function setFirstName(string $firstName): static
     {
-        $this->name = $name;
+        $this->firstName = $firstName;
 
         return $this;
     }

@@ -24,7 +24,7 @@ class UserTest extends KernelTestCase
         $email = $tempUuid . '@test.com';
         $phone = '+336' . sprintf('%09d', \random_int(0, 999999999));
 
-        $user->setName('Test')
+        $user->setFirstName('Test')
             ->setLastName('User')
             ->setUsername($usrname)
             ->setEmail($email)
@@ -103,8 +103,8 @@ class UserTest extends KernelTestCase
         $repo = $this->em->getRepository(User::class);
         $found = $repo->findOneBy(['uuid' => $user->getUuid()]);
 
-        $this->assertEquals($user->getName(), 'Test', 'Name should match before decryption');
-        $this->assertEquals($user->getName(), $found->getName(), 'Name should match after decryption');
+        $this->assertEquals($user->getFirstName(), 'Test', 'Name should match before decryption');
+        $this->assertEquals($user->getFirstName(), $found->getName(), 'Name should match after decryption');
 
         // Check if encrypted field in DB
         $result = $this->em->createQueryBuilder()
@@ -115,6 +115,6 @@ class UserTest extends KernelTestCase
             ->getQuery()
             ->getSingleScalarResult();
             
-        $this->assertNotEquals($user->getName(), $result, 'Name should be encrypted in the database');
+        $this->assertNotEquals($user->getFirstName(), $result, 'Name should be encrypted in the database');
     }
 }

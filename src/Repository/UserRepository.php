@@ -20,6 +20,16 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /**
+     * Find a User by their email (plain text).
+     * @return User|null Returns a User object or null
+     */
+    public function findOneByEmail(string $email): ?User
+    {
+        $emailHash = hash('sha256', $email);
+        return $this->findOneBy(['emailHash' => $emailHash]);
+    }
+
+    /**
      * Used to upgrade (rehash) the user's password automatically over time.
      */
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
