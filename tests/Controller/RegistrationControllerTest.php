@@ -5,25 +5,28 @@ namespace App\Tests;
 use App\Repository\UserRepository;
 use App\Tests\Utils\TestUtils;
 use App\Validator\Constraints\UniqueEmail;
-use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DependencyInjection\Container;
 
 class RegistrationControllerTest extends WebTestCase
 {
     private KernelBrowser $client;
+    private Container $container;
     private UserRepository $userRepository;
     private EntityManagerInterface $em;
+    private TestUtils $testUtils;
 
     protected function setUp(): void
     {
         $this->client = static::createClient();
-        $container = static::getContainer();
-        $this->userRepository = $container->get(UserRepository::class);
-        $this->em = $container->get('doctrine')->getManager();
+        $this->container = static::getContainer();
+        $this->testUtils = new TestUtils($this->container);
+        $this->userRepository = $this->testUtils->getUserRepository();
+        $this->em = $this->testUtils->getEntityManager();
 
-        TestUtils::purgeDatabase($this->em);
+        $this->testUtils->purgeDatabase();
     }
 
     private function submitForm(string $email): void
@@ -61,8 +64,9 @@ class RegistrationControllerTest extends WebTestCase
     public function testRegisterWithExistingEmail(): void
     {
         $this->assertCount(0, $this->userRepository->findAll(), 'No user should exist before registration');
+        
         $email = 'test@exemple.com';
-        $user = TestUtils::createUser(email: $email);
+        $user = $this->testUtils->createUser(email: $email);
         $this->em->persist($user);
         $this->em->flush();
 
