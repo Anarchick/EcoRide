@@ -16,12 +16,13 @@ class UserTest extends KernelTestCase
 {
     private EntityManagerInterface $em;
     private UserRepository $userRepository;
+    private TestUtils $testUtils;
 
     private function fakeUser(): User
     {
         $email = uniqid() . '@test.com';
         $phone = '+336' . sprintf('%09d', \random_int(0, 999999999));
-        $user = TestUtils::createUser(email: $email, phone: $phone, firstName: 'Test');
+        $user = $this->testUtils->createUser(email: $email, phone: $phone, firstName: 'Test');
 
         $this->em->persist($user);
         $this->em->flush(); // The UUID will be generated during the flush
@@ -32,11 +33,12 @@ class UserTest extends KernelTestCase
     protected function setUp(): void
     {
         self::bootKernel();
-        
-        $this->em = static::getContainer()->get('doctrine')->getManager();
-        TestUtils::purgeDatabase($this->em);
 
-        $this->userRepository = static::getContainer()->get(UserRepository::class);
+        $this->testUtils = new TestUtils(static::getContainer());
+        $this->em = $this->testUtils->getEntityManager();
+        $this->testUtils->purgeDatabase();
+
+        $this->userRepository = $this->testUtils->getUserRepository();
     }
 
     public function testUuidIsRandomlyGenerated(): void
@@ -73,7 +75,7 @@ class UserTest extends KernelTestCase
         
         // To test the role hierarchy with AuthorizationChecker, we need to create a security token
         /** @var TokenStorageInterface $tokenStorage */
-        $tokenStorage = static::getContainer()->get('security.token_storage');
+        $tokenStorage = $this->testUtils->getSecurityTokenStorage();
         $token = new UsernamePasswordToken(
             $user,
             'main',
