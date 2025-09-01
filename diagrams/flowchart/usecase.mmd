@@ -8,6 +8,7 @@ visitor --> p/travels[Voir les covoiturages]
 visitor --> /contact[Contacter le support]
 visitor --> /profils[Voir les profils]
 
+user --> /logout[Se déconnecter]
 user --> /profil/credits/add[Ajouter des crédits]
 user --> /travels[Voir les covoiturages]
 /travels --> /travels/contact[Contacter conducteur]
@@ -23,7 +24,8 @@ user --> /profil/driver[devenir conducteur]
 
 driver --> /travels/create[Créer un trajet]
 /travels/create --> /travels/edit[Modifier / annuler le trajet]
-/travels/edit --> /travels/validate[Valider le trajet effectué]
+/travels/edit --> /travels/start[Démarer le trajet]
+/travels/start --> /travels/validate[Valider le trajet effectué]
 driver --> /profil/car/add[Ajouter une voiture]
 /profil/car/add --> /profil/car/delete[Supprimer une voiture]
 /travels/create -->|&lt;&lt;require&gt;&gt;| /profil/car/add
