@@ -18,9 +18,10 @@ use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\PasswordStrength;
 use Symfony\Component\Validator\Constraints\Regex;
 
-class RegistrationFormType extends AbstractType
+class RegistrationType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -65,6 +66,7 @@ class RegistrationFormType extends AbstractType
                         minMessage: 'Votre mot de passe doit contenir au moins {{ limit }} caractères',
                         max: 128
                     ),
+                    new PasswordStrength(minScore: 2, message: 'Le mot de passe est trop faible. Utilisez des majuscules, minuscules, chiffres et symboles.'),
                 ]
             ])
             ->add('agreeTerms', CheckboxType::class, [
