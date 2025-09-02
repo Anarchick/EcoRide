@@ -1,0 +1,13 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        /* Production overrides - no sourcemaps for security */
+        "sourceMap": false,
+        "declaration": false,
+
+        /* Remove unnecessary */
+        "removeComments": true,
+        "noUnusedLocals": false,
+        "noUnusedParameters": false
+    }
+}
