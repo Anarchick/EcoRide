@@ -3,7 +3,8 @@ namespace App\Tests\Entity;
 
 use App\Entity\User;
 use App\Enum\RoleEnum;
-use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+use App\Repository\UserRepository;
+use App\Tests\Utils\TestUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -14,22 +15,14 @@ use Symfony\Component\Uid\Uuid;
 class UserTest extends KernelTestCase
 {
     private EntityManagerInterface $em;
+    private UserRepository $userRepository;
+    private TestUtils $testUtils;
 
     private function fakeUser(): User
     {
-        $user = new User();
-        
-        $tempUuid = Uuid::v4()->toRfc4122();
-        $usrname = substr($tempUuid, 0, 8);
-        $email = $tempUuid . '@test.com';
+        $email = uniqid() . '@test.com';
         $phone = '+336' . sprintf('%09d', \random_int(0, 999999999));
-
-        $user->setName('Test')
-            ->setLastName('User')
-            ->setUsername($usrname)
-            ->setEmail($email)
-            ->setPhone($phone)
-            ->setPassword('password');
+        $user = $this->testUtils->createUser(email: $email, phone: $phone, firstName: 'Test');
 
         $this->em->persist($user);
         $this->em->flush(); // The UUID will be generated during the flush
@@ -40,11 +33,12 @@ class UserTest extends KernelTestCase
     protected function setUp(): void
     {
         self::bootKernel();
-        $this->em = static::getContainer()->get('doctrine')->getManager();
 
-        $purger = new ORMPurger($this->em);
-        $purger->purge(); // Clear the database before each test
-        $this->em->clear();
+        $this->testUtils = new TestUtils(static::getContainer());
+        $this->em = $this->testUtils->getEntityManager();
+        $this->testUtils->purgeDatabase();
+
+        $this->userRepository = $this->testUtils->getUserRepository();
     }
 
     public function testUuidIsRandomlyGenerated(): void
@@ -61,9 +55,8 @@ class UserTest extends KernelTestCase
     public function testUuidIsPersisted(): void
     {
         $user = $this->fakeUser();
+        $found = $this->userRepository->getUserByUuid($user->getUuid());
 
-        $repo = $this->em->getRepository(User::class);
-        $found = $repo->findOneBy(['uuid' => $user->getUuid()]);
         $this->assertNotNull($found, 'User should be found by UUID');
         $this->assertEquals($user->getUuid(), $found->getUuid(), 'UUID should match');
     }
@@ -74,17 +67,15 @@ class UserTest extends KernelTestCase
         $user->addRole(RoleEnum::ADMIN->toEntity($user));
         $this->em->flush();
 
-        // Retrieve the user from the database
-        $repo = $this->em->getRepository(User::class);
         /** @var User $user */
-        $user = $repo->findOneBy(['uuid' => $user->getUuid()]);
+        $user = $this->userRepository->getUserByUuid($user->getUuid());
 
         // Checks that the user has the ADMIN role from BDD
         $this->assertContains(RoleEnum::ADMIN->value, $user->getRoles(), 'User should have ROLE_ADMIN');
         
         // To test the role hierarchy with AuthorizationChecker, we need to create a security token
         /** @var TokenStorageInterface $tokenStorage */
-        $tokenStorage = static::getContainer()->get('security.token_storage');
+        $tokenStorage = $this->testUtils->getSecurityTokenStorage();
         $token = new UsernamePasswordToken(
             $user,
             'main',
@@ -100,21 +91,20 @@ class UserTest extends KernelTestCase
     public function testEncrypted(): void
     {
         $user = $this->fakeUser();
-        $repo = $this->em->getRepository(User::class);
-        $found = $repo->findOneBy(['uuid' => $user->getUuid()]);
+        $found = $this->userRepository->getUserByUuid($user->getUuid());
 
-        $this->assertEquals($user->getName(), 'Test', 'Name should match before decryption');
-        $this->assertEquals($user->getName(), $found->getName(), 'Name should match after decryption');
+        $this->assertEquals($user->getFirstName(), 'Test', 'Name should match before decryption');
+        $this->assertEquals($user->getFirstName(), $found->getFirstName(), 'Name should match after decryption');
 
         // Check if encrypted field in DB
         $result = $this->em->createQueryBuilder()
-            ->select('u.name')
+            ->select('u.firstName')
             ->from(User::class, 'u')
             ->where('u.uuid = :uuid')
             ->setParameter('uuid', $user->getUuid())
             ->getQuery()
             ->getSingleScalarResult();
             
-        $this->assertNotEquals($user->getName(), $result, 'Name should be encrypted in the database');
+        $this->assertNotEquals($user->getFirstName(), $result, 'Name should be encrypted in the database');
     }
 }

@@ -49,7 +49,7 @@ class Car
 
     #[ORM\ManyToOne(inversedBy: 'cars')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?model $model = null;
+    private ?Model $model = null;
 
     #[ORM\Column(enumType: ColorEnum::class)]
     private ?ColorEnum $color = null;
@@ -141,12 +141,12 @@ class Car
         return $this;
     }
 
-    public function getModel(): ?model
+    public function getModel(): ?Model
     {
         return $this->model;
     }
 
-    public function setModel(?model $model): static
+    public function setModel(?Model $model): static
     {
         $this->model = $model;
 

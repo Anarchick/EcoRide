@@ -10,6 +10,10 @@
 /node_modules/
 ###< symfony/framework-bundle ###
 
+###> github ###
+/.github/
+###< github ###
+
 ###> phpunit/phpunit ###
 /phpunit.xml
 /.phpunit.cache/
