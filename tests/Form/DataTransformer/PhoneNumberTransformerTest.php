@@ -3,6 +3,7 @@ namespace App\Form\DataTransformer;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 
 class PhoneNumberTransformerTest extends KernelTestCase
 {
@@ -28,6 +29,6 @@ class PhoneNumberTransformerTest extends KernelTestCase
     {
         $transformer = new PhoneNumberTransformer();
         $this->expectException(TransformationFailedException::class);
-        $transformer->reverseTransform('invalid');
+        $transformer->reverseTransform('0123456789');
     }
 }
