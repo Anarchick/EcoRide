@@ -1,37 +1,35 @@
-<container>
-    <header class="text-center bg-success text-white p-3 mb-4">
-        <h1>{{ title }}</h1>
-    </header>
 
-    <div class="container">
+<div class="text-center bg-success text-white p-3 mb-4">
+    <h1>{{ title }}</h1>
+</div>
 
-        {# Display flash messages #}
-        {% set flash_messages = app.flashes() %}
-        {% for type, messages in flash_messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ type == 'error' ? 'danger' : (type == 'success' ? 'success' : 'info') }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
+<div class="container">
+
+    {# Display flash messages #}
+    {% set flash_messages = app.flashes() %}
+    {% for type, messages in flash_messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ type == 'error' ? 'danger' : (type == 'success' ? 'success' : 'info') }}">
+                {{ message }}
+            </div>
         {% endfor %}
+    {% endfor %}
 
-        {{ form_start(form, {'attr': {'class': 'eco-form'}}) }}
+    {{ form_start(form, {'attr': {'class': 'eco-form'}}) }}
 
-        {% for field_name, field in form %}
-            {# If the field type is repeated #}
-            {% if '_repeated' in field.vars.cache_key %}
-                {{ form_row(field.first, {'label': labels[field_name ~ '_first'], 'label_attr': {'class': 'eco-bold-text'}}) }}
-                {{ form_row(field.second, {'label': labels[field_name ~ '_second'], 'label_attr': {'class': 'eco-bold-text'}}) }}
-            {% else %}
-                {% if field_name != 'submit' and field_name != '_token'%}
-                    {{ form_row(field, {'label': labels[field_name], 'label_attr': {'class': 'eco-bold-text'}}) }}
-                {% endif %}
+    {% for field_name, field in form %}
+        {# If the field type is repeated #}
+        {% if '_repeated' in field.vars.cache_key %}
+            {{ form_row(field.first, {'label': labels[field_name ~ '_first'], 'label_attr': {'class': 'eco-bold-text'}}) }}
+            {{ form_row(field.second, {'label': labels[field_name ~ '_second'], 'label_attr': {'class': 'eco-bold-text'}}) }}
+        {% else %}
+            {% if field_name != 'submit' and field_name != '_token'%}
+                {{ form_row(field, {'label': labels[field_name], 'label_attr': {'class': 'eco-bold-text'}}) }}
             {% endif %}
-        {% endfor %}
+        {% endif %}
+    {% endfor %}
 
-        {{ form_row(form.submit, {'label': submit_label, 'attr': {'class': 'btn btn-success'}}) }}
-        {{ form_errors(form) }}
-        {{ form_end(form) }}
-    </div>
-    
-</container>
+    {{ form_row(form.submit, {'label': submit_label, 'attr': {'class': 'btn btn-success'}}) }}
+    {{ form_errors(form) }}
+    {{ form_end(form) }}
+</div>

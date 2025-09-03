@@ -4,7 +4,7 @@
 {% block title %}EcoRide{% endblock %}
 
 {% block main %}
-<header class="hero position-relative overflow-hidden">
+<section class="hero position-relative overflow-hidden">
 
     <div class="up-decoration">
         <img src="{{ asset('svg/up-front.svg') }}" alt="Décoration avant haut" class="decor up-front">
@@ -18,7 +18,7 @@
         <img src="{{ asset('svg/bottom-back.svg') }}" alt="Décoration arrière bas" class="decor bottom-back">
     </div>
 
-</header>
+</section>
 
 <twig:TravelSearchBar :form="search_form" />
 
