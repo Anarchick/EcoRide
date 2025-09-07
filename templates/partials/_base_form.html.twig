@@ -5,15 +5,7 @@
 
 <div class="container">
 
-    {# Display flash messages #}
-    {% set flash_messages = app.flashes() %}
-    {% for type, messages in flash_messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ type == 'error' ? 'danger' : (type == 'success' ? 'success' : 'info') }}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endfor %}
+    {% include 'partials/_flashes.html.twig' %}
 
     {{ form_start(form, {'attr': {'class': 'eco-form'}}) }}
 
