@@ -492,7 +492,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @see UserInterface
+     * @see Symfony\Component\Security\Core\User\UserInterface
      */
     public function getRoles(): array
     {
@@ -507,23 +507,49 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return array_unique($roles);
     }
 
-    public function addRole(Role $role): static
+    public function addRole(Role|RoleEnum $role): static
     {
-        if (!$this->roles->contains($role)) {
-            $this->roles->add($role);
-            $role->setUser($this);
+        if ($role instanceof RoleEnum) {
+
+            foreach ($this->roles as $roleEntity) {
+                if ($roleEntity->getRole() === $role) {
+                    return $this;
+                }
+            }
+
+            $roleEntity = (new Role())->setRole($role)->setUser($this);
+            $this->roles->add($roleEntity);
+        } else { // $role is a Role entity
+            if (!$this->roles->contains($role)) {
+                $role->setUser($this);
+                $this->roles->add($role);
+            }
         }
 
         return $this;
     }
 
-    public function removeRole(Role $role): static
+    public function removeRole(Role|RoleEnum $role): static
     {
-        if ($this->roles->removeElement($role)) {
-            // set the owning side to null (unless already changed)
-            if ($role->getUser() === $this) {
-                $role->setUser(null);
+        if ($role instanceof RoleEnum) {
+            // Filter does not trigger Doctrine events
+            // $this->roles->filter(
+            //     fn($roleEntity) => $roleEntity->getRole() !== $role
+            // );
+            $rolesToRemove = [];
+            foreach ($this->roles as $roleEntity) {
+                if ($roleEntity->getRole() === $role) {
+                    $rolesToRemove[] = $roleEntity;
+                }
             }
+            
+            // Remove each role properly to trigger Doctrine cascades
+            foreach ($rolesToRemove as $roleToRemove) {
+                $this->removeRole($roleToRemove);
+            }
+
+        } else {
+            $this->roles->removeElement($role);
         }
 
         return $this;

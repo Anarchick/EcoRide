@@ -5,7 +5,7 @@
     "width": 2400,
     "height": 2400,
     "scrollTop": 0,
-    "scrollLeft": 0,
+    "scrollLeft": -348,
     "zoomLevel": 0.97,
     "show": 431,
     "database": 1,
@@ -672,7 +672,7 @@
       "xQwTr4eldBGEw7bj7Zisu": {
         "id": "xQwTr4eldBGEw7bj7Zisu",
         "tableId": "3tuKVqsku1sZTP7MD8IED",
-        "name": "origin",
+        "name": "departure",
         "comment": "INDEX",
         "dataType": "VARCHAR",
         "default": "",
@@ -685,27 +685,27 @@
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1754684803926,
+          "updateAt": 1757260938104,
           "createAt": 1754251412361
         }
       },
       "gzX7vXGg5c-MV594VMmQk": {
         "id": "gzX7vXGg5c-MV594VMmQk",
         "tableId": "3tuKVqsku1sZTP7MD8IED",
-        "name": "destination",
+        "name": "arrival",
         "comment": "INDEX",
         "dataType": "VARCHAR",
         "default": "",
         "options": 8,
         "ui": {
           "keys": 0,
-          "widthName": 61,
+          "widthName": 60,
           "widthComment": 60,
           "widthDataType": 60,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1754684918841,
+          "updateAt": 1757260946160,
           "createAt": 1754251441114
         }
       },

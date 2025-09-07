@@ -8,6 +8,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
+use Symfony\Component\Uid\Uuid as Uid;
 
 /**
  * @extends ServiceEntityRepository<User>
@@ -29,8 +30,31 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $this->findOneBy(['emailHash' => $emailHash]);
     }
 
-    public function getUserByUuid(string $uuid): ?User
+    /**
+     * Find a User by their UUID.
+     * Accepts both 32-character string (without dashes) and standard UUID format (with dashes).
+     * Returns null if the UUID is invalid or no user is found.
+     * @return User|null
+     */
+    public function getUserByUuid(string|Uid $uuid): ?User
     {
+        if (is_string($uuid) && strlen($uuid) == 32) {
+            $uuid = sprintf(
+                '%s-%s-%s-%s-%s', // RFC4122
+                substr($uuid, 0, 8),
+                substr($uuid, 8, 4),
+                substr($uuid, 12, 4),
+                substr($uuid, 16, 4),
+                substr($uuid, 20, 12)
+            );
+        }
+
+        try {
+            $uuid = Uid::fromString($uuid);
+        } catch (\InvalidArgumentException) {
+            return null;
+        }
+
         return $this->findOneBy(['uuid' => $uuid]);
     }
 

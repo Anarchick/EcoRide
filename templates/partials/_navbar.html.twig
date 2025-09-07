@@ -21,13 +21,24 @@
                     <a class="eco-nav-link eco-normal-text {{ route == 'app_contact' ? 'eco-nav-active' : '' }}" href="{{ path('app_contact') }}">Contact</a>
                 </li>
             </ul>
-            
-            <div class="d-inline-flex align-items-center">
-                <div>
-                    <a class="eco-nav-link eco-normal-text" href="{{ path('app_login') }}">Connexion</a>
+
+            {# If the user is logged in #}
+            {% if app.user %}
+                <div class="profile-picture">
+                    {# TODO Replace with scroll menu #}
+                    <a href="{{ path('app_profile_index') }}"> 
+                        <img src="{{ asset('images/ui/profile-placeholder.jpg') }}" alt="Image de profil">
+                    </a>
                 </div>
-                <a class="btn btn-outline-success ms-2" href="{{ path('app_register') }}">Inscription</a>
-            </div>
+            {% else %}
+                <div class="d-inline-flex align-items-center">
+                    <div>
+                        <a class="eco-nav-link eco-normal-text" href="{{ path('app_login') }}">Connexion</a>
+                    </div>
+                    <a class="btn btn-outline-success ms-2" href="{{ path('app_register') }}">Inscription</a>
+                </div>
+            {% endif %}
+            
         </div>
     </nav>
 </header>

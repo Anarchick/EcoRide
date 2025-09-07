@@ -13,7 +13,7 @@ use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Table(name: 'travels')]
-#[ORM\Index(name: 'idx_search_criteria', columns: ['origin', 'destination', 'date', 'passengers_max'])]
+#[ORM\Index(name: 'idx_search_criteria', columns: ['departure', 'arrival', 'date', 'passengers_max'])]
 #[ORM\Entity(repositoryClass: TravelRepository::class)]
 class Travel
 {
@@ -32,10 +32,10 @@ class Travel
     private ?Car $car = null;
 
     #[ORM\Column(length: 90)] // No index Needed
-    private ?string $origin = null;
+    private ?string $departure = null;
 
     #[ORM\Column(length: 90, index: true)] // Index for stats
-    private ?string $destination = null;
+    private ?string $arrival = null;
 
     #[ORM\Column(index: true)] // Index for stats
     private ?\DateTimeImmutable $date = null;
@@ -105,26 +105,26 @@ class Travel
         return $this;
     }
 
-    public function getOrigin(): ?string
+    public function getDeparture(): ?string
     {
-        return $this->origin;
+        return $this->departure;
     }
 
-    public function setOrigin(string $origin): static
+    public function setDeparture(string $departure): static
     {
-        $this->origin = $origin;
+        $this->departure = $departure;
 
         return $this;
     }
 
-    public function getDestination(): ?string
+    public function getArrival(): ?string
     {
-        return $this->destination;
+        return $this->arrival;
     }
 
-    public function setDestination(string $destination): static
+    public function setArrival(string $arrival): static
     {
-        $this->destination = $destination;
+        $this->arrival = $arrival;
 
         return $this;
     }
