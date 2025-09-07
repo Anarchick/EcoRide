@@ -492,7 +492,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @see UserInterface
+     * @see Symfony\Component\Security\Core\User\UserInterface
      */
     public function getRoles(): array
     {
