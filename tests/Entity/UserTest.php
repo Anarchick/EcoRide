@@ -1,6 +1,7 @@
 <?php
 namespace App\Tests\Entity;
 
+use App\Entity\Role;
 use App\Entity\User;
 use App\Enum\RoleEnum;
 use App\Repository\UserRepository;
@@ -64,7 +65,8 @@ class UserTest extends KernelTestCase
     public function testIsGranted(): void
     {
         $user = $this->fakeUser();
-        $user->addRole(RoleEnum::ADMIN->toEntity($user));
+        $user->addRole(RoleEnum::ADMIN);
+        $this->em->persist($user);
         $this->em->flush();
 
         /** @var User $user */
@@ -86,6 +88,32 @@ class UserTest extends KernelTestCase
         /** @var AuthorizationCheckerInterface $security */
         $security = static::getContainer()->get('security.authorization_checker');
         $this->assertTrue($security->isGranted(RoleEnum::MODERATOR->value), 'User should have ROLE_MODERATOR granted due to role hierarchy');
+    }
+
+    public function testRolesUniqueness(): void
+    {
+        $user = $this->fakeUser();
+        $user->addRole(RoleEnum::DRIVER)->addRole(RoleEnum::DRIVER);
+        $this->em->persist($user);
+        $this->em->flush();
+
+        $count = $this->testUtils->getEntityManager()->getRepository(Role::class)->count([]);
+        $this->assertEquals(1, $count, 'User should have unique roles in database');
+    }
+
+    public function testRoleRemove(): void
+    {
+        $user = $this->fakeUser();
+        $user->addRole(RoleEnum::DRIVER);
+        $this->em->persist($user);
+        $this->em->flush();
+
+        $user->removeRole(RoleEnum::DRIVER);
+        $this->em->persist($user);
+        $this->em->flush();
+
+        $count = $this->testUtils->getEntityManager()->getRepository(Role::class)->count([]);
+        $this->assertEquals(0, $count, 'User should have no roles in database');
     }
 
     public function testEncrypted(): void
