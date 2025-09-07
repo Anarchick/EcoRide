@@ -9,8 +9,6 @@ use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Uid\Uuid as Uid;
-use Symfony\Component\Validator\Constraints\Uuid;
-use Symfony\Component\Validator\Validation;
 
 /**
  * @extends ServiceEntityRepository<User>
@@ -40,20 +38,20 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      */
     public function getUserByUuid(string|Uid $uuid): ?User
     {
-        if (is_string($uuid)) {
-            if (strlen($uuid) == 32) {
-                $uuid = substr($uuid, 0, 8) . '-'
-                . substr($uuid, 8, 4) . '-'
-                . substr($uuid, 12, 4) . '-'
-                . substr($uuid, 16, 4) . '-'
-            . substr($uuid, 20);
-            }
+        if (is_string($uuid) && strlen($uuid) == 32) {
+            $uuid = sprintf(
+                '%s-%s-%s-%s-%s', // RFC4122
+                substr($uuid, 0, 8),
+                substr($uuid, 8, 4),
+                substr($uuid, 12, 4),
+                substr($uuid, 16, 4),
+                substr($uuid, 20, 12)
+            );
         }
 
-        $validator = Validation::createValidator();
-        $errors = $validator->validate($uuid, new Uuid());
-
-        if (count($errors) > 0) {
+        try {
+            $uuid = Uid::fromString($uuid);
+        } catch (\InvalidArgumentException) {
             return null;
         }
 
