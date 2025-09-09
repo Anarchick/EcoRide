@@ -1,10 +1,9 @@
 <?php
 
+use App\Entity\User;
 use App\Tests\Utils\TestUtils;
 use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\Uid\Uuid;
 
 class UserRepositoryTest extends KernelTestCase
 {
@@ -32,12 +31,14 @@ class UserRepositoryTest extends KernelTestCase
         $uuidStr = $uuid->toRfc4122();
         $uuidStr32 = str_replace('-', '', $uuidStr);
 
-        $userFound = $this->testUtils->getUserRepository()->getUserByUuid($uuidStr);
+        /** @var User $userFound */
+        $userFound = $this->testUtils->getUserRepository()->getByUuid($uuidStr);
 
         $this->assertNotNull($userFound);
         $this->assertEquals($uuid, $userFound->getUuid());
 
-        $userFound = $this->testUtils->getUserRepository()->getUserByUuid($uuidStr32);
+        /** @var User $userFound */
+        $userFound = $this->testUtils->getUserRepository()->getByUuid($uuidStr32);
 
         $this->assertNotNull($userFound);
         $this->assertEquals($uuid, $userFound->getUuid());

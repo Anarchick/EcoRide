@@ -16,6 +16,8 @@ class CarRepository extends ServiceEntityRepository
         parent::__construct($registry, Car::class);
     }
 
+    use UuidFinderTrait;
+
 //    /**
 //     * @return Car[] Returns an array of Car objects
 //     */
