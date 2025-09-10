@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\Trait;
 
 use Symfony\Component\Uid\Uuid;
 
