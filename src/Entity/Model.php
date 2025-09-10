@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Table(name: 'models')]
+#[ORM\UniqueConstraint(name: 'UNIQ_MODEL_BRAND_NAME', columns: ['brand_id', 'name'])]
 #[ORM\Entity(repositoryClass: ModelRepository::class)]
 class Model
 {
@@ -20,7 +21,7 @@ class Model
     #[ORM\JoinColumn(nullable: false)]
     private ?Brand $brand = null;
 
-    #[ORM\Column(length: 100, unique: true, index: true)]
+    #[ORM\Column(length: 100, unique: false, index: true)]
     private ?string $name = null;
 
     /**
