@@ -2,7 +2,7 @@
 @use './_variables' as vars;
 
 .navbar {
-    height: 50px;
+    min-height: 50px;
 }
 
 .navbar-toggler:focus {
