@@ -17,11 +17,14 @@ class LoginType extends AbstractType
     {
         $builder
             ->add('email', EmailType::class, [
+                'attr' => ['autocomplete' => 'email'],
                 'constraints' => [
                     new Email(message: 'Saisissez une adresse email valide'),
                 ]
             ])
-            ->add('password', PasswordType::class)
+            ->add('password', PasswordType::class, [
+                'attr' => ['autocomplete' => 'current-password'], // Navigator can suggest password
+            ])
             ->add('remember_me', CheckboxType::class, [
                 'required' => false,
             ])
