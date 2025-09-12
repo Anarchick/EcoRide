@@ -12,7 +12,7 @@
         <div class="travel-search-inputs">
             <div class="travel-search-input">
                 {{ ux_icon('ion:location-outline', {class: 'travel-search-icon'}) }}
-                {{ form_widget(form.from, {
+                {{ form_widget(form.departure, {
                     'attr': {
                         'class': 'travel-search-field',
                         'placeholder': 'Départ'
@@ -22,7 +22,7 @@
 
             <div class="travel-search-input">
                 {{ ux_icon('ion:location', {class: 'travel-search-icon'})}}
-                {{ form_widget(form.to, {
+                {{ form_widget(form.arrival, {
                     'attr': {
                         'class': 'travel-search-field',
                         'placeholder': 'Destination'
@@ -42,7 +42,7 @@
             
             <div class="travel-search-input">
                 {{ ux_icon('ion:people', {class: 'travel-search-icon'})}}
-                {{ form_widget(form.passengers, {
+                {{ form_widget(form.passengersMin, {
                     'attr': {
                         'class': 'travel-search-field',
                         'placeholder': 'Passager(s)'

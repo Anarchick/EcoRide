@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Sedarch;
+namespace App\Search;
 
 use App\Enum\LuggageSizeEnum;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -14,7 +14,7 @@ class TravelCriteria
     #[Assert\Regex(pattern: '/^[a-zA-ZÀ-ÿ0-9 \'-]+$/', message: 'Nom de ville invalide')]
     private string $arrival;
     private \DateTimeInterface $date;
-    #[Assert\Range(min: 1, max: 10)]
+    #[Assert\Range(min: 1, max: 10, notInRangeMessage: 'Le nombre de passagers doit être entre {{ min }} et {{ max }}.')]
     private int $passengersMin;
     #[Assert\PositiveOrZero()]
     private float $maxCost;

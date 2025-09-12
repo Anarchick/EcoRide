@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Search\TravelCriteria;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -14,8 +15,8 @@ class TravelSearchType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('from', TextType::class)
-            ->add('to', TextType::class)
+            ->add('departure', TextType::class)
+            ->add('arrival', TextType::class)
             ->add('date', DateType::class, [
                 'widget' => 'single_text',
                 'attr' => [
@@ -24,7 +25,7 @@ class TravelSearchType extends AbstractType
                     'value' => (new \DateTime())->format('Y-m-d')
                 ]
             ])
-            ->add('passengers', IntegerType::class, [
+            ->add('passengersMin', IntegerType::class, [
                 'attr' => [
                     'min' => 1,
                     'max' => 8
@@ -37,7 +38,8 @@ class TravelSearchType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'csrf_protection' => false // Disable for GET requests
+            'csrf_protection' => false, // Disable for GET requests
+            'data_class' => TravelCriteria::class,
         ]);
     }
 }
