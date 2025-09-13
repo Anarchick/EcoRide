@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Car;
+use App\Repository\Trait\UuidFinderTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -15,6 +16,8 @@ class CarRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Car::class);
     }
+
+    use UuidFinderTrait;
 
 //    /**
 //     * @return Car[] Returns an array of Car objects

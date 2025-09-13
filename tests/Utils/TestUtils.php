@@ -33,7 +33,7 @@ class TestUtils
             ->setLastName($lastName)
             ->setUsername($username)
             ->setEmail($email)
-            ->setEmailHash(hash('sha256', $email))
+            // ->setEmailHash(hash('sha256', $email))
             ->setPhone($phone)
             ->setPassword($passwordHasher->hashPassword($user, $password));
 

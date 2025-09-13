@@ -1,0 +1,12 @@
+{# Multiple travels overview #}
+{% import 'travel/macros/travelOverview.html.twig' as travelMacro %}
+
+{% include 'partials/_flashes.html.twig' %}
+
+{% if travels is not empty %}
+    <div class="row">
+        {% for travel in travels %}
+            {{ travelMacro.overview(travel) }}
+        {% endfor %}
+    </div>
+{% endif %}

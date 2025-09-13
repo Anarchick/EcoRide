@@ -27,4 +27,5 @@
 - EsLint
 - PHPUnit
 - doctrine-fixtures-bundle
+- Faker (Faker-car)
 

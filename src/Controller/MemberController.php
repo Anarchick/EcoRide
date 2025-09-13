@@ -14,7 +14,8 @@ final class MemberController extends AbstractController
     #[Route('/', name: 'show')]
     public function index(string $uuid32, UserRepository $userRepository, EntityManagerInterface $em): Response
     {
-        $user = $userRepository->getUserByUuid($uuid32);
+        /** @var User $user */
+        $user = $userRepository->getByUuid($uuid32);
         $sql = 'SELECT * FROM users WHERE uuid = :uuid';
         $conn = $em->getConnection();
         $stmt = $conn->prepare($sql);

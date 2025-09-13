@@ -35,4 +35,11 @@ return [
         'version' => '5.3.7',
         'type' => 'css',
     ],
+    'htmx.org' => [
+        'version' => '2.0.7',
+    ],
+    'scripts/specific/travel' => [
+        'path' => './assets/scripts/specific/travel.js',
+        'entrypoint' => true,
+    ],
 ];

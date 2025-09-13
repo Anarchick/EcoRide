@@ -38,7 +38,6 @@ class RegistrationController extends AbstractController
                 /** @var string $plainPassword */
                 $plainPassword = $form->get('plainPassword')->getData();
 
-                $user->setEmailHash(hash('sha256', $user->getEmail()));
                 $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
 
                 $entityManager->persist($user);

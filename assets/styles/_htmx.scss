@@ -1,0 +1,9 @@
+@use './_variables' as vars;
+
+// Indicateur de chargement htmx
+.htmx-indicator {
+    display: none;
+}
+.htmx-request .htmx-indicator {
+    display: block;
+}

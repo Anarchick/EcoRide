@@ -26,16 +26,25 @@ class RegistrationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('firstName', TextType::class)
-            ->add('lastName', TextType::class)
-            ->add('username', TextType::class)
+            ->add('firstName', TextType::class, [
+                'attr' => ['autocomplete' => 'given-name'],
+            ])
+            ->add('lastName', TextType::class, [
+                'attr' => ['autocomplete' => 'family-name'],
+            ])
+            ->add('username', TextType::class, [
+                'attr' => ['autocomplete' => 'off'],
+            ])
             ->add('phone', TelType::class, [ // TelType can adapt keyboard on mobile
+                'attr' => ['autocomplete' => 'tel-country-code'],
+                // French phone number format validation
                 'constraints' => new Regex(
                     pattern:'/^(?:(?:\+|00)?33[\s\.-]|0)?((?:6|7)(?:[\s\.-]?\d{2}){4})\s*$/',
                     message: 'Votre numéro de téléphone portable est invalide.'
                 )
             ])
             ->add('email', EmailType::class, [
+                'attr' => ['autocomplete' => 'email'],
                 'constraints' => [
                     new Email(message: 'Saisissez une adresse email valide'),
                     new Length(
@@ -48,16 +57,16 @@ class RegistrationType extends AbstractType
             ->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'mapped' => false,
-                // Navigator can suggest password
-                'attr' => ['autocomplete' => 'new-password'],
                 'invalid_message' => 'Les mots de passe doivent correspondre.',
                 'first_options' => [
                     // Keeps the value during errors for better UX
                     // This is a lower security issue accepted due to HTTPS in production
                     'always_empty' => false,
+                    'attr' => ['autocomplete' => 'new-password'], // Navigator can suggest password
                 ],
                 'second_options' => [
                     'always_empty' => false,
+                    'attr' => ['autocomplete' => 'new-password'], // Navigator can suggest password
                 ],
                 'constraints' => [
                     new NotBlank(message: 'Saisissez un mot de passe'),

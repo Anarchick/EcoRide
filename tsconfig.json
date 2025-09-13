@@ -7,8 +7,8 @@
     "moduleResolution": "node",                          /* Résolution des modules Node.js */
     
     /* Dossiers */
-    "rootDir": "./assets",                               /* Source TypeScript */
-    "outDir": "./public/build",                           /* Sortie JavaScript */
+    "rootDir": "./assets/scripts",                               /* Source TypeScript */
+    // "outDir": "./assets/scripts",                           /* Sortie JavaScript */
 
     /* Strict Type Checking (recommandé pour Java dev) */
     "strict": true,                                      /* Mode strict complet */
@@ -38,7 +38,7 @@
   },
   
   "include": [
-    "assets/**/*"                                       /* Inclut tout le dossier assets */
+    "assets/scripts/**/*"                                       /* Inclut tout le dossier assets */
   ],
   
   "exclude": [

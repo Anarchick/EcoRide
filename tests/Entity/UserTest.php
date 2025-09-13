@@ -56,7 +56,8 @@ class UserTest extends KernelTestCase
     public function testUuidIsPersisted(): void
     {
         $user = $this->fakeUser();
-        $found = $this->userRepository->getUserByUuid($user->getUuid());
+        /** @var User $found */
+        $found = $this->userRepository->getByUuid($user->getUuid());
 
         $this->assertNotNull($found, 'User should be found by UUID');
         $this->assertEquals($user->getUuid(), $found->getUuid(), 'UUID should match');
@@ -70,7 +71,7 @@ class UserTest extends KernelTestCase
         $this->em->flush();
 
         /** @var User $user */
-        $user = $this->userRepository->getUserByUuid($user->getUuid());
+        $user = $this->userRepository->getByUuid($user->getUuid());
 
         // Checks that the user has the ADMIN role from BDD
         $this->assertContains(RoleEnum::ADMIN->value, $user->getRoles(), 'User should have ROLE_ADMIN');
@@ -119,7 +120,8 @@ class UserTest extends KernelTestCase
     public function testEncrypted(): void
     {
         $user = $this->fakeUser();
-        $found = $this->userRepository->getUserByUuid($user->getUuid());
+        /** @var User $found */
+        $found = $this->userRepository->getByUuid($user->getUuid());
 
         $this->assertEquals($user->getFirstName(), 'Test', 'Name should match before decryption');
         $this->assertEquals($user->getFirstName(), $found->getFirstName(), 'Name should match after decryption');

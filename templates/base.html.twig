@@ -15,7 +15,8 @@
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
     </head>
-    <body class="d-flex flex-column min-vh-100">
+    {# TODO fix hx-boost="true" not loading JS, using ux-turbo as hotfix #}
+    <body class="d-flex flex-column min-vh-100" hx-boost="false">
         {% include 'partials/_navbar.html.twig' %}
 
         <!-- Main Content -->

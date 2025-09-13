@@ -15,7 +15,7 @@
                     <a class="eco-nav-link eco-normal-text {{ route == 'app_home' ? 'eco-nav-active' : '' }}" href="{{ path('app_home') }}">Accueil</a>
                 </li>
                 <li>
-                    <a class="eco-nav-link eco-normal-text {{ route == 'app_travel' ? 'eco-nav-active' : '' }}" href="{{ path('app_travel')}}">Voyager</a>
+                    <a class="eco-nav-link eco-normal-text {{ route == 'app_travel_index' ? 'eco-nav-active' : '' }}" href="{{ path('app_travel_index')}}">Voyager</a>
                 </li>
                 <li>
                     <a class="eco-nav-link eco-normal-text {{ route == 'app_contact' ? 'eco-nav-active' : '' }}" href="{{ path('app_contact') }}">Contact</a>
@@ -31,7 +31,8 @@
                     </a>
                 </div>
             {% else %}
-                <div class="d-inline-flex align-items-center">
+                {# Disable hx-boost on login/register links #}
+                <div class="d-inline-flex align-items-center" hx-boost="false">
                     <div>
                         <a class="eco-nav-link eco-normal-text" href="{{ path('app_login') }}">Connexion</a>
                     </div>
