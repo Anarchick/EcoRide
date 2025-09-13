@@ -31,7 +31,8 @@
                     </a>
                 </div>
             {% else %}
-                <div class="d-inline-flex align-items-center">
+                {# Disable hx-boost on login/register links #}
+                <div class="d-inline-flex align-items-center" hx-boost="false">
                     <div>
                         <a class="eco-nav-link eco-normal-text" href="{{ path('app_login') }}">Connexion</a>
                     </div>
