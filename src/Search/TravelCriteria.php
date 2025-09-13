@@ -3,58 +3,39 @@
 namespace App\Search;
 
 use App\Enum\LuggageSizeEnum;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class TravelCriteria
 {
     #[Assert\Length(max: 45)]
     #[Assert\Regex(pattern: '/^[a-zA-ZÀ-ÿ0-9 \'-]+$/', message: 'Nom de ville invalide')]
-    private string $departure;
+    public ?string $departure;
     #[Assert\Length(max: 45)]
     #[Assert\Regex(pattern: '/^[a-zA-ZÀ-ÿ0-9 \'-]+$/', message: 'Nom de ville invalide')]
-    private string $arrival;
-    private \DateTimeInterface $date;
+    public ?string $arrival;
+    #[Assert\Range(
+        min: 'today',
+        max: '+1 month',
+        notInRangeMessage: 'La date doit être comprise entre aujourd\'hui et dans un mois.'
+    )]
+    public ?\DateTimeInterface $date;
     #[Assert\Range(min: 1, max: 10, notInRangeMessage: 'Le nombre de passagers doit être entre {{ min }} et {{ max }}.')]
-    private int $passengersMin;
+    public int $passengersMin = 1;
     #[Assert\PositiveOrZero()]
-    private float $maxCost;
-    private bool $isSmokingAllowed;
-    private bool $isPetsAllowed;
-    private LuggageSizeEnum $luggageSizeMin;
-
-    public function __construct(
-        // Required
-        string $departure,
-        string $arrival,
-        \DateTimeInterface $date,
-        int $passengersMin = 1,
-        // filters
-        float $maxCost = PHP_INT_MAX,
-        bool $isSmokingAllowed = false,
-        bool $isPetsAllowed = false,
-        LuggageSizeEnum $luggageSizeMin = LuggageSizeEnum::NONE
-    )
-    {
-        // TODO: sanitize strings (trim, remove extra spaces, etc.)
-        // TODO: validate inputs
-        $this->departure = $departure;
-        $this->arrival = $arrival;
-        $this->date = $date;
-        $this->passengersMin = $passengersMin;
-        $this->maxCost = $maxCost;
-        $this->isSmokingAllowed = $isSmokingAllowed;
-        $this->isPetsAllowed = $isPetsAllowed;
-        $this->luggageSizeMin = $luggageSizeMin;
-    }
+    public float $maxCost = PHP_INT_MAX;
+    public bool $isSmokingAllowed = false;
+    public bool $isPetsAllowed = false;
+    public LuggageSizeEnum $luggageSizeMin = LuggageSizeEnum::NONE;
 
     public function getDeparture(): string
     {
-        return $this->departure;
+        return (new AsciiSlugger())->slug($this->departure);
     }
 
     public function getArrival(): string
     {
-        return $this->arrival;
+        return (new AsciiSlugger())->slug($this->arrival);
     }
 
     /**

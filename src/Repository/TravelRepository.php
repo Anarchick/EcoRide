@@ -5,7 +5,7 @@ namespace App\Repository;
 use App\Entity\Travel;
 use App\Enum\FuelTypeEnum;
 use App\Repository\Trait\UuidFinderTrait;
-use App\Sedarch\TravelCriteria;
+use App\Search\TravelCriteria;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
