@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'users')]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[UniqueEntity(fields: ['uuid'], message: 'There is already an account with this uuid', onDelete: "CASCADE")]
+#[UniqueEntity(fields: ['uuid'], message: 'There is already an account with this uuid')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -43,21 +43,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Encrypted]
     #[Assert\NotBlank()]
     #[Assert\Length(min: 2, max: 20)]
-    #[Assert\Regex(pattern: '/^[a-zA-ZÀ-ÿ\s\'\-]+$/', message: 'Votre nom ne doit contenir que des lettres, des espaces ou des tirets.')]
+    #[Assert\Regex(pattern: '/^[a-zA-ZÀ-ÿ \'\-]+$/', message: 'Votre nom ne doit contenir que des lettres, des espaces ou des tirets.')]
     #[ORM\Column(length: 255)]
     private ?string $firstName = null;
 
     #[Encrypted]
     #[Assert\NotBlank()]
     #[Assert\Length(min: 2, max: 25)]
-    #[Assert\Regex(pattern: '/^[a-zA-ZÀ-ÿ\s\'\-]+$/', message: 'Votre nom ne doit contenir que des lettres, des espaces ou des tirets.')]
+    #[Assert\Regex(pattern: '/^[a-zA-ZÀ-ÿ \'\-]+$/', message: 'Votre nom ne doit contenir que des lettres, des espaces ou des tirets.')]
     #[ORM\Column(length: 255)]
     private ?string $lastName = null;
 
     #[Encrypted]
     #[Assert\NotBlank()]
     #[Assert\Length(min:3, max: 20)]
-    #[Assert\Regex(pattern: '/^[a-zA-ZÀ-ÿ\s\'\-]+$/', message: 'Votre pseudonyme ne doit contenir que des lettres, des chiffres, des tirets ou des underscores.')]
+    #[Assert\Regex(pattern: '/^[a-zA-ZÀ-ÿ\d _\-]+$/', message: 'Votre pseudonyme ne doit contenir que des lettres, des chiffres, des tirets ou des underscores.')]
     #[ORM\Column(length: 255)]
     private ?string $username = null;
 
@@ -533,6 +533,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeRole(Role|RoleEnum $role): static
     {
         if ($role instanceof RoleEnum) {
+            // https://github.com/doctrine/collections/issues/467
             // Filter does not trigger Doctrine events
             // $this->roles->filter(
             //     fn($roleEntity) => $roleEntity->getRole() !== $role
