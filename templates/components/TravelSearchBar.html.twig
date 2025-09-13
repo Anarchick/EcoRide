@@ -1,13 +1,27 @@
 {# 
     Use the form TravelSearchType
+    Different behavior according to the current page:
+    - Home page: GET redirection to /travel
+    - /travel page: HTMX request with target
 #}
+{% set current_route = app.request.get('_route') %}
+{% set is_travel_page = current_route == 'app_travel_index' %}
+
 <section class="container">
     {{ form_start(form, {
             'method': 'GET',
             'action': path('app_travel_index'), 
             'attr': {
-                'class': 'travel-search-bar'
-            }
+                'id': 'travel-search-bar',
+                'hx-trigger': 'change delay:500ms from:input',
+            } | merge(is_travel_page ? {
+                'hx-get': path('app_travel_index'),
+                'hx-target': '#travel-results',
+                'hx-push-url': 'true',
+                'hx-indicator': '#loading'
+            } : {
+                'hx-get': path('app_home')
+            })
     }) }}
         <div class="travel-search-inputs">
             <div class="travel-search-input">

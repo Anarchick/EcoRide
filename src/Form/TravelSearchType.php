@@ -15,20 +15,29 @@ class TravelSearchType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('departure', TextType::class)
-            ->add('arrival', TextType::class)
+            ->add('departure', TextType::class, [
+                'attr' => [
+                    'autocomplete' => 'off'
+                ]
+            ])
+            ->add('arrival', TextType::class, [
+                'attr' => [
+                    'autocomplete' => 'off'
+                ]
+            ])
             ->add('date', DateType::class, [
                 'widget' => 'single_text',
                 'attr' => [
                     'min' => (new \DateTime())->format('Y-m-d'),
                     'max' => (new \DateTime('+1 month'))->format('Y-m-d'),
-                    'value' => (new \DateTime())->format('Y-m-d')
+                    'autocomplete' => 'off'
                 ]
             ])
             ->add('passengersMin', IntegerType::class, [
                 'attr' => [
                     'min' => 1,
-                    'max' => 8
+                    'max' => 8,
+                    'autocomplete' => 'off'
                 ]
             ])
             // Do not add a submit button for this form

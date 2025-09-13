@@ -2,14 +2,29 @@
 
 {% block title %}EcoRide - Voyager{% endblock %}
 
+{% block importmap %}
+    {{ importmap(['app', 'scripts/specific/travel']) }}
+{% endblock %}
+
 {% block main %}
 <twig:TravelSearchBar :form="search_form" />
-<div class="container">
-    <P>Tous les trajets</P>
-    {{ dump(all_travels) }}
 
-    <p>{{ travels|length }} trajets trouvés. en fonction des critères de recherche.</p>
-    {{ dump(travels) }}
+<div class="container mt-4">
+    <!-- Loading animation -->
+    <div id="loading" class="htmx-indicator">
+        <div class="d-flex flex-column justify-content-center align-items-center m-4">
+            <div class="spinner-border text-success" role="status"></div>
+            <span class="sr-only mt-2">Recherche en cours...</span>
+        </div>
+    </div>
+    
+    <!-- results area -->
+    <div id="travel-results">
+        <div class="text-center text-muted">
+            <i class="bi bi-search"></i>
+            <p>Utilisez la barre de recherche pour trouver des trajets</p>
+        </div>
+    </div>
 </div>
 
 {% endblock %}

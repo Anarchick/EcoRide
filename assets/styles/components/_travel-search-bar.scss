@@ -1,7 +1,7 @@
 @use '../_utils' as utils;
 @use '../_variables' as vars;
 
-.travel-search-bar {
+#travel-search-bar {
     padding: utils.px-size(3) utils.px-size(4);
     margin-top: utils.px-size(4);
     border-radius: vars.$border-radius;
