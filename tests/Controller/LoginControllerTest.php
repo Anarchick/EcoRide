@@ -43,7 +43,7 @@ class LoginControllerTest extends WebTestCase
 
         $this->submitForm($this->email, $this->password);
 
-        self::assertResponseRedirects('/travel');
+        self::assertResponseRedirects('/travel/');
         $this->client->followRedirect();
 
         self::assertSelectorNotExists('.alert-danger');

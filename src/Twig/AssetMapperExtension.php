@@ -30,9 +30,10 @@ class AssetMapperExtension extends AbstractExtension
         return [];
     }
 
-    public function renderImportmap(string $entrypoint = 'app'): string
+    public function renderImportmap($entrypoint = 'app'): string
     {
         // Returns an empty string in the test environment
+        // Accept either string or array of entrypoints for compatibility
         return '';
     }
 }
