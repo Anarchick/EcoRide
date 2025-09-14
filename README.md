@@ -57,6 +57,19 @@ FIXTURE_PASSWORD=MotDePasseAChanger
 
 ## Déploiement Heroku
 
+
+git push heroku master
+
+heroku config:set APP_ENV=prod
+heroku config:set APP_DEBUG=0
+heroku config:set APP_SECRET=$(php -r 'echo bin2hex(random_bytes(16));')
+heroku config:set DATABASE_URL=urlFourniParJawsDB
+
+heroku run php bin/console doctrine:migrations:migrate
+heroku run php bin/console cache:clear --env=prod
+
+heroku open
+
 ## Tester le site
 
 Afin de tester la recherche sur Heroku, j'ai mis en place des fixtures pour les trajets.

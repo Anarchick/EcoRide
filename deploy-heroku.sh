@@ -1,14 +1,14 @@
 # !/bin/bash
 
 # Script de déploiement pour Heroku
-# Doit être éxécuté sur la branche 'main'
+# Doit être éxécuté sur la branche 'master'
 
 set -e  # Arrêter le script en cas d'erreur
 
 # Vérifier que nous sommes sur la bonne branche
 BRANCH=$(git branch --show-current)
-if [ "$BRANCH" != "main" ]; then
-    echo "Vous devez être sur la branche 'main' pour déployer"
+if [ "$BRANCH" != "master" ]; then
+    echo "Vous devez être sur la branche 'master' pour déployer"
     exit 1
 fi
 
@@ -26,6 +26,8 @@ heroku login
 heroku config:set APP_ENV=prod
 heroku config:set APP_DEBUG=0
 heroku config:set APP_SECRET=$(php -r 'echo bin2hex(random_bytes(16));')
+
+# Rajouter manuellement FIXTURE_ADMIN_PASSWORD et FIXTURE_PASSWORD
 
 # Déployer
 git add .
