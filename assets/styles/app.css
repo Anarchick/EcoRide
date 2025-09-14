@@ -1,0 +1,111 @@
+:root {
+  --bs-light-rgb: 255, 255, 255;
+  --bs-body-font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --bs-body-line-height: 1;
+  --bs-navbar-toggler-focus-width: 0px;
+}
+
+.navbar {
+  min-height: 50px;
+}
+
+.navbar-toggler:focus {
+  box-shadow: none !important;
+}
+
+.eco-nav-link {
+  display: block;
+  width: fit-content;
+  padding: 8px 0;
+  color: #198754;
+  text-decoration: none;
+}
+
+.eco-nav-active {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+@media (min-width: 992px) {
+  .eco-nav-link {
+    margin: 0 8px;
+  }
+}
+.profile-picture {
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.profile-picture img {
+  height: 100%;
+  object-fit: cover;
+}
+
+.eco-form > div > input.is-invalid {
+  animation: shake 300ms;
+}
+
+@keyframes shake {
+  25% {
+    transform: translateX(4px);
+  }
+  50% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+.form-check-input {
+  margin-top: 0 !important;
+}
+
+.htmx-indicator {
+  display: none;
+}
+
+.htmx-request .htmx-indicator {
+  display: block;
+}
+
+.htmx-request.htmx-indicator {
+  display: block;
+}
+
+@font-face {
+  font-family: "RymanEco";
+  src: url("../fonts/RymanEco-Regular.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+body {
+  color: #333;
+  background-color: rgb(var(--bs-light-rgb));
+}
+
+html, body {
+  height: 100%;
+}
+
+.eco-small-text {
+  font-size: 0.75rem;
+}
+
+.eco-normal-text {
+  font-size: 1rem;
+}
+
+.eco-bold-text {
+  font-weight: 600;
+}
+
+.eco-title-text {
+  font-family: "RymanEco", "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #85C266;
+  font-size: 1.5rem;
+}
+
+.min-vh-100 {
+  min-height: 100vh !important;
+}/*# sourceMappingURL=app.css.map */
