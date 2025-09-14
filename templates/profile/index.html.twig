@@ -6,7 +6,7 @@
 <div class="container">
 
     {% include 'partials/_flashes.html.twig' %}
-    {{ dump(user) }}
+    {# {{ dump(user) }} #}
     <p>Pseudo : {{ user.username }}</p>
     <p>Roles : [{{ user.roles|join(', ') }}]</p>
 
