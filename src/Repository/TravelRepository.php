@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Travel;
+use App\Enum\DateIntervalEnum;
 use App\Enum\FuelTypeEnum;
 use App\Repository\Trait\UuidFinderTrait;
 use App\Search\TravelCriteria;
@@ -62,4 +63,51 @@ class TravelRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * Used for chart.js statistics: get the count of travels by period intervals
+     * 
+     * @param int $interval The interval step (1, 2, 3...)
+     * @param DateIntervalEnum $intervalEnum The type of interval (DAY, MONTH, YEAR)
+     * @param \DateTimeInterface $from Start date
+     * @param \DateTimeInterface $to End date
+     * @return array Array with 'period' and 'count' keys for each interval
+     */
+    public function getCountsByPeriod(
+            int $interval = 1,
+            DateIntervalEnum $intervalEnum = DateIntervalEnum::DAY,
+            \DateTimeInterface $from,
+            \DateTimeInterface $to
+    ): array {
+        $dateFormat = match($intervalEnum) {
+            DateIntervalEnum::DAY => "DATE_FORMAT(t.date, '%Y-%m-%d')",
+            //DateIntervalEnum::WEEK => "DATE_FORMAT(t.date, '%Y-%m-%d')", // SQL does not have a week format
+            DateIntervalEnum::MONTH => "DATE_FORMAT(t.date, '%Y-%m')",
+            DateIntervalEnum::YEAR => "DATE_FORMAT(t.date, '%Y')",
+            default => throw new \InvalidArgumentException("Interval not supported: {$intervalEnum->value}")
+        };
+        // Select amount of travels grouped by the chosen interval
+        $qb = $this->createQueryBuilder('t')
+            ->select("$dateFormat as period", 'COUNT(t.uuid) as count')
+            ->where('t.date BETWEEN :from AND :to')
+            ->groupBy('period')
+            ->orderBy('period', 'ASC')
+            ->setParameter('from', $from)
+            ->setParameter('to', $to);
+
+        $results = $qb->getQuery()->getResult();
+
+        // If interval > 1, cannot be done in SQL
+        if ($interval > 1) {
+            return $this->aggregateByInterval($results, $interval, $intervalEnum, $from, $to);
+        }
+
+        return $results;
+    }
+
+    /**
+     * Aggregate results by custom interval (e.g. every 2 days, every 3 months)
+     */
+    private function aggregateByInterval(array $results, int $interval, DateIntervalEnum $intervalEnum, \DateTimeInterface $from, \DateTimeInterface $to): array {
+        throw new \LogicException('Not implemented yet');
+    }
 }
