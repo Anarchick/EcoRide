@@ -31,14 +31,20 @@ class RegistrationControllerTest extends WebTestCase
 
     private function submitForm(string $email): void
     {
+        $password = $_ENV['FIXTURE_PASSWORD'] ?? null;
+
+        if ($password === 'ChangeMe!' || $password === null) {
+            throw new \RuntimeException('The FIXTURE_PASSWORD environment variable is not set.');
+        }
+
         $this->client->submitForm("S'inscrire", [
             'registration[firstName]' => 'John',
             'registration[lastName]' => 'Doe',
             'registration[username]' => 'johndoe',
             'registration[phone]' => '+33612345678',
             'registration[email]' => $email,
-            'registration[plainPassword][first]' => '2]~4t.C6=pqN23',
-            'registration[plainPassword][second]' => '2]~4t.C6=pqN23',
+            'registration[plainPassword][first]' => $password,
+            'registration[plainPassword][second]' => $password,
             'registration[agreeTerms]' => true,
         ]);
     }
