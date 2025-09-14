@@ -13,6 +13,7 @@ use App\Enum\FuelTypeEnum;
 use App\Enum\LuggageSizeEnum;
 use App\Enum\RoleEnum;
 use App\Repository\BrandRepository;
+use App\Repository\ModelRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -43,6 +44,7 @@ final class ProfileController extends AbstractController
     public function action(Request $request,
             EntityManagerInterface $em,
             BrandRepository $brandRepository,
+            ModelRepository $modelRepository
     ): Response
     {
         /** @var User $user */
@@ -56,15 +58,28 @@ final class ProfileController extends AbstractController
 
         switch ($action) {
             case 'become_driver':
-                if ($brandRepository->count([]) === 0) {
+                $brand = $brandRepository->findOneBy(['name' => 'Tesla']);
+
+                if (!$brand) {
                     $brand = (new Brand())->setName('Tesla');
                     $em->persist($brand);
-                    $model = (new Model())->setBrand($brand)->setName('Model 3');
-                    $em->persist($model);
-                    $this->addFlash('success', 'Marque et modèle créés');
+                    $this->addFlash('success', 'Marque Tesla créée');
                 }
 
-                if ($user->getCars()->count() === 0) {
+                $model = $modelRepository->findOneBy([
+                    'brand' => $brand,
+                    'name' => 'Model 3'
+                ]);
+
+                if (!$model) {
+                    $model = (new Model())->setBrand($brand)->setName('Model 3');
+                    $em->persist($model);
+                    $this->addFlash('success', 'Marque Model 3 créée');
+                }
+
+                $car = $user->getCars()->first();
+
+                if (!$car) {
                     $car = (new Car())
                         ->setColor(ColorEnum::GRAY)
                         ->setFuelType(FuelTypeEnum::ELECTRIC)
@@ -77,15 +92,21 @@ final class ProfileController extends AbstractController
                     $this->addFlash('success', 'Voiture créée et associée');
                 }
 
-                $user->addRole(RoleEnum::DRIVER);
-                $em->persist($user);
+                if ($this->isGranted(RoleEnum::DRIVER->value)) {
+                    $this->addFlash('info', 'Vous êtes déjà conducteur.');
+                } else {
+                    $user->addRole(RoleEnum::DRIVER);
+                    $em->persist($user);
+                    $this->addFlash('success', 'Vous êtes maintenant conducteur !');
+                }
+                
                 $em->flush();
 
                 // $token = new UsernamePasswordToken($user, 'main', $user->getRoles());
                 // $this->container->get('security.token_storage')->setToken($token);
                 break;
             case 'create_trip':
-                if (!in_array(RoleEnum::DRIVER->value, $user->getRoles())) {
+                if (!$this->isGranted(RoleEnum::DRIVER->value)) {
                     $this->addFlash('error', 'Vous devez être conducteur pour créer un trajet.');
                     return $this->redirectToRoute('app_profile_index');
                 }
@@ -100,9 +121,9 @@ final class ProfileController extends AbstractController
                 $travel = (new Travel())
                     ->setCar($car)
                     ->setDriver($user)
-                    ->setDeparture('Paris')
-                    ->setArrival('Lyon')
-                    ->setDate(new \DateTimeImmutable())
+                    ->setDeparture('Annecy')
+                    ->setArrival('Marseille')
+                    ->setDate(new \DateTimeImmutable('+ 1 day'))
                     ->setPassengersMax($car->getTotalSeats() - 1)
                     ->setDuration(60*5)
                     ->setDistance(450)
@@ -113,7 +134,7 @@ final class ProfileController extends AbstractController
                     ->setLuggageSize(LuggageSizeEnum::MEDIUM);
                 $em->persist($travelPreference);
                 $em->flush();
-                $this->addFlash('success', 'Trajet créé Entre Paris et Lyon Aujourd\'hui');
+                $this->addFlash('success', 'Trajet créé Entre Annecy et Marseille demain');
                 break;
             case 'logout':
                 return $this->redirectToRoute('app_logout');
