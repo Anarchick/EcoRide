@@ -7,6 +7,7 @@
 
     {% include 'partials/_flashes.html.twig' %}
     {# {{ dump(user) }} #}
+    <pre>{{ user|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
     <p>Pseudo : {{ user.username }}</p>
     <p>Roles : [{{ user.roles|join(', ') }}]</p>
 
