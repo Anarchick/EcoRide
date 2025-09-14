@@ -4,11 +4,14 @@
 
 {% block main %}
 <div class="container">
-<h1>User déchiffré :</h1>
+{# <h1>User déchiffré :</h1>
 {{ dump(user) }}
 
 <h1>User dans la bdd :</h1>
-{{ dump(cryptedUser)}}
+{{ dump(cryptedUser)}} #}
+    <p>Prénom : {{ user.firstName }}</p>
+    <p>Nom : {{ user.lastName }}</p>
+    <p>Pseudo : {{ user.username }}</p>
 </div>
 
 {% endblock %}
