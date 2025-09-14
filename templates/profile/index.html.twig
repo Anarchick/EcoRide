@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}EcoRide - Profil{% endblock %}
+
+{% block main %}
+<div class="container">
+
+    {% include 'partials/_flashes.html.twig' %}
+    {{ dump(user) }}
+    <p>Pseudo : {{ user.username }}</p>
+    <p>Roles : [{{ user.roles|join(', ') }}]</p>
+
+    <form method="post" action="{{ path('app_profile_action') }}">
+        <button name="action" value="become_driver" class="btn btn-primary">Devenir conducteur</button>
+        <button name="action" value="create_trip" class="btn btn-primary">Créer un trajet</button>
+        <button name="action" value="logout" class="btn btn-primary">Deconnexion</button>
+    </form>
+</div>
+
+
+{% endblock %}

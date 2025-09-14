@@ -1,5 +1,8 @@
 doctrine:
     dbal:
+        platform_service: App\Doctrine\Platform\MariaDBUuidPlatform
+        types:
+            uuid: Symfony\Bridge\Doctrine\Types\UuidType
         url: '%env(resolve:DATABASE_URL)%'
 
         # IMPORTANT: You MUST configure your server version,
@@ -26,6 +29,9 @@ doctrine:
                 alias: App
         controller_resolver:
             auto_mapping: false
+        dql:
+            string_functions:
+                DATE_FORMAT: DoctrineExtensions\Query\Mysql\DateFormat
 
 when@test:
     doctrine:

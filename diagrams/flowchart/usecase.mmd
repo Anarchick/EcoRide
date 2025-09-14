@@ -1,0 +1,35 @@
+flowchart LR
+visitor((Visiteur))
+user((Covoitureur))
+driver((Conducteur))
+
+visitor  --> /login[Se connecter / Se login]
+visitor --> p/travels[Voir les covoiturages]
+visitor --> /contact[Contacter le support]
+visitor --> /profils[Voir les profils]
+
+user --> /logout[Se déconnecter]
+user --> /profil/credits/add[Ajouter des crédits]
+user --> /travels[Voir les covoiturages]
+/travels --> /travels/contact[Contacter conducteur]
+/travels --> /travels/join[Reserver un covoiturage]
+/travels/join -->/travels/validate
+/travels/join --> /travels/review[Laisser un avis]
+/travels/join --> /travels/leave[Annuler reservation]
+user --> /profil[Acceder au profil<br> et aux paramètres]
+/profil --> /profil/edit[Modifier profil]
+/profil --> /profil/history[Voir l'historique des trajets]
+/profil/edit --> /profil/delete[Supprimer profil]
+user --> /profil/driver[devenir conducteur]
+
+driver --> /travels/create[Créer un trajet]
+/travels/create --> /travels/edit[Modifier / annuler le trajet]
+/travels/edit --> /travels/start[Démarer le trajet]
+/travels/start --> /travels/validate[Valider le trajet effectué]
+driver --> /profil/car/add[Ajouter une voiture]
+/profil/car/add --> /profil/car/delete[Supprimer une voiture]
+/travels/create -->|&lt;&lt;require&gt;&gt;| /profil/car/add
+driver --> /profil/credits/transfert[Transférer des crédits]
+
+user -->|&lt;&lt;extends&gt;&gt;| visitor
+driver -->|&lt;&lt;extends&gt;&gt;| user

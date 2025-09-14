@@ -1,0 +1,18 @@
+flowchart LR
+modo((Modérateur))
+admin((Administrateur))
+
+modo --> /login[Se connecter]
+/login --> /logout[Se déconnecter]
+modo --> /profil[Acceder au profil et aux paramètres]
+/profil --> /profil/edit[Modifier profil]
+modo --> /travels/edit[Modifier un trajet]
+modo --> /profils/edit[Modifier un profil d'utilisateur]
+modo --> /contact/view[Voir les messages]
+/contact/view --> /contact/reply[Répondre à un message]
+
+admin --> /admin/dashboard[Accéder au tableau de bord]
+/admin/dashboard --> /admin/modo/create[Créer un compte modérateur]
+/admin/dashboard --> /admin/modo/delete[Supprimer un compte modérateur]
+
+admin -->|&lt;&lt;extends&gt;&gt;| modo

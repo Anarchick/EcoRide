@@ -4,6 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="EcoRide - Covoiturage écologique pour un avenir durable">
+        <meta name="author" content="EcoRide">
         <title>{% block title %}EcoRide{% endblock %}</title>
         {# TODO icone du site #}
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>🚗</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>eco</text></svg>">
@@ -14,7 +15,8 @@
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
     </head>
-    <body class="d-flex flex-column min-vh-100">
+    {# TODO fix hx-boost="true" not loading JS, using ux-turbo as hotfix #}
+    <body class="d-flex flex-column min-vh-100" hx-boost="false">
         {% include 'partials/_navbar.html.twig' %}
 
         <!-- Main Content -->

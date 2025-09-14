@@ -1,6 +1,10 @@
 @use './_utils' as utils;
 @use './_variables' as vars;
 
+.navbar {
+    min-height: 50px;
+}
+
 .navbar-toggler:focus {
     box-shadow: none !important;
 }
@@ -21,5 +25,15 @@
 @media (min-width: 992px) {
     .eco-nav-link {
         margin: 0 utils.px-size(3);
+    }
+}
+
+.profile-picture {
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    img {
+        height: 100%;
+        object-fit: cover;
     }
 }

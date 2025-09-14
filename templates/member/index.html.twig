@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello MemberController!{% endblock %}
+
+{% block main %}
+<div class="container">
+<h1>User déchiffré :</h1>
+{{ dump(user) }}
+
+<h1>User dans la bdd :</h1>
+{{ dump(cryptedUser)}}
+</div>
+
+{% endblock %}

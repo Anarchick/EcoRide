@@ -7,6 +7,10 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node build.mjs",
+    "build:watch": "node build.mjs --watch",
+    "build:prod": "NODE_ENV=production node build.mjs",
+    "ts:watch": "tsc --watch",
     "dev": "browser-sync start --proxy localhost:8000 --files \"templates/**/*.twig,assets/**/*.{css,scss,js,ts},src/**/*.php\" --reload-delay 1000",
     "watch": "browser-sync start --proxy localhost:8000 --files \"templates/**/*.twig,assets/**/*.{css,scss,js,ts},src/**/*.php\" --no-open"
   },
@@ -18,9 +22,13 @@
     "@eslint/js": "^9.30.1",
     "@types/node": "^24.0.12",
     "browser-sync": "^3.0.4",
+    "esbuild": "^0.25.9",
     "eslint": "^9.30.1",
     "globals": "^16.3.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.36.0"
+  },
+  "dependencies": {
+    "chart.js": "^4.5.0"
   }
 }

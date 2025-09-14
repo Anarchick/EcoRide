@@ -9,7 +9,7 @@ final class TravelControllerTest extends WebTestCase
     public function testIndex(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/travel');
+        $client->request('GET', '/travel/');
 
         self::assertResponseIsSuccessful();
     }

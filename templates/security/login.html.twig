@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}EcoRide - Connexion{% endblock %}
+
+{% block main %}
+{% include 'partials/_base_form.html.twig' with {
+    'title': 'Connexion',
+    'form': loginForm,
+    'labels': {
+        'email': 'Votre email',
+        'password': 'Votre mot de passe',
+        'remember_me': 'Se souvenir de moi'
+    },
+    'submit_label': 'Se connecter'
+} %}
+{% endblock %}

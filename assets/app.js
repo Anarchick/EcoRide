@@ -1,12 +1,23 @@
 import './bootstrap.js';
-/*
- * Welcome to your app's main JavaScript file!
- *
- * This file will be included onto the page via the importmap() Twig function,
- * which should already be in your base.html.twig.
- */
-
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
 import './styles/app.css';
 import './styles/home/home.css';
+import htmx from 'htmx.org';
+
+window.htmx = htmx;
+
+// Make HTMX work with Symfony\ux-turbo
+document.addEventListener("turbo:load", function() {
+    if (window.htmx) {
+        htmx.process(document.body);
+    }
+});
+
+/*
+document.addEventListener('htmx:afterSwap', (event) => {
+    if (window.htmx) {
+        htmx.process(document.body);
+    }
+});
+*/

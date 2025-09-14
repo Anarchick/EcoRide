@@ -1,0 +1,11 @@
+{# Single travel overview #}
+{% macro overview(travel) %}
+<div class="mb-3">
+    {{ dump(travel) }}
+    <div class="d-flex gap-3">
+        <p>⬆️</p>
+        <a href="{{ path('app_travel_show', { uuid32: travel.travelUuid | replace({'-': ''}) }) }}">Voir le trajet</a>
+        <a href="{{ path('app_member_show', { uuid32: travel.driverUuid | replace({'-': ''}) }) }}">Voir le profil</a>
+    </div>
+</div>
+{% endmacro %}
