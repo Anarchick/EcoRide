@@ -24,11 +24,11 @@ class Travel
     private ?Uuid $uuid;
 
     #[ORM\ManyToOne(inversedBy: 'travels')]
-    #[ORM\JoinColumn(nullable: false, name: 'driver_uuid', referencedColumnName: 'uuid')]
+    #[ORM\JoinColumn(nullable: false, name: 'driver_uuid', referencedColumnName: 'uuid', onDelete: 'CASCADE')]
     private ?User $driver = null;
 
     #[ORM\ManyToOne(inversedBy: 'travels')]
-    #[ORM\JoinColumn(nullable: false, name: 'car_uuid', referencedColumnName: 'uuid')]
+    #[ORM\JoinColumn(nullable: false, name: 'car_uuid', referencedColumnName: 'uuid', onDelete: 'CASCADE')]
     private ?Car $car = null;
 
     #[ORM\Column(length: 90)] // No index Needed
