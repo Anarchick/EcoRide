@@ -29,3 +29,8 @@ public/build/
 *.css.map
 assets/**/*.css
 ###< Sass compiled files ###
+
+###> TypeScript compiled files ###
+assets/scripts/**/*.js
+assets/scripts/**/*.js.map
+###< TypeScript compiled files ###
