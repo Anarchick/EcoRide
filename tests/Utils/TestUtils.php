@@ -22,9 +22,15 @@ class TestUtils
         string $username = 'johndoe',
         string $email = 'johndoe@test.com',
         string $phone = '+33612345678',
-        string $password = '2]~4t.C6=pqN23'
+        ?string $password = null
     ): User
     {
+        $password ??= $_ENV['FIXTURE_PASSWORD'] ?? null;
+
+        if ($password === 'ChangeMe!' || $password === null) {
+            throw new \RuntimeException('The FIXTURE_PASSWORD environment variable is not set.');
+        }
+
         /** @var UserPasswordHasherInterface $passwordHasher */
         $passwordHasher = $this->container->get('security.user_password_hasher');
 

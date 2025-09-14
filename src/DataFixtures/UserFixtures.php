@@ -23,6 +23,11 @@ class UserFixtures extends Fixture
     // Add users
     public function load(ObjectManager $manager): void
     {
+        $password = $_ENV['FIXTURE_PASSWORD'] ?? null;
+
+        if ($password === 'ChangeMe!' || $password === null) {
+            throw new \RuntimeException('The FIXTURE_PASSWORD environment variable is not set.');
+        }
 
         for ($i=0; $i < self::BATCH_SIZE; $i++) { 
             $user = new User();
@@ -31,7 +36,7 @@ class UserFixtures extends Fixture
                 ->setUsername($this->faker->userName())
                 ->setPhone('+33 6 12 34 56 ' . sprintf('%02d', $i))
                 ->setEmail($this->faker->email())
-                ->setPassword($this->passwordHasher->hashPassword($user, '2]~4t.C6=pqN23'))
+                ->setPassword($this->passwordHasher->hashPassword($user, $password))
                 ->setBio($this->faker->paragraph());
             $manager->persist($user);
             $this->addReference('user_' . $i, $user);

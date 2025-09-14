@@ -58,8 +58,14 @@ class TravelFixtures extends Fixture implements DependentFixtureInterface
             $car = $user->getCars()->first();
             $passengersmax = $car->getTotalSeats() -1;
 
-            // create 1 travel by day between -31 days and +31 days
+            // create between 0 and 1 travel by day between -31 days and +31 days
             for ($day = -31; $day < 31; $day++) {
+
+                // Skip some days randomly
+                if ($this->faker->boolean(15)) {
+                    continue;
+                }
+
                 $travel = new Travel();
                 $travelPreference = new TravelPreference();
 

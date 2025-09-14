@@ -12,7 +12,7 @@ class LoginControllerTest extends WebTestCase
     private KernelBrowser $client;
     private TestUtils $testUtils;
     private string $email = 'email@example.com';
-    private string $password = '2]~4t.C6=pqN23';
+    private string $password;
 
     protected function setUp(): void
     {
@@ -23,6 +23,13 @@ class LoginControllerTest extends WebTestCase
 
         $this->testUtils->purgeDatabase();
         // Create a User fixture
+        $this->password = $_ENV['FIXTURE_PASSWORD'] ?? null;
+
+        if ($this->password === 'ChangeMe!' || $this->password === null) {
+            dd('password: ' . $this->password);
+            throw new \RuntimeException('The FIXTURE_PASSWORD environment variable is not set.');
+        }
+
         $user = $this->testUtils->createUser(email: $this->email, password: $this->password);
         $em->persist($user);
         $em->flush();
@@ -43,7 +50,7 @@ class LoginControllerTest extends WebTestCase
 
         $this->submitForm($this->email, $this->password);
 
-        self::assertResponseRedirects('/travel');
+        self::assertResponseRedirects('/travel/');
         $this->client->followRedirect();
 
         self::assertSelectorNotExists('.alert-danger');

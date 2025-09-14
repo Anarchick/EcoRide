@@ -23,7 +23,7 @@ class RegistrationController extends AbstractController
     {
         // If already connected
         if ($this->getUser()) {
-            return $this->redirectToRoute('app_travel');
+            return $this->redirectToRoute('app_travel_index');
         }
 
         $user = new User();

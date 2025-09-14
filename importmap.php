@@ -42,4 +42,8 @@ return [
         'path' => './assets/scripts/specific/travel.js',
         'entrypoint' => true,
     ],
+    'scripts/specific/admin' => [
+        'path' => './assets/scripts/specific/admin.js',
+        'entrypoint' => true,
+    ],
 ];
