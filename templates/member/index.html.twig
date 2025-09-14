@@ -3,10 +3,12 @@
 {% block title %}Hello MemberController!{% endblock %}
 
 {% block main %}
-<p>User déchiffré :</p>
+<div class="container">
+<h1>User déchiffré :</h1>
 {{ dump(user) }}
 
-<p>User dans la bdd :</p>
+<h1>User dans la bdd :</h1>
 {{ dump(cryptedUser)}}
+</div>
 
 {% endblock %}
