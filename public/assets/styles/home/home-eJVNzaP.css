@@ -5,7 +5,7 @@
   --bs-navbar-toggler-focus-width: 0px;
 }
 
-.travel-search-bar {
+#travel-search-bar {
   padding: 8px 16px;
   margin-top: 16px;
   border-radius: 8px;

@@ -5,6 +5,10 @@
   --bs-navbar-toggler-focus-width: 0px;
 }
 
+.navbar {
+  min-height: 50px;
+}
+
 .navbar-toggler:focus {
   box-shadow: none !important;
 }
@@ -27,6 +31,47 @@
     margin: 0 8px;
   }
 }
+.profile-picture {
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.profile-picture img {
+  height: 100%;
+  object-fit: cover;
+}
+
+.eco-form > div > input.is-invalid {
+  animation: shake 300ms;
+}
+
+@keyframes shake {
+  25% {
+    transform: translateX(4px);
+  }
+  50% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+.form-check-input {
+  margin-top: 0 !important;
+}
+
+.htmx-indicator {
+  display: none;
+}
+
+.htmx-request .htmx-indicator {
+  display: block;
+}
+
+.htmx-request.htmx-indicator {
+  display: block;
+}
+
 @font-face {
   font-family: "RymanEco";
   src: url("../fonts/RymanEco-Regular-DdYK1zB.otf") format("opentype");

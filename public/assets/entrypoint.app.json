@@ -4,11 +4,11 @@
     "bootstrap",
     "\/assets\/styles\/app.css",
     "\/assets\/styles\/home\/home.css",
+    "htmx.org",
     "@symfony\/stimulus-bundle",
     "@popperjs\/core",
     "@hotwired\/stimulus",
     "\/assets\/@symfony\/stimulus-bundle\/controllers.js",
     "\/assets\/@symfony\/ux-turbo\/turbo_controller.js",
-    "\/assets\/controllers\/hello_controller.js",
     "@hotwired\/turbo"
 ]

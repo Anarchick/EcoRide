@@ -1,0 +1,15 @@
+@use './_variables' as vars;
+
+// Loading indicator htmx
+.htmx-indicator {
+    display: none;
+}
+// First Load
+.htmx-request .htmx-indicator {
+    display: block;
+}
+
+// other requests
+.htmx-request.htmx-indicator {
+    display: block;
+}

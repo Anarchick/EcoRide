@@ -1,6 +1,6 @@
 {
     "app": {
-        "path": "\/assets\/app-n92iR8U.js",
+        "path": "\/assets\/app-PFKhlTv.js",
         "type": "js"
     },
     "\/assets\/bootstrap.js": {
@@ -8,15 +8,11 @@
         "type": "js"
     },
     "\/assets\/@symfony\/stimulus-bundle\/controllers.js": {
-        "path": "\/assets\/@symfony\/stimulus-bundle\/controllers-qoRywO9.js",
+        "path": "\/assets\/@symfony\/stimulus-bundle\/controllers-qdNIY9X.js",
         "type": "js"
     },
     "\/assets\/@symfony\/ux-turbo\/turbo_controller.js": {
         "path": "\/assets\/@symfony\/ux-turbo\/turbo_controller-zl4y2v3.js",
-        "type": "js"
-    },
-    "\/assets\/controllers\/hello_controller.js": {
-        "path": "\/assets\/controllers\/hello_controller-VYgvytJ.js",
         "type": "js"
     },
     "\/assets\/controllers\/csrf_protection_controller.js": {
@@ -24,11 +20,11 @@
         "type": "js"
     },
     "\/assets\/styles\/app.css": {
-        "path": "\/assets\/styles\/app-cBUiWlE.css",
+        "path": "\/assets\/styles\/app-eRGoh2d.css",
         "type": "css"
     },
     "\/assets\/styles\/home\/home.css": {
-        "path": "\/assets\/styles\/home\/home-CAvvWWG.css",
+        "path": "\/assets\/styles\/home\/home-eJVNzaP.css",
         "type": "css"
     },
     "@hotwired\/stimulus": {
@@ -54,5 +50,17 @@
     "bootstrap\/dist\/css\/bootstrap.min.css": {
         "path": "\/assets\/vendor\/bootstrap\/dist\/css\/bootstrap.min-BtgVHdz.css",
         "type": "css"
+    },
+    "htmx.org": {
+        "path": "\/assets\/vendor\/htmx.org\/htmx.org.index-r1o2I9r.js",
+        "type": "js"
+    },
+    "scripts\/specific\/travel": {
+        "path": "\/assets\/scripts\/specific\/travel-NZMjx4h.js",
+        "type": "js"
+    },
+    "scripts\/specific\/admin": {
+        "path": "\/assets\/scripts\/specific\/admin-AXApZHl.js",
+        "type": "js"
     }
 }

@@ -22,7 +22,7 @@
 ###> symfony/asset-mapper ###
 assets/build/
 /assets/vendor/
-!/public/assets/
+/public/assets/
 ###< symfony/asset-mapper ###
 
 ###> Sass compiled files ###
@@ -35,3 +35,10 @@ assets/**/*.css
 assets/scripts/**/*.js
 assets/scripts/**/*.js.map
 ###< TypeScript compiled files ###
+
+###> HEROKU ###
+!/public/assets/
+!assets/build/
+!assets/**/*.css
+!assets/scripts/**/*.js
+###< HEROKU ###

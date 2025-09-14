@@ -1,0 +1,14 @@
+.eco-form > div > input.is-invalid {
+    animation: shake 300ms;
+}
+
+@keyframes shake {
+    25% { transform: translateX(4px);} 
+    50% { transform: translateX(-4px);}
+    75% { transform: translateX(4px);}
+}
+
+.form-check-input {
+    // vertical align checkbox with label
+    margin-top: 0 !important;
+}
