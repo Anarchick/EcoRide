@@ -1,6 +1,9 @@
 # see https://symfony.com/doc/current/reference/configuration/framework.html
 framework:
     secret: '%env(APP_SECRET)%'
+    # Heroku using Nginx causing CSRF token issues, see https://github.com/symfony/symfony/issues/59065
+    csrf_protection: true
+    trusted_proxies: '127.0.0.1'
 
     # Note that the session will be started ONLY if you read or write from it.
     session: true
