@@ -28,8 +28,8 @@ driver --> /travels/create[Créer un trajet]
 /travels/start --> /travels/validate[Valider le trajet effectué]
 driver --> /profil/car/add[Ajouter une voiture]
 /profil/car/add --> /profil/car/delete[Supprimer une voiture]
-/travels/create -->|&lt;&lt;require&gt;&gt;| /profil/car/add
+/travels/create -->|&lt;require&gt;| /profil/car/add
 driver --> /profil/credits/transfert[Transférer des crédits]
 
-user -->|&lt;&lt;extends&gt;&gt;| visitor
-driver -->|&lt;&lt;extends&gt;&gt;| user
+user -->|&lt;extends&gt;| visitor
+driver -->|&lt;extends&gt;| user
