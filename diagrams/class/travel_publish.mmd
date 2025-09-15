@@ -1,0 +1,83 @@
+classDiagram
+    Driver "1" *-- "0..*" Car : owns
+    Driver "1" *-- "0..*" Travel : driver
+    User "0..*" -- "0..*" Travel : passenger
+    Car "0..*" o-- "1" Brand : has
+    Car "0..*" o-- "1" Model : has
+    Car "1" -- "0..*" Travel : has
+    Brand "1" *-- "1..*" Model : has
+    Travel "1" *-- "1" TravelPreference : has
+    Driver <|-- User
+
+    class Driver {
+        +addCar(Car)
+        +getCars()
+        +addRole(RoleEnum)
+        +canPublishTravel()
+        +joinTravel(Travel)
+        +leaveTravel(Travel)
+    }
+    class User {
+        +string[] roles
+        +getUuid()
+        +getUsername()
+        +getRatingAverage()
+        +addRole(RoleEnum)
+    }
+    class Car {
+        +getBrand()
+        +getModel()
+        +getColor()
+        +getFuelType()
+        +getTotalSeats()
+        +getPlate()
+        +setBrand(Brand)
+        +setModel(Model)
+        +setColor(ColorEnum)
+        +setFuelType(FuelTypeEnum)
+        +setTotalSeats(int)
+        +setPlate(string)
+    }
+    class Brand {
+        +getName()
+        +setName(string)
+    }
+    class Model {
+        +getName()
+        +setBrand(Brand)
+        +setName(string)
+    }
+    class Travel {
+        +getCar()
+        +getDriver()
+        +getDeparture()
+        +getArrival()
+        +getDate()
+        +getPassengersMax()
+        +getDuration()
+        +getDistance()
+        +getCost()
+        +getState()
+        +getTravelPreference()
+        +setCar(Car)
+        +setDriver(User)
+        +setDeparture(string)
+        +setArrival(string)
+        +setDate(DateTimeImmutable)
+        +setPassengersMax(int)
+        +setDuration(int)
+        +setDistance(int)
+        +setCost(float)
+        +setState(TravelStateEnum)
+        +setTravelPreference(TravelPreference)
+    }
+    class TravelPreference {
+        +getIsPetsAllowed()
+        +getIsSmokingAllowed()
+        +getLuggageSize()
+        +getComment()
+        +setIsPetsAllowed(bool)
+        +setIsSmokingAllowed(bool)
+        +setLuggageSize(LuggageSizeEnum)
+        +setComment(string)
+    }
