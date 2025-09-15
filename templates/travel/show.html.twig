@@ -6,6 +6,12 @@
 
 <div class="container">
     <h1>Détails du trajet</h1>
-    {{ dump(travel) }}
+    {# {{ dump(travel) }} #}
+    <div class="border">
+        <p>travel uuid : {{ travel.travelUuid }}</p>
+        <p>usern uuid : {{ travel.driverUuid }}</p>
+        <p>datetime : {{ travel.date.date}}</p>
+        <p>fuelType : {{ travel.fuelType.value }}</p>
+    </div>
 </div>
 {% endblock %}
