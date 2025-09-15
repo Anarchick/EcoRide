@@ -47,7 +47,7 @@
 
 **variables environnement**
 
-Créer un fichier .env.local ou autre .local avec:
+Créer un fichier .env.local et .env.test.local avec:
 ```ini
 FIXTURE_ADMIN_PASSWORD=MotDePasseAChanger
 FIXTURE_PASSWORD=MotDePasseAChanger
@@ -64,6 +64,16 @@ php bin/console asset-map:compile
 ```bash
 docker compose up
 ```
+
+**Mise en place schema BDD**
+
+Les opérations sont à répété avec le paramètre --env=test
+```bash
+php bin/console doctrine:create --if-not-exists
+php bin/console doctrine:migrations:migrate
+php bin/console cache:clear
+```
+Celà crééra les base de données ecoride et ecoride_test
 
 **Démarer le serveur de dévellopement**
 
@@ -115,4 +125,4 @@ heroku open
 ## Diagrammes
 le dossier diagrams/ contient des .erd et .mmd
 
-Il est nécéssaire d'avoir les extension ERD Editor et mermaid Chart afin de les visualiser.
+Il est nécéssaire d'avoir les extension VS Code ERD Editor et mermaid Chart afin de les visualiser.
