@@ -6,7 +6,7 @@ participant F as Frontend
 U ->> F: Créer un nouveau voyage
 activate F
 create participant B as Backend
-F ->> B: Appel /travels/create
+F ->> B: Appel /travel/create
 activate B
 create participant D as Doctrine
 B ->> D: Vérifier données
