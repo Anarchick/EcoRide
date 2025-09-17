@@ -100,10 +100,15 @@ heroku login
 heroku create ecoride-20250803 --region eu
 git push heroku master
 
+# Pas besoin sur heroku, il le fait automatiquement
+#heroku run "composer install --no-dev --optimize-autoloader"
+
 heroku config:set APP_ENV=prod
 heroku config:set APP_DEBUG=0
 heroku config:set APP_SECRET=$(php -r 'echo bin2hex(random_bytes(16));')
 heroku config:set DATABASE_URL=urlFourniParJawsDB
+heroku config:set SPEC_SHAPER_ENCRYPT_KEY=$(php -r "echo base64_encode(openssl_random_pseudo_bytes(32)))"
+
 
 heroku run "php bin/console doctrine:create --if-not-exists"
 heroku run php bin/console doctrine:migrations:migrate
