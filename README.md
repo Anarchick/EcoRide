@@ -128,11 +128,11 @@ heroku open
 
 1. Afin de tester la recherche sur Heroku, j'ai mis en place des fixtures pour les trajets et l'utilisateur.
 
-2. Actuellement seuls des trajets Paris vers Lyon ou Lyon vers Paris sont disponibles, et ce, sur une période d'environ +30 jours à compter de la date d'envoi du dossier ECF.
+2. Actuellement seuls des trajets Paris vers Lyon ou Lyon vers Paris sont disponibles, et ce, jusqu'au 14 octobre 2025.
 
-3. En vous connectant avec le compte admin, vous pouvez accéder à /admin qui a un accès restreint et qui affiche un chart.js en async
+3. En vous connectant avec le compte admin, vous pouvez accéder à /admin qui a un accès restreint et qui affiche un chart.js en async.
 
-4. Après votre connexion réussie, le /profil affiche 3 boutons utilitaires pour pallier aux fonctionnalités non implémentées. Celui nommé "Créer un trajet" nécessite une recherche "Annecy vers Lyon demain jusqu'à 4 personnes
+4. Après votre connexion réussie, le /profil affiche 3 boutons utilitaires pour pallier aux fonctionnalités non implémentées. Celui nommé "Créer un trajet" nécessite une recherche "Annecy vers Lyon demain jusqu'à 4 personnes.
 
 ## Diagrammes
 le dossier diagrams/ contient des .erd et .mmd
