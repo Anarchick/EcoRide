@@ -15,7 +15,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted(RoleEnum::ADMIN->value)]
 final class AdminController extends AbstractController
 {
-    #[Route('/', name: 'app_admin_index')]
+    #[Route('/', name: 'index')]
     public function index(TravelRepository $travelRepository, UserRepository $userRepository): Response
     {
         $chartTravels = $travelRepository->getCountsByPeriod(
