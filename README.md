@@ -45,7 +45,7 @@
 
 *Note*: Sans Docker, il sera nécessaire d'installer et configurer manuellement MariaDB.
 
-**variables environnement**
+**variables d'environnement**
 
 Créer un fichier .env.local et .env.test.local avec:
 ```ini
@@ -60,22 +60,22 @@ npm run build:watch
 php bin/console asset-map:compile
 ```
 
-**Démarer les containers docker**
+**Démarrer les conteneurs Docker**
 ```bash
 docker compose up
 ```
 
 **Mise en place schema BDD**
 
-Les opérations sont à répété avec le paramètre --env=test
+Les opérations sont à répéter avec le paramètre --env=test
 ```bash
 php bin/console doctrine:create --if-not-exists
 php bin/console doctrine:migrations:migrate
 php bin/console cache:clear
 ```
-Celà crééra les base de données ecoride et ecoride_test
+Cela créera les bases de données ecoride et ecoride_test
 
-**Démarer le serveur de dévellopement**
+**Démarrer le serveur de développement**
 
 ```bash
 # Nécéssite SymfonyCLI
@@ -91,25 +91,32 @@ mailer: localhost:8025
 
 ## Déploiement Heroku
 ```bash
-# La compilation des assets ne fonctionne pas sur heroku
-# Le .gitignore de la branche master est configurer pour heroku
+# Se placer dans la branche master qui contient un .gitignore adapté pour Heroku
+git checkout master
+
+# La compilation des assets ne fonctionne pas sur Heroku
+# Le .gitignore de la branche master est configuré pour Heroku
+npm run build:prod
+npm run ts:prod
 php bin/console asset-map:compile
 
 heroku login
 # A faire une seule fois
 heroku create ecoride-20250803 --region eu
+# Envoyer le commit sur Heroku et attendre qu'il installe les paquets
 git push heroku master
 
-# Pas besoin sur heroku, il le fait automatiquement
+# Pas besoin sur Heroku, il le fait automatiquement
 #heroku run "composer install --no-dev --optimize-autoloader"
 
+# Définir les variables d'environnement sur Heroku
 heroku config:set APP_ENV=prod
 heroku config:set APP_DEBUG=0
 heroku config:set APP_SECRET=$(php -r 'echo bin2hex(random_bytes(16));')
 heroku config:set DATABASE_URL=urlFourniParJawsDB
 heroku config:set SPEC_SHAPER_ENCRYPT_KEY=$(php -r "echo base64_encode(openssl_random_pseudo_bytes(32)))"
 
-
+# Créer la base de données, appliquer les migrations et vider le cache 
 heroku run "php bin/console doctrine:create --if-not-exists"
 heroku run php bin/console doctrine:migrations:migrate
 heroku run "php bin/console cache:clear --env=prod"
@@ -130,4 +137,4 @@ heroku open
 ## Diagrammes
 le dossier diagrams/ contient des .erd et .mmd
 
-Il est nécéssaire d'avoir les extension VS Code ERD Editor et mermaid Chart afin de les visualiser.
+Il est nécessaire d'avoir les extensions VS Code ERD Editor et mermaid Chart afin de les visualiser.

@@ -10,6 +10,7 @@
     "build": "node build.mjs",
     "build:watch": "node build.mjs --watch",
     "build:prod": "NODE_ENV=production node build.mjs",
+    "ts:prod": "tsc --project tsconfig.prod.json",
     "ts:watch": "tsc --watch",
     "dev": "browser-sync start --proxy localhost:8000 --files \"templates/**/*.twig,assets/**/*.{css,scss,js,ts},src/**/*.php\" --reload-delay 1000",
     "watch": "browser-sync start --proxy localhost:8000 --files \"templates/**/*.twig,assets/**/*.{css,scss,js,ts},src/**/*.php\" --no-open"
