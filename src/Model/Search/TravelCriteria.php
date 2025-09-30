@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Search;
+namespace App\Model\Search;
 
 use App\Enum\LuggageSizeEnum;
 use Symfony\Component\String\Slugger\AsciiSlugger;

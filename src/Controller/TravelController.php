@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Form\TravelSearchType;
 use App\Repository\TravelRepository;
-use App\Search\TravelCriteria;
+use App\Model\Search\TravelCriteria;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

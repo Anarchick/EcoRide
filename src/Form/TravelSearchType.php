@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Search\TravelCriteria;
+use App\Model\Search\TravelCriteria;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;

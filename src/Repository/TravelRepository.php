@@ -6,7 +6,7 @@ use App\Entity\Travel;
 use App\Enum\DateIntervalEnum;
 use App\Enum\FuelTypeEnum;
 use App\Repository\Trait\UuidFinderTrait;
-use App\Search\TravelCriteria;
+use App\Model\Search\TravelCriteria;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
