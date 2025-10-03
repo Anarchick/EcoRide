@@ -17,6 +17,14 @@
     </head>
     {# TODO fix hx-boost="true" not loading JS, using ux-turbo as hotfix #}
     <body class="d-flex flex-column min-vh-100" hx-boost="false">
+
+        {# Dev-only layout guide #}
+        {% if app.environment is defined and app.environment == 'dev' %}
+            <div id="dev-layout-guide" class="dev-layout-guide" aria-hidden="true" role="presentation">
+                <div></div><div></div><div></div><div></div>
+            </div>
+        {% endif %}
+
         {% include 'partials/_navbar.html.twig' %}
 
         <!-- Main Content -->

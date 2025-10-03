@@ -11,12 +11,13 @@ $eco-title-font-family: 'RymanEco', 'Roboto', 'Helvetica Neue', Helvetica, Arial
 $eco-font-family: var(--bs-body-font-family);
 
 // Colors
-$background-color: rgb(var(--bs-light-rgb));
-$secondary-background-color: #333;
+$background-color: #FFF;
+$secondary-background-color: #212529;
 $third-background-color: #D1D1D1;
-$interactive-color: #198754;
-$title-color: #85C266;
+$interactive-color: #134E1D;
+$title-color: #A1F278;
 $text-color: #333;
+$text-light-color: #FFF;
 $text-secondary-background-color: $background-color;
 
 $border-radius: 8px;

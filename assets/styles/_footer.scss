@@ -1,0 +1,32 @@
+@use './_utils' as utils;
+@use './_variables' as vars;
+
+footer {
+    display: flex;
+    flex-direction: column;
+    gap: utils.px-size(12);
+    padding: utils.px-size(12) 0;
+    margin-top: utils.px-size(30);
+    background: vars.$secondary-background-color;
+    color: vars.$text-light-color;
+
+    h5, a, p, ul {
+        color: vars.$text-light-color !important;
+        margin: 0;       
+    }
+
+}
+
+.footer-block {
+    display: flex;
+    flex-direction: column;
+    gap: utils.px-size(4);
+}
+
+@media (min-width: 768px) {
+    footer {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+}

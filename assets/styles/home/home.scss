@@ -1,4 +1,5 @@
 @use '../_variables' as vars;
+@use '../_utils' as utils;
 @use '../components/travel-search-bar.scss';
 
 .hero {
@@ -59,29 +60,64 @@
     z-index: 0;
 }
 
+#cards {
+    gap: utils.px-size(24);
+    margin-top: utils.px-size(30);
+}
+
 .eco-card {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: utils.px-size(8);
     justify-content: center;
     align-items: flex-start;
     align-self: stretch;
     border: 0;
 }
 
+@function eco-card-width-mobile() {
+    @return calc( 60px + (100% - 60px) /2 );
+}
+
+@function eco-card-width-tablet() {
+    @return calc(40px + (100% - 100px) / 2);
+}
+
 .eco-card-img {
-    width: auto;
-    height: 100%;
-    aspect-ratio: 202 / 114;
-    max-height: 160px;
+    width: eco-card-width-mobile();
+    height: auto;
+    aspect-ratio: 262 / 148;
     object-fit: cover;
     border-radius: vars.$border-radius;
 }
+
 .eco-card-text {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 4px;
-    width: 280px;
+    width: eco-card-width-mobile();
+}
+
+@media (min-width: 768px) {
+    .eco-card {
+        justify-content: space-between;
+        padding: 0 calc(20px + (100% - 140px) / 8 );
+        gap: utils.px-size(10);
+    }
+
+    .eco-card-img {
+        width: eco-card-width-tablet();
+    }
+
+    .eco-card-text {
+        width: eco-card-width-tablet();
+    }
+}
+
+@media (min-width: 1200px) {
+    .eco-card {
+        padding: 0 0;
+    }
 }

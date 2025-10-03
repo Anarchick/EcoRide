@@ -1,8 +1,10 @@
 @use './_utils' as utils;
 @use './_variables' as vars;
 @use './_nav-bar';
+@use './_footer';
 @use './_form';
 @use './_htmx';
+@use './_dev';
 
 
 // Police personnalisée EcoRide
@@ -26,7 +28,42 @@ html, body {
     height: 100%;
 }
 
+// Containers
+$container-padding-mobile: 16px;
+$container-padding-tablet: 32px;
+$container-padding-desktop: 160px;
+$container-main-padding-desktop: 310px;
+
+@mixin eco-container($left: $container-padding-mobile, $right: $container-padding-mobile) {
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: $left;
+    padding-right: $right;
+}
+
+@function eco-container-desktop-padding() {
+    @return calc($container-padding-desktop + 40px + (100% - ($container-padding-desktop * 2) - 220px) / 6);
+}
+
+.eco-container { @include eco-container(); }
+.eco-container-main { @include eco-container(); }
+
+@media (min-width: 768px) {
+    .eco-container { @include eco-container($container-padding-tablet, $container-padding-tablet); }
+    .eco-container-main { @include eco-container($container-padding-tablet, $container-padding-tablet); }
+}
+
+@media (min-width: 1200px) {
+    .eco-container { @include eco-container($container-padding-desktop, $container-padding-desktop); }
+    .eco-container-main { @include eco-container(eco-container-desktop-padding(), eco-container-desktop-padding()); }
+}
+
 // Typography
+a, p {
+    font-style: normal;
+    font-weight: 400;
+}
+
 .eco-small-text {
     font-size: utils.rem(12);
 }
@@ -48,4 +85,17 @@ html, body {
 // S'assurer que le footer reste en bas
 .min-vh-100 {
     min-height: 100vh !important;
+}
+
+// colors
+a, button {
+    color: vars.$interactive-color !important;
+}
+
+.color-interact {
+    color: vars.$interactive-color !important;
+}
+
+.color-light {
+    color: vars.$text-light-color !important;
 }
