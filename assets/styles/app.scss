@@ -59,6 +59,11 @@ $container-main-padding-desktop: 310px;
 }
 
 // Typography
+
+h1, h2, h3, h4, h5, h6 {
+    margin-bottom: 0;
+}
+
 a, p {
     font-style: normal;
     font-weight: 400;
@@ -97,5 +102,30 @@ a, button {
 }
 
 .color-light {
+    color: vars.$text-light-color !important;
+}
+
+// button
+
+.eco-btn {
+    padding: utils.px-size(3) utils.px-size(6);
+    color: vars.$interactive-color;
+    background-color: transparent;
+    border: 1px solid vars.$interactive-color;
+    border-radius: utils.px-size(4);
+    text-align: center;
+    vertical-align: middle;
+    text-decoration: none;
+    line-height: 1.5;
+    transition: .15s ease-in-out;
+
+    &:hover {
+        background-color: vars.$interactive-color !important;
+        color: vars.$text-light-color !important;
+    }
+}
+
+.eco-btn-filled {
+    background-color: vars.$interactive-color !important;
     color: vars.$text-light-color !important;
 }

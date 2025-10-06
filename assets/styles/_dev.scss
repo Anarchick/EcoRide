@@ -21,12 +21,12 @@
     padding-left: var(--dev-grid-margin-mobile);
     padding-right: var(--dev-grid-margin-mobile);
     align-items: stretch;
-}
 
-.dev-layout-guide > div {
-    background-color: var(--dev-grid-color);
-    height: 100%;
-    box-sizing: border-box;
+    > div {
+        background-color: var(--dev-grid-color);
+        height: 100%;
+        box-sizing: border-box;
+    }
 }
 
 @media (min-width: 768px) {
