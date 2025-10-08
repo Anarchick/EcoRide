@@ -21,12 +21,17 @@ class TravelCriteria
     )]
     public ?\DateTimeInterface $date;
     #[Assert\Range(min: 1, max: 10, notInRangeMessage: 'Le nombre de passagers doit être entre {{ min }} et {{ max }}.')]
-    public int $passengersMin = 1;
+    public ?int $minPassengers;
     #[Assert\PositiveOrZero()]
-    public float $maxCost = PHP_INT_MAX;
-    public bool $isSmokingAllowed = false;
-    public bool $isPetsAllowed = false;
-    public LuggageSizeEnum $luggageSizeMin = LuggageSizeEnum::NONE;
+    public ?int $maxCost;
+    #[Assert\PositiveOrZero()]
+    public ?int $maxDuration;
+    #[Assert\Range(min: 0, max: 5, notInRangeMessage: 'Le score doit être entre {{ min }} et {{ max }}.')]
+    public ?int $minScore;
+    public ?bool $isElectricPreferred;
+    public ?bool $isSmokingAllowed;
+    public ?bool $isPetsAllowed;
+    public ?LuggageSizeEnum $luggageSizeMin = LuggageSizeEnum::NONE;
 
     public function getDeparture(): string
     {
@@ -53,28 +58,45 @@ class TravelCriteria
         return $this->date;
     }
 
-    public function getPassengersMin(): int
+    public function getMinPassengers(): int
     {
-        return $this->passengersMin;
+        return $this->minPassengers ?? 1;
     }
 
-    public function getMaxCost(): float
+    // Get max duration in hours
+    public function getMaxDuration(): int
     {
-        return $this->maxCost;
+        return $this->maxDuration ?? PHP_INT_MAX;
+    }
+
+    public function getMinScore(): int
+    {
+        return $this->minScore ?? 0;
+    }
+
+    public function getMaxCost(): int
+    {
+        return $this->maxCost ?? PHP_INT_MAX;
+    }
+
+    public function isElectricPreferred(): bool
+    {
+        return $this->isElectricPreferred ?? false;
     }
 
     public function isSmokingAllowed(): bool
     {
-        return $this->isSmokingAllowed;
+        return $this->isSmokingAllowed ?? false;
     }
 
     public function isPetsAllowed(): bool
     {
-        return $this->isPetsAllowed;
+        return $this->isPetsAllowed ?? false;
     }
 
     public function getLuggageSizeMin(): LuggageSizeEnum
     {
-        return $this->luggageSizeMin;
+        return $this->luggageSizeMin ?? LuggageSizeEnum::NONE;
     }
+    
 }

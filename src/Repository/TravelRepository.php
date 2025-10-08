@@ -47,7 +47,7 @@ class TravelRepository extends ServiceEntityRepository
             ->andWhere('t.arrival = :arrival')
             //->andWhere('tp.isPetsAllowed = :isPetsAllowed')
             ->groupBy('t.uuid, d.uuid, t.date, t.duration, t.cost, t.passengersMax, c.fuelType')
-            ->having('availablePlaces >= :passengersMin')
+            ->having('availablePlaces >= :minPassengers')
             ->orderBy('CASE WHEN c.fuelType = :electric THEN 1 ELSE 0 END', 'DESC')
             ->addOrderBy('t.date', 'ASC')
             ->setMaxResults(10)
@@ -57,7 +57,7 @@ class TravelRepository extends ServiceEntityRepository
             ->setParameter('dateMax', $criteria->getDateTime()->format('Y-m-d 23:59:59'))
             ->setParameter('departure', $criteria->getDeparture())
             ->setParameter('arrival', $criteria->getArrival())
-            ->setParameter('passengersMin', $criteria->getPassengersMin())
+            ->setParameter('minPassengers', $criteria->getMinPassengers())
             ->setParameter('electric', FuelTypeEnum::ELECTRIC)
             ->getQuery()
             ->getResult();

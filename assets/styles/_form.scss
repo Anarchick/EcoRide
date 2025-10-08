@@ -23,3 +23,22 @@
     color: vars.$text-light-color;
     text-align: center;
 }
+
+input[type="range"] {
+
+    &::-webkit-slider-runnable-track {
+        background-color: rgba(vars.$interactive-color, 0.35);
+    }
+
+    &::-webkit-slider-thumb {
+        background: vars.$interactive-color;
+        box-shadow: none;
+    }
+}
+
+input[type="checkbox"] {
+    &:checked {
+        background-color: vars.$interactive-color;
+        border-color: vars.$interactive-color;
+    }
+}

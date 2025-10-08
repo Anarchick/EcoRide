@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const departure = form.querySelector('input[name="travel_search[departure]"]');
             const arrival = form.querySelector('input[name="travel_search[arrival]"]');
             const date = form.querySelector('input[name="travel_search[date]"]');
-            const passengers = form.querySelector('input[name="travel_search[passengersMin]"]');
+            const passengers = form.querySelector('input[name="travel_search[minPassengers]"]');
             const allRequiredFilled = Boolean(departure?.value.trim() &&
                 arrival?.value.trim() &&
                 date?.value.trim() &&

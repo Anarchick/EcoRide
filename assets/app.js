@@ -3,6 +3,7 @@ import'./layout_guide.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
 import './styles/app.css';
+import './scripts/travel-search-bar.js'
 import './styles/home/home.css';
 import htmx from 'htmx.org';
 

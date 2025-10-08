@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function (): void {
             const departure: HTMLInputElement | null = form.querySelector('input[name="travel_search[departure]"]');
             const arrival: HTMLInputElement | null = form.querySelector('input[name="travel_search[arrival]"]');
             const date: HTMLInputElement | null = form.querySelector('input[name="travel_search[date]"]');
-            const passengers: HTMLInputElement | null = form.querySelector('input[name="travel_search[passengersMin]"]');
+            const passengers: HTMLInputElement | null = form.querySelector('input[name="travel_search[minPassengers]"]');
             
             const allRequiredFilled: boolean = Boolean(
                 departure?.value.trim() && 
