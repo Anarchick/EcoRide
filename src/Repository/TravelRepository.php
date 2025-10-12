@@ -5,6 +5,8 @@ namespace App\Repository;
 use App\Entity\Travel;
 use App\Enum\DateIntervalEnum;
 use App\Enum\FuelTypeEnum;
+use App\Enum\LuggageSizeEnum;
+use App\Enum\TravelStateEnum;
 use App\Repository\Trait\UuidFinderTrait;
 use App\Model\Search\TravelCriteria;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -36,8 +38,11 @@ class TravelRepository extends ServiceEntityRepository
     public function getTravelsByCriteria(TravelCriteria $criteria, int $page): array
     {
         $firstResult = max($page - 1, 0) * 10;
-        return $this->createQueryBuilder('t')
-            ->select('t.uuid as travelUuid, d.uuid as driverUuid, t.date, t.duration, t.cost, t.passengersMax, COUNT(tu) AS currentPassengers, (t.passengersMax - COUNT(tu)) AS availablePlaces, c.fuelType')
+        $query = $this->createQueryBuilder('t')
+            ->select('t.uuid as travelUuid, t.date, t.duration, t.cost, t.passengersMax, c.fuelType')
+            ->addSelect('COUNT(tu) AS currentPassengers, (t.passengersMax - COUNT(tu)) AS availablePlaces')
+            ->addSelect('DATE_ADD(t.date, t.duration, \'MINUTE\') AS arrivalDateTime')
+            ->addSelect('d.uuid AS driverUuid, d.username AS driverUsername, d.ratingAverage AS driverRating')
             ->innerJoin('t.driver', 'd')
             ->innerJoin('t.travelPreference', 'tp')
             ->innerJoin('t.car', 'c')
@@ -45,22 +50,54 @@ class TravelRepository extends ServiceEntityRepository
             ->where('t.date BETWEEN :dateMin AND :dateMax')
             ->andWhere('t.departure = :departure')
             ->andWhere('t.arrival = :arrival')
-            //->andWhere('tp.isPetsAllowed = :isPetsAllowed')
+            ->andWhere('t.state = :state')
             ->groupBy('t.uuid, d.uuid, t.date, t.duration, t.cost, t.passengersMax, c.fuelType')
             ->having('availablePlaces >= :minPassengers')
             ->orderBy('CASE WHEN c.fuelType = :electric THEN 1 ELSE 0 END', 'DESC')
             ->addOrderBy('t.date', 'ASC')
             ->setMaxResults(10)
             ->setFirstResult($firstResult)
-            //->setParameter('isPetsAllowed', true)
             ->setParameter('dateMin', $criteria->getDateTime()->format('Y-m-d H:i:s'))
             ->setParameter('dateMax', $criteria->getDateTime()->format('Y-m-d 23:59:59'))
             ->setParameter('departure', $criteria->getDeparture())
             ->setParameter('arrival', $criteria->getArrival())
             ->setParameter('minPassengers', $criteria->getMinPassengers())
-            ->setParameter('electric', FuelTypeEnum::ELECTRIC)
-            ->getQuery()
-            ->getResult();
+            ->setParameter('state', TravelStateEnum::PENDING)
+            ->setParameter('electric', FuelTypeEnum::ELECTRIC);
+        
+        if ($criteria->isElectricPreferred()) {
+            $query->andWhere('c.fuelType = :electric');
+        }
+
+        if ($criteria->isSmokingAllowed()) {
+            $query->andWhere('tp.isSmokingAllowed = true');
+        }
+
+        if ($criteria->isPetsAllowed()) {
+            $query->andWhere('tp.isPetsAllowed = true');
+        }
+
+        if ($criteria->getMaxCost() < 1000) {
+            $query->andWhere('t.cost <= :maxCost')
+                ->setParameter('maxCost', $criteria->getMaxCost());
+        }
+
+        if ($criteria->getLuggageSizeMin() != LuggageSizeEnum::NONE) {
+            $query->andWhere('tp.luggageSize >= :minLuggageSize')
+                ->setParameter('minLuggageSize', $criteria->getLuggageSizeMin()->ordinal());
+        }
+
+        if ($criteria->getMinScore() > 0) {
+            $query->andWhere('d.ratingAverage >= :minScore')
+                ->setParameter('minScore', $criteria->getMinScore());
+        }
+
+        if ($criteria->getMaxDuration() < 24) {
+            $query->andWhere('t.duration <= :maxDuration')
+                ->setParameter('maxDuration', $criteria->getMaxDuration() * 60);
+        }
+
+        return $query->getQuery()->getResult();
     }
 
     /**

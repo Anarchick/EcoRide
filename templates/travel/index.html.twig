@@ -3,18 +3,18 @@
 {% block title %}EcoRide - Voyager{% endblock %}
 
 {% block importmap %}
-    {{ importmap(['app', 'scripts/specific/travel']) }}
+    {{ importmap(['app', 'scripts/specific/travel', 'travel/index.css']) }}
 {% endblock %}
 
 {% block main %}
 <twig:TravelSearchBar :form="search_form" />
 
-<div class="container mt-4">
+<div class="eco-container-main">
     <!-- Loading animation -->
     <div id="loading" class="htmx-indicator">
         <div class="d-flex flex-column justify-content-center align-items-center m-4">
             <div class="spinner-border text-success" role="status"></div>
-            <span class="sr-only mt-2">Recherche en cours...</span>
+            <span class="eco-small-text sr-only mt-2">Recherche en cours...</span>
         </div>
     </div>
     
@@ -22,7 +22,7 @@
     <div id="travel-results">
         <div class="text-center text-muted">
             <i class="bi bi-search"></i>
-            <p>Utilisez la barre de recherche pour trouver des trajets</p>
+            <p class="eco-small-text">Utilisez la barre de recherche pour trouver des trajets</p>
         </div>
     </div>
 </div>

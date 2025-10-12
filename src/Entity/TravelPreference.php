@@ -22,8 +22,8 @@ class TravelPreference
     #[ORM\Column(index: true)]
     private ?bool $isPetsAllowed = false;
 
-    #[ORM\Column(enumType: LuggageSizeEnum::class, index: true)]
-    private ?LuggageSizeEnum $luggageSize = null;
+    #[ORM\Column(index: true)]
+    private ?int $luggageSize = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $comment = null;
@@ -64,13 +64,17 @@ class TravelPreference
         return $this;
     }
 
-    public function getLuggageSize(): ?LuggageSizeEnum
+    public function getLuggageSize(): ?int
     {
         return $this->luggageSize;
     }
 
-    public function setLuggageSize(LuggageSizeEnum $luggageSize): static
+    public function setLuggageSize(int | LuggageSizeEnum $luggageSize): static
     {
+        if ($luggageSize instanceof LuggageSizeEnum) {
+            $luggageSize = $luggageSize->ordinal();
+        }
+
         $this->luggageSize = $luggageSize;
 
         return $this;

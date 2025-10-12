@@ -66,7 +66,7 @@ class TravelCriteria
     // Get max duration in hours
     public function getMaxDuration(): int
     {
-        return $this->maxDuration ?? PHP_INT_MAX;
+        return $this->maxDuration ?? 24;
     }
 
     public function getMinScore(): int
@@ -76,7 +76,7 @@ class TravelCriteria
 
     public function getMaxCost(): int
     {
-        return $this->maxCost ?? PHP_INT_MAX;
+        return $this->maxCost * 10 ?? 1000;
     }
 
     public function isElectricPreferred(): bool
@@ -98,5 +98,5 @@ class TravelCriteria
     {
         return $this->luggageSizeMin ?? LuggageSizeEnum::NONE;
     }
-    
+
 }

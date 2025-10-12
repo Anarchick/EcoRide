@@ -11,4 +11,16 @@ enum FuelTypeEnum: string
     case ELECTRIC = 'electric';
     case HYDROGEN = 'hydrogen';
     case HYBRID = 'hybrid';
+
+    public function getEcoScore(): int
+    {
+        return match($this) {
+            self::ELECTRIC, self::HYDROGEN => 5,
+            self::HYBRID => 4,
+            self::BIO_DIESEL, self::BIO_ETHANOL => 3,
+            self::GAZ => 2,
+            self::PETROL, self::DIESEL => 1,
+        };
+    }
+    
 }

@@ -39,7 +39,7 @@
             </div>
 
             <div>
-                <div class="line-separator"></div>
+                <div class="line-separator" aria-hidden="true"></div>
                 <div class="travel-search-input">
                     {{ ux_icon('ion:location', {class: 'travel-search-icon'})}}
                     {{ form_widget(form.arrival, {
@@ -52,7 +52,7 @@
             </div>
 
             <div>
-                <div class="line-separator"></div>
+                <div class="line-separator" aria-hidden="true"></div>
                 <div class="travel-search-input">
                     {{ ux_icon('ion:calendar', {class: 'travel-search-icon'})}}
                     {{ form_widget(form.date, {
@@ -65,7 +65,7 @@
             </div>
             
             <div>
-                <div class="line-separator"></div>
+                <div class="line-separator" aria-hidden="true"></div>
                 <div class="travel-search-input">
                     {{ ux_icon('ion:people', {class: 'travel-search-icon'})}}
                     {{ form_widget(form.minPassengers, {
@@ -90,44 +90,45 @@
         </button>
 
         <div id="travel-search-filters-collapse" class="collapse">
-            <div id="filters" class="">
-
+            <div id="filters">
             
-            <div class="services">
-                <h2 class="eco-normal-text eco-bold-text">Services</h2>
-                {{ form_widget(form.isElectricPreferred) }}
-                {{ form_widget(form.isSmokingAllowed) }}
-                {{ form_widget(form.isPetsAllowed) }}
-            </div>
-            
-            <div class="filter-col-2">
-                <div class="price">
-                    <h2 class="eco-normal-text  eco-bold-text">Prix max.</h2>
-                    <div class= "filter-slider">
-                        {{ ux_icon('mdi:storm', {class: 'travel-search-icon'}) }}
-                        <p id="filter-price-text" class="filter-range-text eco-text-small m-0">999</p>
-                        {{ form_widget(form.maxCost, {id: 'filter-price-input'}) }}
+                <div>
+                    <h2 class="eco-normal-text eco-bold-text">Services</h2>
+                    <div class="eco-normal-text">
+                        {{ form_widget(form.isElectricPreferred, {'label': 'Électrique seulement'}) }}
+                        {{ form_widget(form.isSmokingAllowed, {'label': 'Fumeur autorisé'}) }}
+                        {{ form_widget(form.isPetsAllowed, {'label': 'Animaux autorisés'}) }}
                     </div>
                 </div>
-
-                <div class="luggage">
-                    <h2 class="eco-normal-text eco-bold-text">Bagages</h2>
-                    {{ form_widget(form.luggageSizeMin) }}
+                
+                <div>
+                    <div>
+                        <h2 class="eco-normal-text eco-bold-text">Prix max.</h2>
+                        <div class="filter-slider">
+                            {{ ux_icon('mdi:storm', {class: 'travel-search-icon'}) }}
+                            <p id="filter-price-text" class="filter-range-text eco-normal-text m-0">999</p>
+                            {{ form_widget(form.maxCost, {id: 'filter-price-input'}) }}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h2 class="eco-normal-text eco-bold-text">Bagages</h2>
+                        {{ form_widget(form.luggageSizeMin) }}
+                    </div>
                 </div>
-            </div>
-            
-            <div class="score">
-                <h2 class="eco-normal-text eco-bold-text">Note min.</h2>
-                {{ form_widget(form.minScore) }}
-            </div>
-
-            <div class="duration">
-                <h2 class="eco-normal-text eco-bold-text">Durée max.</h2>
-                <div class="filter-slider">
-                    <p id="filter-duration-text" class="filter-range-text eco-text-small m-0">24h</p>
-                    {{ form_widget(form.maxDuration, {id: 'filter-duration-input'}) }}
+                
+                <div>
+                    <h2 class="eco-normal-text eco-bold-text">Note min.</h2>
+                    {{ form_widget(form.minScore) }}
                 </div>
-            </div>
+                
+                <div>
+                    <h2 class="eco-normal-text eco-bold-text">Durée max.</h2>
+                    <div class="filter-slider">
+                        <p id="filter-duration-text" class="filter-range-text eco-normal-text m-0">24h</p>
+                        {{ form_widget(form.maxDuration, {id: 'filter-duration-input'}) }}
+                    </div>
+                </div>
             
             </div>
         </div>

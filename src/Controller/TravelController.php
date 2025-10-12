@@ -92,7 +92,27 @@ final class TravelController extends AbstractController
         // not HTMX Context
         return $this->render('travel/index.html.twig', [
             'search_form' => $searchForm,
+            'criteria' => $searchForm->getData(),
         ]);
+    }
+
+    #[Route('/index-debug', name: 'index_debug')]
+    public function indexDebug(Request $request, TravelRepository $travelRepository, KernelInterface $kernel): Response
+    {
+        if ($kernel->getEnvironment() !== 'dev') {
+            throw $this->createNotFoundException('Page non trouvée');
+        }
+
+        $criteria = new TravelCriteria();
+        $criteria->date = new \DateTime('tomorrow');
+        $criteria->departure = 'Paris';
+        $criteria->arrival = 'Lyon';
+        $criteria->minPassengers = 1;
+        $criteria->maxCost = 900;
+
+        $travels = $travelRepository->getTravelsByCriteria($criteria, 1);
+        dd($travels);
+        
     }
 
     #[Route('/{uuid32}', name: 'show', methods: ['GET'], requirements: ['uuid32' => '[a-f0-9]{32}'])]

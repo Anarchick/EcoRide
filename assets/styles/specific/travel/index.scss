@@ -1,0 +1,90 @@
+@use '../../_utils' as utils;
+@use '../../_variables' as vars;
+
+.travel-card {
+    height: 100px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 24px);
+    grid-template-areas:    "profile duration duration price"
+                            "profile address address places"
+                            "profile date date details";
+    column-gap: 20px;
+    padding: 12px 0;
+    margin-bottom: 8px;
+    border-radius: vars.$border-radius;
+    background-color: vars.$third-background-color;
+}
+
+.travel-card-ecologic {
+    border: 1px solid vars.$interactive-color;
+}
+
+.A1 {
+    grid-area: profile;
+    align-items: center;
+    overflow: hidden;
+    
+    .profile-component {
+        
+        .profile-picture {
+            justify-self: center;
+            height: calc(66.6%);
+            width: auto;
+        }
+
+        .profile-info {
+            justify-self: center;
+            height: calc(33.4%);
+        }
+
+    }
+}
+
+.B1 {
+    grid-area: duration;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    > .separator {
+        height: 1px;
+        width: 100%;
+        background-color: vars.$text-color;
+    }
+}
+
+.D1 {
+    grid-area: price;
+    align-items: center;
+    justify-content: center;
+}
+
+.B2 {
+    grid-area: address;
+}
+
+.D2 {
+    grid-area: places;
+    justify-content: center;
+    gap: 4px;
+}
+
+.B3 {
+    grid-area: date;
+    align-content: center;
+}
+
+.D3 {
+    grid-area: details;
+    width: fit-content;
+    margin: 0 !important;
+    justify-self: center;
+    padding: 0 12px;
+}
+
+.travel-card-ecologic {
+    border: 1px solid vars.$interactive-color;
+}

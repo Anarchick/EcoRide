@@ -1,19 +1,58 @@
 {# Single travel overview #}
 {% macro overview(travel) %}
-<div class="mb-3">
-    {# {{ dump(travel) }} #}
-    <div class="border">
-        <p>travel uuid : {{ travel.travelUuid }}</p>
-        <p>usern uuid : {{ travel.driverUuid }}</p>
-        <p>datetime : {{ travel.date.date}}</p>
-        <p>fuelType : {{ travel.fuelType.value }}</p>
-    </div>
-    <div class="d-flex gap-3">
 
-        <p>⬆️</p>
+{% set hours = (travel.duration / 60)|round(0, 'floor') %}
+{% set minutes = travel.duration % 60 %}
 
-        <a href="{{ path('app_travel_show', { uuid32: travel.travelUuid | replace({'-': ''}) }) }}">Voir le trajet</a>
-        <a href="{{ path('app_member_show', { uuid32: travel.driverUuid | replace({'-': ''}) }) }}">Voir le profil</a>
+{% set isEcological = travel.fuelType.value == 'electric' %}
+<article class="travel-card{{ isEcological ? ' travel-card-ecologic' : '' }}">
+
+    {# Profile #}
+    <div class="A1">
+        {% include 'components/profile.html.twig' with {
+            'userUuid': travel.driverUuid,
+            'userName': travel.driverUsername,
+            'userRating': travel.driverRating
+        } %}
     </div>
-</div>
+
+    {# Duration #}
+    <div class="B1">
+        <time class="eco-normal-text eco-bold-text" datetime="{{ travel.date | date('Y-m-d H:i') }}">{{ travel.date | date('H\\hi') }}</time>
+        <div class="separator" aria-hidden="true"></div>
+        <time class="eco-small-text" datetime="PT{{ travel.duration }}M">{{ '%02dh%02d'|format(hours, minutes) }}</time>
+        <div class="separator" aria-hidden="true"></div>
+        <time class="eco-normal-text eco-bold-text" datetime="{{ travel.arrivalDateTime | date('Y-m-d H:i') }}">{{ travel.arrivalDateTime | date('H\\hi') }}</time>
+    </div>
+
+    {# Cost #}
+    <div class="D1 d-flex">
+        {{ ux_icon('mdi:storm', {class: 'h-100'}) }}
+        <p class="eco-normal-text eco-bold-text">{{ travel.cost }}</p>
+    </div>
+
+    {# Addresses #}
+    <div class="B2 eco-small-text d-flex justify-content-between">
+        <p>Annecy</p>
+        <p>Lyon</p>
+    </div>
+
+    {# Passengers #}
+    <div class="D2 eco-normal-text eco-bold-text d-flex">
+        {{ ux_icon('ion:people', {class: 'h-75'}) }}
+        <p>{{ travel.currentPassengers }}/{{ travel.passengersMax }}</p>
+    </div>
+
+    {# Date #}
+    <div class="B3 eco-small-text">
+        <time datetime="{{ travel.date | date('Y-m-d') }}">{{ travel.date | date('d/m/Y') }}</time>
+    </div>
+
+    {# Details #}
+    <a class="D3 eco-btn ms-2 eco-normal-text" target="_blank"
+        href="{{ path('app_travel_show', { uuid32: travel.travelUuid | replace({'-': ''}) }) }}">
+        Details
+    </a>
+
+</article>
 {% endmacro %}

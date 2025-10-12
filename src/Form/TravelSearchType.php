@@ -56,8 +56,8 @@ class TravelSearchType extends AbstractType
                 'required' => false,
             ])
             ->add('luggageSizeMin', ChoiceType::class, [
-                'required' => false,
                 'choices' => LuggageSizeEnum::getChoices(),
+                'data' => LuggageSizeEnum::NONE, 
             ])
             ->add('maxCost', RangeType::class, [
                 'required' => false,
@@ -76,7 +76,6 @@ class TravelSearchType extends AbstractType
                 ]
             ])
             ->add('minScore', ChoiceType::class, [
-                'required' => false,
                 'choices' => [
                     'Toutes les notes' => 0,
                     '1+' => 1,
@@ -85,6 +84,7 @@ class TravelSearchType extends AbstractType
                     '4+' => 4,
                     '5' => 5,
                 ],
+                'data' => 0,
             ])
 
             // Do not add a submit button for this form

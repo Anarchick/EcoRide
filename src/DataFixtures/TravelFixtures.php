@@ -83,12 +83,20 @@ class TravelFixtures extends Fixture implements DependentFixtureInterface
                     ->setCar($car)
                     ->setDriver($user)
                     ->setDistance($this->faker->numberBetween(450, 530))
-                    ->setDuration($this->faker->numberBetween(60*4, 60*5))
+                    ->setDuration($this->faker->numberBetween(60*4, 60*7))
                     ->setTravelPreference($travelPreference);
 
                 $travelPreference->setLuggageSize(LuggageSizeEnum::cases()[array_rand(LuggageSizeEnum::cases())])
                     ->setComment($this->faker->paragraph())
                     ->setTravel($travel);
+
+                if ($this->faker->boolean(30)) {
+                    $travelPreference->setIsSmokingAllowed(true);
+                }
+
+                if ($this->faker->boolean(30)) {
+                    $travelPreference->setIsPetsAllowed(true);
+                }
 
                 $manager->persist($travel);
                 $manager->persist($travelPreference);
