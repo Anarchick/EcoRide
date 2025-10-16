@@ -29,6 +29,7 @@
     "typescript-eslint": "^8.36.0"
   },
   "dependencies": {
+    "bootstrap": "^5.3.8",
     "chart.js": "^4.5.0"
   }
 }
