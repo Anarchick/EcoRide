@@ -4,7 +4,7 @@ const DELAY_MS: number = 100;
 document.addEventListener('DOMContentLoaded', function (): void {
     // Wait for HTMX initialization and inputs to be set from Controller
     setTimeout((): void => {
-        const form: HTMLFormElement | null = document.getElementById('travel-search-bar') as HTMLFormElement; // templates/components/TravelSearchBar.html.twig
+        const form: HTMLFormElement | null = document.getElementById('travel-search') as HTMLFormElement; // templates/components/TravelSearchBar.html.twig
 
         // @ts-expect-error htmx is loaded globally
         if (form && window.htmx) {
@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', function (): void {
                 
                 if (htmxUrl && htmxTarget) { // Always true
                     
+                    
                     const formData: FormData = new FormData(form);
                     const searchParams: URLSearchParams = new URLSearchParams();
 
@@ -48,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function (): void {
                     });
                     
                     const fullUrl: string = `${htmxUrl}?${searchParams.toString()}`;
-                    
+                    console.log('Manual HTMX ajax call to:', fullUrl);
                     // manual HTMX request
                     // @ts-expect-error htmx is loaded globally
                     window.htmx.ajax('GET', fullUrl, {
