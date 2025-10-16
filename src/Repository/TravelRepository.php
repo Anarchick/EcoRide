@@ -11,6 +11,7 @@ use App\Repository\Trait\UuidFinderTrait;
 use App\Model\Search\TravelCriteria;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * @extends ServiceEntityRepository<Travel>
@@ -43,26 +44,27 @@ class TravelRepository extends ServiceEntityRepository
             ->addSelect('COUNT(tu) AS currentPassengers, (t.passengersMax - COUNT(tu)) AS availablePlaces')
             ->addSelect('DATE_ADD(t.date, t.duration, \'MINUTE\') AS arrivalDateTime')
             ->addSelect('d.uuid AS driverUuid, d.username AS driverUsername, d.ratingAverage AS driverRating')
+            ->addSelect('tp.isSmokingAllowed AS isSmokingAllowed, tp.isPetsAllowed AS isPetsAllowed, tp.luggageSize AS luggageSize')
             ->innerJoin('t.driver', 'd')
             ->innerJoin('t.travelPreference', 'tp')
             ->innerJoin('t.car', 'c')
             ->leftJoin('t.carpoolers', 'tu')
-            ->where('t.date BETWEEN :dateMin AND :dateMax')
+            ->where('t.state = :state')
             ->andWhere('t.departure = :departure')
             ->andWhere('t.arrival = :arrival')
-            ->andWhere('t.state = :state')
+            ->andWhere('t.date BETWEEN :dateMin AND :dateMax')
             ->groupBy('t.uuid, d.uuid, t.date, t.duration, t.cost, t.passengersMax, c.fuelType')
             ->having('availablePlaces >= :minPassengers')
-            ->orderBy('CASE WHEN c.fuelType = :electric THEN 1 ELSE 0 END', 'DESC')
+            ->orderBy('CASE WHEN c.fuelType = :electric THEN 0 ELSE 1 END', 'ASC')
             ->addOrderBy('t.date', 'ASC')
             ->setMaxResults(10)
             ->setFirstResult($firstResult)
-            ->setParameter('dateMin', $criteria->getDateTime()->format('Y-m-d H:i:s'))
-            ->setParameter('dateMax', $criteria->getDateTime()->format('Y-m-d 23:59:59'))
+            ->setParameter('state', TravelStateEnum::PENDING)
             ->setParameter('departure', $criteria->getDeparture())
             ->setParameter('arrival', $criteria->getArrival())
+            ->setParameter('dateMin', $criteria->getDateTime()->format('Y-m-d H:i:s'))
+            ->setParameter('dateMax', $criteria->getDateTime()->format('Y-m-d 23:59:59'))
             ->setParameter('minPassengers', $criteria->getMinPassengers())
-            ->setParameter('state', TravelStateEnum::PENDING)
             ->setParameter('electric', FuelTypeEnum::ELECTRIC);
         
         if ($criteria->isElectricPreferred()) {
@@ -77,6 +79,7 @@ class TravelRepository extends ServiceEntityRepository
             $query->andWhere('tp.isPetsAllowed = true');
         }
 
+        // Only apply filters with no default values
         if ($criteria->getMaxCost() < 1000) {
             $query->andWhere('t.cost <= :maxCost')
                 ->setParameter('maxCost', $criteria->getMaxCost());
@@ -98,6 +101,23 @@ class TravelRepository extends ServiceEntityRepository
         }
 
         return $query->getQuery()->getResult();
+    }
+
+    public function getCarpoolers(string|Uuid $uuid): array
+    {
+        $uuid = $this->toUuid($uuid);
+
+        if (!$uuid) {
+            return [];
+        }
+
+        return $this->createQueryBuilder('t')
+            ->select('tu.uuid as passengerUuid, tu.username as passengerUsername, tu.ratingAverage as passengerRating')
+            ->innerJoin('t.carpoolers', 'tu')
+            ->where('t.uuid = :travelUuid')
+            ->setParameter('travelUuid', $uuid)
+            ->orderBy('tu.username', 'ASC')
+            ->getQuery()->getResult();
     }
 
     /**

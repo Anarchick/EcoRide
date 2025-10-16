@@ -1,0 +1,140 @@
+@use '../../_utils' as utils;
+@use '../../_variables' as vars;
+
+
+// travel cards
+
+.travel-card {
+    height: 100px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    column-gap: 20px;
+    padding: 12px 0;
+    margin-bottom: 8px;
+    border-radius: vars.$border-radius;
+    background-color: vars.$third-background-color;
+}
+
+.travel-card-index {
+    height: 100px;
+    grid-template-rows: repeat(3, 24px);
+    grid-template-areas:    "profile schedule schedule price"
+                            "profile address address places"
+                            "profile date date details";
+}
+
+.travel-card-show {
+    height: fit-content;
+    height: fit-content;
+    grid-template-rows: 24px auto;
+    grid-template-areas:    "date schedule schedule places"
+                            ". address address properties";
+    margin: 16px 0;
+}
+
+.ga-profile {
+    grid-area: profile;
+    align-items: center;
+    overflow: hidden;
+    
+    .profile-component {
+        
+        .profile-picture {
+            justify-self: center;
+            height: calc(66.6%);
+            width: auto;
+        }
+
+        .profile-info {
+            justify-self: center;
+            height: calc(33.4%);
+        }
+
+    }
+}
+
+.ga-schedule {
+    grid-area: schedule;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    > .separator {
+        height: 1px;
+        width: 100%;
+        background-color: vars.$text-color;
+    }
+}
+
+.ga-price {
+    grid-area: price;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ga-address {
+    grid-area: address;
+    display: flex;
+    justify-content: space-between;
+}
+
+.ga-places {
+    grid-area: places;
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+}
+
+.ga-date {
+    grid-area: date;
+    align-content: center;
+}
+
+.ga-details {
+    grid-area: details;
+    width: fit-content;
+    margin: 0 !important;
+    justify-self: center;
+    padding: 0 12px;
+}
+
+.ga-properties {
+    grid-area: properties;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+}
+
+// Specific styles for travel show page
+
+#map {
+    width: 100%;
+    height: 30vh;
+    background-color: vars.$third-background-color;
+}
+
+.travel-interaction {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: 24px auto;
+    column-gap: 20px;
+    grid-template-areas:    ". . . price"
+                            "message . . book";
+}
+
+.ga-message {
+    grid-area: message;
+    align-self: center;
+    justify-self: center;
+}
+
+.ga-book {
+    grid-area: book;
+    align-self: center;
+    justify-self: center;
+}
+

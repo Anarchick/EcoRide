@@ -1,14 +1,11 @@
 {# Single travel overview #}
-{% macro overview(travel) %}
-
-{% set hours = (travel.duration / 60)|round(0, 'floor') %}
-{% set minutes = travel.duration % 60 %}
+{% macro overview(travel, criteria) %}
 
 {% set isEcological = travel.fuelType.value == 'electric' %}
-<article class="travel-card{{ isEcological ? ' travel-card-ecologic' : '' }}">
+<article class="travel-card travel-card-index{{ isEcological ? ' border-interactive' : '' }}">
 
     {# Profile #}
-    <div class="A1">
+    <div class="ga-profile">
         {% include 'components/profile.html.twig' with {
             'userUuid': travel.driverUuid,
             'userName': travel.driverUsername,
@@ -16,41 +13,43 @@
         } %}
     </div>
 
-    {# Duration #}
-    <div class="B1">
-        <time class="eco-normal-text eco-bold-text" datetime="{{ travel.date | date('Y-m-d H:i') }}">{{ travel.date | date('H\\hi') }}</time>
-        <div class="separator" aria-hidden="true"></div>
-        <time class="eco-small-text" datetime="PT{{ travel.duration }}M">{{ '%02dh%02d'|format(hours, minutes) }}</time>
-        <div class="separator" aria-hidden="true"></div>
-        <time class="eco-normal-text eco-bold-text" datetime="{{ travel.arrivalDateTime | date('Y-m-d H:i') }}">{{ travel.arrivalDateTime | date('H\\hi') }}</time>
+    {# Schedule #}
+    <div class="ga-schedule">
+        {% include 'travel/partials/_schedule.html.twig' with {
+            date: travel.date,
+            duration: travel.duration,
+            arrivalDateTime: travel.arrivalDateTime
+        } %}
     </div>
 
     {# Cost #}
-    <div class="D1 d-flex">
-        {{ ux_icon('mdi:storm', {class: 'h-100'}) }}
-        <p class="eco-normal-text eco-bold-text">{{ travel.cost }}</p>
+    <div class="ga-price">
+        {% include 'travel/partials/_price.html.twig' with {
+            cost: travel.cost,
+            slot: criteria.minPassengers
+        } %}
     </div>
 
     {# Addresses #}
-    <div class="B2 eco-small-text d-flex justify-content-between">
-        <p>Annecy</p>
-        <p>Lyon</p>
+    <div class="ga-address eco-small-text">
+        <p>{{ criteria.departure }}</p>
+        <p>{{ criteria.arrival }}</p>
     </div>
 
     {# Passengers #}
-    <div class="D2 eco-normal-text eco-bold-text d-flex">
+    <div class="ga-places eco-normal-text">
         {{ ux_icon('ion:people', {class: 'h-75'}) }}
         <p>{{ travel.currentPassengers }}/{{ travel.passengersMax }}</p>
     </div>
 
     {# Date #}
-    <div class="B3 eco-small-text">
+    <div class="ga-date eco-small-text">
         <time datetime="{{ travel.date | date('Y-m-d') }}">{{ travel.date | date('d/m/Y') }}</time>
     </div>
 
     {# Details #}
-    <a class="D3 eco-btn ms-2 eco-normal-text" target="_blank"
-        href="{{ path('app_travel_show', { uuid32: travel.travelUuid | replace({'-': ''}) }) }}">
+    <a class="ga-details eco-btn ms-2 eco-normal-text" target="_blank"
+        href="{{ path('app_travel_show', { uuid32: travel.travelUuid | replace({'-': ''}), slot: criteria.minPassengers }) }}">
         Details
     </a>
 

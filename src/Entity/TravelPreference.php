@@ -80,6 +80,11 @@ class TravelPreference
         return $this;
     }
 
+    public function getLuggageSizeEnum(): ?LuggageSizeEnum
+    {
+        return $this->luggageSize !== null ? LuggageSizeEnum::fromOrdinal($this->luggageSize) : null;
+    }
+
     public function getComment(): ?string
     {
         return $this->comment;

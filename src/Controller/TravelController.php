@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Travel;
+use App\Enum\TravelStateEnum;
 use App\Form\TravelSearchType;
 use App\Repository\TravelRepository;
 use App\Model\Search\TravelCriteria;
@@ -11,10 +13,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/travel', name: 'app_travel_', methods: ['GET'])]
+#[Route('/travel', name: 'app_travel_')]
 final class TravelController extends AbstractController
 {
-    #[Route('/', name: 'index')]
+    #[Route('/', name: 'index', methods: ['GET'])]
     public function index(Request $request, TravelRepository $travelRepository, KernelInterface $kernel): Response
     {
         $htmxHeader = $request->headers->get('HX-Request');
@@ -86,6 +88,7 @@ final class TravelController extends AbstractController
 
             return $this->render('travel/overviews.html.twig', [
                 'travels' => $travels,
+                'criteria' => $searchForm->getData(),
             ]);
         }
 
@@ -97,7 +100,7 @@ final class TravelController extends AbstractController
     }
 
     #[Route('/index-debug', name: 'index_debug')]
-    public function indexDebug(Request $request, TravelRepository $travelRepository, KernelInterface $kernel): Response
+    public function indexDebug(TravelRepository $travelRepository, KernelInterface $kernel): Response
     {
         if ($kernel->getEnvironment() !== 'dev') {
             throw $this->createNotFoundException('Page non trouvée');
@@ -116,16 +119,39 @@ final class TravelController extends AbstractController
     }
 
     #[Route('/{uuid32}', name: 'show', methods: ['GET'], requirements: ['uuid32' => '[a-f0-9]{32}'])]
-    public function show(string $uuid32, TravelRepository $travelRepository): Response
+    public function show(Request $request, string $uuid32, TravelRepository $travelRepository): Response
     {
+        /** @var Travel|null */
         $travel = $travelRepository->getByUuid($uuid32);
+        $requestData = $request->query->all();
+        $slot = $requestData['slot'] ?? 1;
 
         if (!$travel) {
             throw $this->createNotFoundException('Trajet non trouvé');
         }
 
+        if ($travel->getState() !== TravelStateEnum::PENDING) {
+            $this->addFlash('error', 'Ce trajet n\'est plus disponible pour la réservation.');
+            return $this->redirectToRoute('app_travel_index');
+        }
+
+        $carpoolers = $travel->getCarpoolers();
+        $slot = $travel->getValidatedSlotCount($slot);
+        
         return $this->render('travel/show.html.twig', [
-            'travel' => $travel
+            'travel' => $travel,
+            'arrivalDateTime' => (new \DateTime($travel->getDate()->format('Y-m-d H:i:s')))->add(new \DateInterval('PT' . $travel->getDuration() . 'M')),
+            'carpoolers' => $carpoolers,
+            'slot' => $slot,
+        ]);
+    }
+
+    #[Route('/{uuid32}/book', name: 'book', methods: ['POST'], requirements: ['uuid32' => '[a-f0-9]{32}'])]
+    public function book(Request $request, string $uuid32, TravelRepository $travelRepository): Response
+    {   
+        // Redirect to booking confirmation page (to be created)
+        return $this->redirectToRoute('app_travel_show', [
+            'uuid32' => $uuid32
         ]);
     }
 

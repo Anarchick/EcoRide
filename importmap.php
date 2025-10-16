@@ -46,8 +46,8 @@ return [
         'path' => './assets/scripts/specific/admin.js',
         'entrypoint' => true,
     ],
-    'travel/index.css' => [
-        'path' => './assets/styles/specific/travel/index.css',
+    'travel.css' => [
+        'path' => './assets/styles/specific/travel/travel.css',
         'entrypoint' => true,
         'type' => 'css',
     ]

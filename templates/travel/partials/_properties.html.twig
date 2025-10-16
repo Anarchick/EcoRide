@@ -1,0 +1,30 @@
+{% if ecologic %}
+<div class="d-flex color-interact"
+    data-bs-toggle="tooltip" 
+    data-bs-placement="bottom"
+    title="Trajet écologique">
+    {{ ux_icon('mdi:leaf') }}
+</div>
+{% endif %}
+<div class="position-relative d-flex" 
+    data-bs-toggle="tooltip" 
+    data-bs-placement="bottom" 
+    title="{{ animals ? 'Animaux acceptés' : 'pas d\'animaux' }}">
+    {{ ux_icon('fluent:animal-paw-print-20-filled') }}
+    {% if not animals %}
+    {{ ux_icon('system-uicons:no-sign', {class: 'text-danger position-absolute top-50 start-50 translate-middle h-100'}) }}
+    {% endif %}
+</div>
+
+<div class="position-relative d-flex" 
+    data-bs-toggle="tooltip" 
+    data-bs-placement="bottom" 
+    title="{{ smoking ? 'Cigarettes autorisées' : 'non-fumeur' }}">
+    {{ ux_icon('mdi:cigarette') }}
+    {% if not smoking %}
+        {{ ux_icon('system-uicons:no-sign', {class: 'text-danger position-absolute top-50 start-50 translate-middle h-100'}) }}
+    {% endif %}
+</div>
+<div class="d-flex" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{{ luggage.getLabel()|capitalize }}">
+{{ ux_icon('material-symbols-light:luggage-rounded') }}
+</div>

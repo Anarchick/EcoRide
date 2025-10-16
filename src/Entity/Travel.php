@@ -244,4 +244,23 @@ class Travel
 
         return $this;
     }
+
+    // LOGIC METHODS
+
+    public function getAvailableSlots(): int
+    {
+        return $this->passengersMax - count($this->carpoolers);
+    }
+
+    /**
+     * Validate and return a slot count between 1 and the number of available places.
+     * If there are no available places, return 1.
+     * @param int $slot The requested slot count
+     * @return int The validated slot count
+     */
+    public function getValidatedSlotCount(int $slot): int
+    {
+        $availablePlaces = $this->getAvailableSlots();
+        return max(1, min((int)$slot, $availablePlaces));
+    }
 }
