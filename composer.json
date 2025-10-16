@@ -7,6 +7,7 @@
         "php": ">=8.2",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "ext-intl": "*",
         "beberlei/doctrineextensions": "^1.5",
         "doctrine/dbal": "^3",
         "doctrine/doctrine-bundle": "^2.15",
@@ -52,6 +53,7 @@
         "symfony/web-link": "7.3.*",
         "symfony/yaml": "7.3.*",
         "twig/extra-bundle": "^2.12|^3.0",
+        "twig/intl-extra": "^3.21",
         "twig/twig": "^2.12|^3.0"
     },
     "config": {
