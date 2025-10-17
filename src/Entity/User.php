@@ -121,19 +121,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $travels;
 
     /**
-     * @var Collection<int, Travel>
-     */
-    #[ORM\ManyToMany(targetEntity: Travel::class, inversedBy: 'carpoolers')]
-    #[ORM\JoinTable(name: 'user_travel')]
-    #[ORM\JoinColumn(name: 'user_uuid', referencedColumnName: 'uuid')]
-    #[ORM\InverseJoinColumn(name: 'travel_uuid', referencedColumnName: 'uuid')]
-    private Collection $carpools;
-
-    /**
      * @var Collection<int, Role>
      */
     #[ORM\OneToMany(targetEntity: Role::class, mappedBy: 'user', orphanRemoval: true, cascade: ['persist'])]
     private Collection $roles;
+
+    /**
+     * @var Collection<int, Carpooler>
+     */
+    #[ORM\OneToMany(targetEntity: Carpooler::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $carpoolers;
 
     public function __construct()
     {
@@ -142,8 +139,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->cars = new ArrayCollection();
         $this->transactions = new ArrayCollection();
         $this->travels = new ArrayCollection();
-        $this->carpools = new ArrayCollection();
         $this->roles = new ArrayCollection();
+        $this->carpoolers = new ArrayCollection();
     }
 
     public function getUuid(): ?Uuid
@@ -469,30 +466,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, Travel>
-     */
-    public function getCarpools(): Collection
-    {
-        return $this->carpools;
-    }
-
-    public function addCarpool(Travel $carpool): static
-    {
-        if (!$this->carpools->contains($carpool)) {
-            $this->carpools->add($carpool);
-        }
-
-        return $this;
-    }
-
-    public function removeCarpool(Travel $carpool): static
-    {
-        $this->carpools->removeElement($carpool);
-
-        return $this;
-    }
-
-    /**
      * @see Symfony\Component\Security\Core\User\UserInterface
      */
     public function getRoles(): array
@@ -565,6 +538,49 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmailHash(string $emailHash): static
     {
         $this->emailHash = $emailHash;
+
+        return $this;
+    }
+
+    // LOGIC METHODS
+
+    public function hasRole(RoleEnum $role): bool
+    {
+        foreach ($this->roles as $roleEntity) {
+            if ($roleEntity->getRole() === $role) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return Collection<int, Carpooler>
+     */
+    public function getCarpoolers(): Collection
+    {
+        return $this->carpoolers;
+    }
+
+    public function addCarpooler(Carpooler $carpooler): static
+    {
+        if (!$this->carpoolers->contains($carpooler)) {
+            $this->carpoolers->add($carpooler);
+            $carpooler->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCarpooler(Carpooler $carpooler): static
+    {
+        if ($this->carpoolers->removeElement($carpooler)) {
+            // set the owning side to null (unless already changed)
+            if ($carpooler->getUser() === $this) {
+                $carpooler->setUser(null);
+            }
+        }
 
         return $this;
     }

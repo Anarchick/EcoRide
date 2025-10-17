@@ -2,12 +2,14 @@
 
 namespace App\Entity;
 
+use App\Enum\RoleEnum;
 use App\Enum\TravelStateEnum;
 use App\Repository\TravelRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
@@ -37,7 +39,8 @@ class Travel
     #[ORM\Column(length: 90, index: true)] // Index for stats
     private ?string $arrival = null;
 
-    #[ORM\Column(index: true)] // Index for stats
+    #[ORM\Column(index: true)]
+    #[Gedmo\Timestampable(on: 'create')]
     private ?\DateTimeImmutable $date = null;
 
     #[ORM\Column]
@@ -59,9 +62,9 @@ class Travel
     private ?TravelPreference $travelPreference = null;
 
     /**
-     * @var Collection<int, User>
+     * @var Collection<int, Carpooler>
      */
-    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'carpools')]
+    #[ORM\OneToMany(targetEntity: Carpooler::class, mappedBy: 'travel', orphanRemoval: true)]
     private Collection $carpoolers;
 
     public function __construct()
@@ -219,27 +222,30 @@ class Travel
     }
 
     /**
-     * @return Collection<int, User>
+     * @return Collection<int, Carpooler>
      */
     public function getCarpoolers(): Collection
     {
         return $this->carpoolers;
     }
 
-    public function addCarpooler(User $carpooler): static
+    public function addCarpooler(Carpooler $carpooler): static
     {
         if (!$this->carpoolers->contains($carpooler)) {
             $this->carpoolers->add($carpooler);
-            $carpooler->addCarpool($this);
+            $carpooler->setTravel($this);
         }
-
+        
         return $this;
     }
 
-    public function removeCarpooler(User $carpooler): static
+    public function removeCarpooler(Carpooler $carpooler): static
     {
         if ($this->carpoolers->removeElement($carpooler)) {
-            $carpooler->removeCarpool($this);
+            // set the owning side to null (unless already changed)
+            if ($carpooler->getTravel() === $this) {
+                $carpooler->setTravel(null);
+            }
         }
 
         return $this;
@@ -247,9 +253,18 @@ class Travel
 
     // LOGIC METHODS
 
+    public function getUsedSlots(): int
+    {
+        $usedSlots = 0;
+        foreach ($this->carpoolers as $carpooler) {
+            $usedSlots += $carpooler->getSlots();
+        }
+        return $usedSlots;
+    }
+    
     public function getAvailableSlots(): int
     {
-        return $this->passengersMax - count($this->carpoolers);
+        return $this->passengersMax - $this->getUsedSlots();
     }
 
     /**
@@ -263,4 +278,63 @@ class Travel
         $availablePlaces = $this->getAvailableSlots();
         return max(1, min((int)$slot, $availablePlaces));
     }
+
+    public function isCarpooler(User $user): bool
+    {
+        foreach ($this->carpoolers as $carpooler) {
+            if ($carpooler->getUser()->getUuid() === $user->getUuid()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function join(User $user, int $slot, int $cost): Carpooler|null
+    {
+        if (!$this->isCarpooler($user)) {
+
+            if ($this->state !== TravelStateEnum::PENDING) {
+                throw new \InvalidArgumentException('Le trajet n\'est plus disponible pour la réservation.');
+            }
+
+            if ($this->isCarpooler($user)) {
+                throw new \InvalidArgumentException('L\'utilisateur est déjà covoitureur de ce trajet.');
+            }
+
+            $validatedSlot = $this->getValidatedSlotCount($slot);
+            if ($validatedSlot < $slot) {
+                throw new \InvalidArgumentException('Le nombre de places demandées dépasse le nombre de places disponibles.');
+            }
+
+            if ($validatedSlot <= 0) {
+                throw new \InvalidArgumentException('Le nombre de places réservées doit être au moins de 1.');
+            }
+
+            if ($user->getCredits() < $cost) {
+                throw new \InvalidArgumentException('L\'utilisateur n\'a pas assez de crédits pour réserver ce trajet.');
+            }
+
+            if ($user->getUuid() === $this->driver?->getUuid()) {
+                throw new \InvalidArgumentException('Le conducteur ne peut pas être covoitureur de son propre trajet.');
+            }
+
+            if ($user->hasRole(RoleEnum::ADMIN) || $user->hasRole(RoleEnum::MODERATOR)) {
+                throw new \InvalidArgumentException('Un administrateur ou modérateur ne peut pas être covoitureur.');
+            }
+
+            $carpooler = new Carpooler();
+            $carpooler->setTravel($this)
+                ->setUser($user)
+                ->setSlots($slot)
+                ->setCost($cost);
+            $this->addCarpooler($carpooler);
+
+            $user->setCredits($user->getCredits() - $cost);
+
+            return $carpooler;
+        }
+
+        return null;
+    }
+
 }
