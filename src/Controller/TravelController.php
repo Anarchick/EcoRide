@@ -3,10 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\Travel;
+use App\Entity\User;
 use App\Enum\TravelStateEnum;
 use App\Form\TravelSearchType;
 use App\Repository\TravelRepository;
 use App\Model\Search\TravelCriteria;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -123,11 +125,13 @@ final class TravelController extends AbstractController
     {
         /** @var Travel|null */
         $travel = $travelRepository->getByUuid($uuid32);
+        $passengersCount = $travelRepository->getTravelPassengersCount($travel);
         $requestData = $request->query->all();
         $slot = $requestData['slot'] ?? 1;
 
         if (!$travel) {
-            throw $this->createNotFoundException('Trajet non trouvé');
+            $this->addFlash('error', 'Trajet non trouvé');
+            return $this->redirectToRoute('app_travel_index');
         }
 
         if ($travel->getState() !== TravelStateEnum::PENDING) {
@@ -142,17 +146,55 @@ final class TravelController extends AbstractController
             'travel' => $travel,
             'arrivalDateTime' => (new \DateTime($travel->getDate()->format('Y-m-d H:i:s')))->add(new \DateInterval('PT' . $travel->getDuration() . 'M')),
             'carpoolers' => $carpoolers,
+            'usedSlots' => $travel->getUsedSlots(),
             'slot' => $slot,
+            'passengersCount' => $passengersCount,
         ]);
     }
 
     #[Route('/{uuid32}/book', name: 'book', methods: ['POST'], requirements: ['uuid32' => '[a-f0-9]{32}'])]
-    public function book(Request $request, string $uuid32, TravelRepository $travelRepository): Response
+    public function book(Request $request, string $uuid32, TravelRepository $travelRepository, EntityManagerInterface $em): Response
     {   
-        // Redirect to booking confirmation page (to be created)
-        return $this->redirectToRoute('app_travel_show', [
-            'uuid32' => $uuid32
-        ]);
+        /** @var Travel|null */
+        $travel = $travelRepository->getByUuid($uuid32);
+        /** @var User|null */
+        $user = $this->getUser();
+        
+        if (!$travel) {
+            $this->addFlash('error', 'Trajet non trouvé');
+            return $this->redirectToRoute('app_travel_index');
+        }
+
+        // Check user authentication
+        if (!$user) {
+            $this->addFlash('error', 'Vous devez être connecté pour réserver un trajet.');
+            return $this->redirectToRoute('app_login');
+        }
+
+        try {
+            $slot = $request->request->getInt('slot', 1);
+            $cost = $slot * $travel->getCost();
+            $carpool = $travel->join($user, $slot, $cost);
+            
+            if ($carpool) {
+                $em->persist($carpool);
+                $em->persist($travel);
+                // $em->persist($user);
+                $em->flush();
+            }
+
+            $this->addFlash('success', "Réservation de $slot place(s) effectuée avec succès");
+            return $this->redirectToRoute('app_travel_show', [
+                'uuid32' => $uuid32
+            ]);
+        } catch (\InvalidArgumentException $e) {
+            $this->addFlash('error', $e->getMessage());
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Une erreur est survenue lors de la réservation. Veuillez réessayer plus tard.');
+            // TODO log
+        }
+        
+        return $this->redirectToRoute('app_travel_show', ['uuid32' => $uuid32]);
     }
 
 }

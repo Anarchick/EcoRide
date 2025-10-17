@@ -25,6 +25,28 @@ class TravelRepository extends ServiceEntityRepository
 
     use UuidFinderTrait;
 
+    public function getTravelPassengersCount(string|Uuid|Travel $uuid): int
+    {
+        if ($uuid instanceof Travel) {
+            $uuid = $uuid->getUuid();
+        }
+
+        $uuid = $this->toUuid($uuid);
+
+        if (!$uuid) {
+            return 0;
+        }
+
+        return (int) $this->createQueryBuilder('t')
+            ->select('COALESCE(SUM(cp.slots), 0) AS passengersCount')
+            ->leftJoin('t.carpoolers', 'cp')
+            ->where('t.uuid = :travelUuid')
+            ->setParameter('travelUuid', $uuid)
+            ->groupBy('t.uuid')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     /**
      * Get travels by criteria with pagination.
      * Each page contains 10 results.
@@ -41,14 +63,16 @@ class TravelRepository extends ServiceEntityRepository
         $firstResult = max($page - 1, 0) * 10;
         $query = $this->createQueryBuilder('t')
             ->select('t.uuid as travelUuid, t.date, t.duration, t.cost, t.passengersMax, c.fuelType')
-            ->addSelect('COUNT(tu) AS currentPassengers, (t.passengersMax - COUNT(tu)) AS availablePlaces')
+            // Sum all slots reserved by carpoolers for accurate passenger count
+            ->addSelect('COALESCE(SUM(cp.slots), 0) AS currentPassengers')
+            ->addSelect('(t.passengersMax - COALESCE(SUM(cp.slots), 0)) AS availablePlaces')
             ->addSelect('DATE_ADD(t.date, t.duration, \'MINUTE\') AS arrivalDateTime')
             ->addSelect('d.uuid AS driverUuid, d.username AS driverUsername, d.ratingAverage AS driverRating')
             ->addSelect('tp.isSmokingAllowed AS isSmokingAllowed, tp.isPetsAllowed AS isPetsAllowed, tp.luggageSize AS luggageSize')
             ->innerJoin('t.driver', 'd')
             ->innerJoin('t.travelPreference', 'tp')
             ->innerJoin('t.car', 'c')
-            ->leftJoin('t.carpoolers', 'tu')
+            ->leftJoin('t.carpoolers', 'cp')
             ->where('t.state = :state')
             ->andWhere('t.departure = :departure')
             ->andWhere('t.arrival = :arrival')
