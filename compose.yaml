@@ -13,6 +13,34 @@ services:
     networks:
       - app_network
 
+  mongodb:
+    image: mongo:8.0.15
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data_dev:/data/db:rw
+    networks:
+      - app_network
+
+  mongo-express:
+    image: mongo-express:latest
+    depends_on:
+      - mongodb
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://root:root@mongodb:27017/
+      ME_CONFIG_BASICAUTH_ENABLED: true
+      ME_CONFIG_BASICAUTH_USERNAME: root
+      ME_CONFIG_BASICAUTH_PASSWORD: root
+    networks:
+      - app_network
+
   phpmyadmin:
     image: phpmyadmin:latest
     depends_on:
@@ -39,6 +67,7 @@ services:
 
 volumes:
   db_data_dev:
+  mongo_data_dev:
 
 networks:
   app_network:
