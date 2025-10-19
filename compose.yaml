@@ -17,8 +17,9 @@ services:
     image: mongo:8.0.15
     restart: unless-stopped
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: root
+      - MONGODB_INITDB_DATABASE=${MONGODB_DB:-app}
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
     ports:
       - "27017:27017"
     volumes:
