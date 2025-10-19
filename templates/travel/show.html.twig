@@ -7,7 +7,10 @@
 {% endblock %}
 
 {% block main %}
-<canvas id="map"></canvas>
+{% if map %}
+    {{ ux_map(map, {'id': 'map'}) }}
+{% endif %}
+
 <div class="eco-container-main">
 
     {% include 'partials/_flashes.html.twig' %}

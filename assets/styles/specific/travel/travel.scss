@@ -112,8 +112,10 @@
 
 #map {
     width: 100%;
-    height: 30vh;
+    height: 40vh;
+    min-height: 300px;
     background-color: vars.$third-background-color;
+    overflow: hidden;
 }
 
 .travel-interaction {

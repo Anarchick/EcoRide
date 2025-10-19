@@ -8,6 +8,7 @@
 /var/
 /vendor/
 /node_modules/
+/.php_tmp/
 ###< symfony/framework-bundle ###
 
 ###> github ###

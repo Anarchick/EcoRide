@@ -8,6 +8,7 @@ use App\Enum\TravelStateEnum;
 use App\Form\TravelSearchType;
 use App\Repository\TravelRepository;
 use App\Model\Search\TravelCriteria;
+use App\Service\MapService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -121,7 +122,12 @@ final class TravelController extends AbstractController
     }
 
     #[Route('/{uuid32}', name: 'show', methods: ['GET'], requirements: ['uuid32' => '[a-f0-9]{32}'])]
-    public function show(Request $request, string $uuid32, TravelRepository $travelRepository): Response
+    public function show(
+        Request $request,
+        string $uuid32,
+        TravelRepository $travelRepository,
+        MapService $mapService
+        ): Response
     {
         /** @var Travel|null */
         $travel = $travelRepository->getByUuid($uuid32);
@@ -142,6 +148,12 @@ final class TravelController extends AbstractController
         $carpoolers = $travel->getCarpoolers();
         $slot = $travel->getValidatedSlotCount($slot);
         
+        // Create map with Symfony UX Map
+        $map = $mapService->createTravelMap(
+            $travel->getDeparture(),
+            $travel->getArrival()
+        );
+        
         return $this->render('travel/show.html.twig', [
             'travel' => $travel,
             'arrivalDateTime' => (new \DateTime($travel->getDate()->format('Y-m-d H:i:s')))->add(new \DateInterval('PT' . $travel->getDuration() . 'M')),
@@ -149,6 +161,7 @@ final class TravelController extends AbstractController
             'usedSlots' => $travel->getUsedSlots(),
             'slot' => $slot,
             'passengersCount' => $passengersCount,
+            'map' => $map, // Pass map to template
         ]);
     }
 

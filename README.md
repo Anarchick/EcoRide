@@ -18,6 +18,7 @@
 - Symfony/uid
 - Symfony/ux-icons
 - Symfony/ux-live-component
+- Symfony/ux-leaflet-map
 - HTMX
 - Chart.js
 
