@@ -1,9 +1,12 @@
 flowchart LR
+visitor((Visiteur))
 modo((Modérateur))
 admin((Administrateur))
 
-modo --> /login[Se connecter]
-/login --> /logout[Se déconnecter]
+visitor --> /login[Se connecter]
+modo -->|&lt;require&gt;| visitor
+
+modo --> /logout[Se déconnecter]
 modo --> /profil[Acceder au profil et aux paramètres]
 /profil --> /profil/edit[Modifier profil]
 modo --> /travels/edit[Modifier un trajet]
