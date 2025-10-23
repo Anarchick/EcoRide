@@ -38,26 +38,25 @@ class RouteCache
      * @var array<int, array{lat: float, lon: float}>
      */
     #[MongoDB\Field(type: 'collection')]
-    #[Assert\NotBlank(message: 'La géométrie de l\'itinéraire est obligatoire')]
+    #[Assert\NotBlank()]
     #[Assert\Count(
-        min: 2,
-        minMessage: 'L\'itinéraire doit contenir au moins {{ limit }} points'
+        min: 2
     )]
     private array $geometry = [];
 
     #[MongoDB\Field(type: 'float')]
-    #[Assert\NotBlank(message: 'La distance est obligatoire')]
+    #[Assert\NotBlank()]
     #[Assert\Positive()]
     #[Assert\Range(
-        min: 0.1,
-        max: 10000
+        min: 10,
+        max: 1500
     )]
     private float $distanceKm;
 
     #[MongoDB\Field(type: 'int')]
     #[Assert\Range(
         min: 1,
-        max: 10080
+        max: 1440
     )]
     private int $durationMinutes;
 
@@ -170,5 +169,5 @@ class RouteCache
     {
         return $this->expiresAt > new \DateTime();
     }
-    
+
 }

@@ -153,11 +153,6 @@ readonly class RouteData
 
     /**
      * Create RouteData from RouteCache geometry array
-     * 
-     * @param array<int, array{lat: float, lon: float}> $geometry
-     * @param float $distanceKm
-     * @param int $durationMinutes
-     * @return self
      */
     public static function fromCacheGeometry(array $geometry, float $distanceKm, int $durationMinutes): self
     {
