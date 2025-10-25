@@ -76,7 +76,7 @@ class GeocodingService
         }
     }
 
-    private function normalizeCityName(string $cityName): string
+    public function normalizeCityName(string $cityName): string
     {
         return mb_strtolower(trim($cityName));
     }
