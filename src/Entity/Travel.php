@@ -13,6 +13,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'travels')]
 #[ORM\Index(name: 'idx_search_criteria', columns: ['departure', 'arrival', 'date', 'passengers_max'])]
@@ -44,15 +45,22 @@ class Travel
     private ?\DateTimeImmutable $date = null;
 
     #[ORM\Column]
+    #[Assert\Positive()]
     private ?int $duration = null;
 
     #[ORM\Column]
+    #[Assert\Positive()]
     private ?int $distance = null;
 
     #[ORM\Column(type: Types::SMALLINT)] // No index Needed
+    #[Assert\Range(
+        min: 1,
+        max: 8
+    )]
     private ?int $passengersMax = null;
 
     #[ORM\Column]
+    #[Assert\PositiveOrZero()]
     private ?int $cost = null;
 
     #[ORM\Column(enumType: TravelStateEnum::class, index: true)]
