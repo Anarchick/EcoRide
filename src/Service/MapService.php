@@ -17,6 +17,16 @@ class MapService
         private readonly LoggerInterface $logger
     ) {}
 
+    public function getGeocodingService(): GeocodingService
+    {
+        return $this->geocodingService;
+    }
+
+    public function getRoutingService(): RoutingService
+    {
+        return $this->routingService;
+    }
+
     /**
      * Create a Symfony UX Map for displaying a route between two cities
      * Shows markers and OSRM routing polyline with distance/duration

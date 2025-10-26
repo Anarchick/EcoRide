@@ -28,7 +28,7 @@ readonly class RouteData
         #[Assert\Positive()]
         #[Assert\Range(
             min: 0.1,
-            max: 10000
+            max: 1000
         )]
         public float $distanceKm,
         
@@ -153,6 +153,7 @@ readonly class RouteData
 
     /**
      * Create RouteData from RouteCache geometry array
+
      */
     public static function fromCacheGeometry(array $geometry, float $distanceKm, int $durationMinutes): self
     {

@@ -9,8 +9,8 @@ namespace App\Model;
 readonly class GeolocationData
 {
     public function __construct(
-        public float $latitude,
-        public float $longitude
+        public readonly float $latitude,
+        public readonly float $longitude
     ) {
         if ($latitude < -90 || $latitude > 90) {
             throw new \InvalidArgumentException(

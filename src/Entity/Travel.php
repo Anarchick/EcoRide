@@ -326,7 +326,7 @@ class Travel
                 throw new \InvalidArgumentException('Le conducteur ne peut pas être covoitureur de son propre trajet.');
             }
 
-            if ($user->hasRole(RoleEnum::ADMIN) || $user->hasRole(RoleEnum::MODERATOR)) {
+            if ($user->isModerator()) {
                 throw new \InvalidArgumentException('Un administrateur ou modérateur ne peut pas être covoitureur.');
             }
 

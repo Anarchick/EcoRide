@@ -46,8 +46,12 @@ trait UuidFinderTrait
      * @param string|Uuid $uuid
      * @return T|null
      */
-    public function getByUuid(string|Uuid $uuid): mixed
+    public function getByUuid(string|Uuid|null $uuid): mixed
     {
+        if (!$uuid) {
+            return null;
+        }
+
         return $this->findOneBy(['uuid' => $this->toUuid($uuid)]);
     }
 }
