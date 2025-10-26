@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}EcoRide - Voyager{% endblock %}
+
+{% block importmap %}
+    {{ importmap(['app', 'travel.css']) }}
+{% endblock %}
+
+{% block main %}
+<div class="form-header eco-page-text text-center">
+    <h1>Créer un trajet</h1>
+</div>
+
+<section class="eco-container-main">
+    {% include 'partials/_flashes.html.twig' %}
+
+    {{ form_start(form, {'attr': {'class': 'eco-form'}}) }}
+    {{ form_end(form) }}
+</section>
+
+{% endblock %}

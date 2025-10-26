@@ -2,19 +2,30 @@
 
 namespace App\Controller;
 
+use App\Entity\Car;
 use App\Entity\Travel;
 use App\Entity\User;
+use App\Enum\RoleEnum;
 use App\Enum\TravelStateEnum;
+use App\Form\Travel2Type;
+use App\Form\TravelType;
 use App\Form\TravelSearchType;
 use App\Repository\TravelRepository;
 use App\Model\Search\TravelCriteria;
+use App\Repository\CarRepository;
+use App\Security\Voter\TravelVoter;
 use App\Service\MapService;
+use App\Service\SessionTTLService;
+use App\Service\TravelCreationService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/travel', name: 'app_travel_')]
 final class TravelController extends AbstractController
@@ -121,19 +132,134 @@ final class TravelController extends AbstractController
         
     }
 
-    #[Route('/{uuid32}', name: 'show', methods: ['GET'], requirements: ['uuid32' => '[a-f0-9]{32}'])]
+    #[Route('/create', name: 'create')]
+    #[IsGranted(RoleEnum::DRIVER->value)]
+    public function create(
+        Request $request,
+        EntityManagerInterface $em,
+        CarRepository $carRepository,
+        MapService $mapService,
+        TravelCreationService $travelCreationService,
+        SessionTTLService $sessionTTL,
+    ): Response
+    {
+        /** @var User|null */
+        $user = $this->getUser();
+
+        if ($user->getCars()->isEmpty()) {
+            $this->addFlash('error', 'Vous devez ajouter une voiture avant de pouvoir créer un trajet.');
+            return $this->redirectToRoute('app_car_create');
+        }
+        /** @var array<string, mixed>|null */
+        $travelData = $sessionTTL->get('travel_create_data');
+
+        // Step 1 : Needed data for step 2
+        if (!$travelData ) {
+            $travel = new Travel();
+            $form = $this->createForm(TravelType::class, $travel, ['cars' => $user->getCars()]);
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $result = $travelCreationService->validateStep1($travel);
+
+                if (!$result['success']) {
+                    $this->addFlash('error', $result['error']);
+                    return $this->redirectToRoute('app_travel_create');
+                }
+
+                $sessionTTL->set('travel_create_data', [
+                    ...$result['data'],
+                    'date' => $travel->getDate()->format('Y-m-d H:i:s'),
+                    'car_uuid' => $travel->getCar()->getUuid()->toRfc4122(),
+                ], 1800);
+
+                return $this->redirectToRoute('app_travel_create');
+            }
+
+            return $this->render('travel/create.html.twig', [
+                'form' => $form,
+            ]);
+        }
+
+        // Step 2
+        /** @var Car|null */
+        $car = $carRepository->getByUuid($travelData['car_uuid']);
+
+        if (!$car) {
+            $sessionTTL->remove('travel_create_data');
+            $this->addFlash('error', 'voiture invalide.');
+            return $this->redirectToRoute('app_travel_create');
+        }
+
+        $travel = $travelCreationService->createTravel(
+            $user,
+            $car,
+            $travelData,
+            new \DateTimeImmutable($travelData['date'])
+        );
+
+        $form = $this->createForm(Travel2Type::class, $travel, [
+            'passengers_max' => $travel->getPassengersMax(),
+            'distance_km' => $travel->getDistance(),
+            'fuel_type' => $car->getFuelType(),
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->persist($travel);
+            $em->persist($travel->getTravelPreference());
+            $em->flush();
+
+            $sessionTTL->remove('travel_create_data');
+
+            $this->addFlash('success', 'Trajet créé avec succès');
+            return $this->redirectToRoute('app_travel_show', [
+                'uuid' => $travel->getUuid()->toRfc4122(),
+            ], Response::HTTP_SEE_OTHER);
+        }
+
+        $map = $mapService->createTravelMap(
+            $travelData['departure'],
+            $travelData['arrival']
+        );
+
+        return $this->render('travel/create_step2.html.twig', [
+            'form' => $form,
+            'map' => $map,
+        ]);
+    }
+
+    #[Route('/{uuid}/remove', name: 'remove', methods: ['POST'],
+        requirements: ['uuid' => Requirement::UID_RFC4122]
+    )]
+    #[IsGranted(TravelVoter::REMOVE, subject: 'travel')]
+    public function remove(
+        #[MapEntity(mapping: ['uuid' => 'uuid'])]
+        Travel $travel,
+        EntityManagerInterface $entityManager
+    ): Response
+    {
+        $entityManager->remove($travel);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Trajet supprimé avec succès');
+        return $this->redirectToRoute('app_travel_index', [],
+            Response::HTTP_SEE_OTHER
+        );
+    }
+
+    #[Route('/{uuid}', name: 'show', methods: ['GET'],
+        requirements: ['uuid' => Requirement::UID_RFC4122]
+    )]
     public function show(
         Request $request,
-        string $uuid32,
+        String $uuid,
         TravelRepository $travelRepository,
         MapService $mapService
         ): Response
     {
         /** @var Travel|null */
-        $travel = $travelRepository->getByUuid($uuid32);
-        $passengersCount = $travelRepository->getTravelPassengersCount($travel);
-        $requestData = $request->query->all();
-        $slot = $requestData['slot'] ?? 1;
+        $travel = $travelRepository->getByUuid($uuid);
 
         if (!$travel) {
             $this->addFlash('error', 'Trajet non trouvé');
@@ -145,8 +271,10 @@ final class TravelController extends AbstractController
             return $this->redirectToRoute('app_travel_index');
         }
 
+        $passengersCount = $travelRepository->getTravelPassengersCount($travel);
+        $requestData = $request->query->all();
         $carpoolers = $travel->getCarpoolers();
-        $slot = $travel->getValidatedSlotCount($slot);
+        $slot = $travel->getValidatedSlotCount($requestData['slot'] ?? 1);
         
         // Create map with Symfony UX Map
         $map = $mapService->createTravelMap(
@@ -165,11 +293,52 @@ final class TravelController extends AbstractController
         ]);
     }
 
-    #[Route('/{uuid32}/book', name: 'book', methods: ['POST'], requirements: ['uuid32' => '[a-f0-9]{32}'])]
-    public function book(Request $request, string $uuid32, TravelRepository $travelRepository, EntityManagerInterface $em): Response
-    {   
+    #[Route('/{uuid}/edit', name: 'edit',
+        requirements: ['uuid' => Requirement::UID_RFC4122]
+    )]
+    #[IsGranted(TravelVoter::EDIT, subject: 'travel')]
+    public function edit(
+        #[MapEntity(mapping: ['uuid' => 'uuid'])]
+        Travel $travel,
+        Request $request,
+        EntityManagerInterface $em
+    ): Response
+    {
+        $form = $this->createForm(Travel2Type::class, $travel, [
+            'passengers_max' => $travel->getPassengersMax(),
+            'distance_km' => $travel->getDistance(),
+            'fuel_type' => $travel->getCar()->getFuelType(),
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->persist($travel);
+            $em->persist($travel->getTravelPreference());
+            $em->flush();
+
+            $this->addFlash('success', 'Trajet mis à jour avec succès');
+
+            return $this->redirectToRoute('app_travel_show', [
+                'uuid' => $travel->getUuid()->toRfc4122(),
+            ], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('travel/edit.html.twig', [
+            'form' => $form,
+            'travel' => $travel,
+        ]);
+    }
+
+    #[Route('/{uuid}/book', name: 'book', methods: ['POST'], requirements: ['uuid' => Requirement::UID_RFC4122])]
+    public function book(
+        Request $request,
+        String $uuid,
+        TravelRepository $travelRepository,
+        EntityManagerInterface $em
+    ): Response
+    {
         /** @var Travel|null */
-        $travel = $travelRepository->getByUuid($uuid32);
+        $travel = $travelRepository->getByUuid($uuid);
         /** @var User|null */
         $user = $this->getUser();
         
@@ -197,9 +366,6 @@ final class TravelController extends AbstractController
             }
 
             $this->addFlash('success', "Réservation de $slot place(s) effectuée avec succès");
-            return $this->redirectToRoute('app_travel_show', [
-                'uuid32' => $uuid32
-            ]);
         } catch (\InvalidArgumentException $e) {
             $this->addFlash('error', $e->getMessage());
         } catch (\Exception $e) {
@@ -207,7 +373,7 @@ final class TravelController extends AbstractController
             // TODO log
         }
         
-        return $this->redirectToRoute('app_travel_show', ['uuid32' => $uuid32]);
+        return $this->redirectToRoute('app_travel_show', ['uuid' => $uuid]);
     }
 
 }
