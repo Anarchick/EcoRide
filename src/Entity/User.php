@@ -555,6 +555,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return false;
     }
 
+    public function isModerator(): bool
+    {
+        return $this->hasRole(RoleEnum::MODERATOR) || $this->hasRole(RoleEnum::ADMIN);
+    }
+
     /**
      * @return Collection<int, Carpooler>
      */
