@@ -74,7 +74,7 @@
                 slot: slot
             } %}
         </div>
-        <form action="{{ path('app_travel_book', {'uuid32': travel.uuid | replace({'-': ''})})}}" method="POST" class="ga-book">
+        <form action="{{ path('app_travel_book', { 'uuid': travel.uuid }) }}" method="POST" class="ga-book">
             <input type="hidden" name="slot" value="{{ slot }}">
             <button type="submit" class="eco-btn eco-normal-text">
                 Réserver {{ slot }} place{% if slot > 1 %}s{% endif %}

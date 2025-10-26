@@ -1,5 +1,5 @@
 <article class="profile-component w-100 h-100">
-    <a href="{{ path('app_member_show', { uuid32: userUuid | replace({'-': ''}) }) }}" target="_blank" class="eco-small-text">
+    <a href="{{ path('app_member_show', { uuid: userUuid }) }}" target="_blank" class="eco-small-text">
         <div class="profile-picture">
                 <img    src="{{ asset('images/ui/profile-placeholder.jpg') }}"
                         alt="Image de profil de {{ userName | decrypt }}">

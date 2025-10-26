@@ -49,7 +49,7 @@
 
     {# Details #}
     <a class="ga-details eco-btn ms-2 eco-normal-text" target="_blank"
-        href="{{ path('app_travel_show', { uuid32: travel.travelUuid | replace({'-': ''}), slot: criteria.minPassengers }) }}">
+        href="{{ path('app_travel_show', { uuid: travel.travelUuid, slot: criteria.minPassengers }) }}">
         Details
     </a>
 
