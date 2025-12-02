@@ -6,6 +6,7 @@ participant F as Frontend
 U ->> F: Créer un nouveau voyage
 activate F
 create participant B as Backend
+Note right of F: formulaire étape 1
 F ->> B: Appel /travel/create
 activate B
 create participant D as Doctrine
@@ -13,20 +14,31 @@ B ->> D: Vérifier données
 activate D
 alt données valides
     D -->>- B: Données valides
+    B ->> B: validation logique métier
+    B ->> B: Enregistrement des données en Session TTL
+    B -->> F: second formulaire
+    deactivate B
+    F -->> U: Afficher formulaire étape 2
+    U ->> F: Soumettre formulaire étape 2
+    F ->>+ B: /travel/create
+    B ->>+ D: vérifier données
+    D -->>- B: Données valides
     B ->> B: Créer voyage
     B ->>+ D: Enregistrer voyage
-    D -->>- B: Voyage enregistré
-    B ->> B: Envoyer mails de confirmation
-    B -->> F: Voyage créé
+    deactivate D
+    %% D -->>- B: Voyage enregistré
+    %% B ->> B: Envoyer mails de confirmation
+    B -->>- F: Succès + redirection
     F -->> U: Afficher confirmation
 activate D
+activate B
 else données invalides
     deactivate D
     destroy D
     D -->> B: Données invalides
     deactivate B
     destroy B
-    B -->> F: Erreur
+    B -->> F: Erreur + redirection
     F -->> U: Afficher message d'erreur
     deactivate F
 end

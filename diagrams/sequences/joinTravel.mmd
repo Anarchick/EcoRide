@@ -6,7 +6,7 @@ participant F as Frontend
 U ->> F: Rejoindre un voyage
 activate F
 create participant B as Backend
-F ->> B: Appel /travel/join
+F ->> B: POST /travel/{uuid}/book
 activate B
 create participant D as Doctrine
 B ->>+ D: Vérifier données
@@ -18,7 +18,7 @@ alt données valides
     B ->>+ D: Soustraitre crédits
     D -->>- B: Crédits soustraits
     B ->> B: Envoyer mails de confirmation
-    B -->> F: Voyage rejoint
+    B -->> F: succès + redirection
     F -->> U: Afficher confirmation
 activate D
 else données invalides
@@ -27,7 +27,7 @@ else données invalides
     D -->> B: Données invalides
     deactivate B
     destroy B
-    B -->> F: Erreur
+    B -->> F: Erreur + redirection
     F -->> U: Afficher message d'erreur
     deactivate F
 end
