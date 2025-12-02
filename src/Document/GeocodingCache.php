@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * MongoDB document for caching geocoding results
  * Stores city name to GPS coordinates mapping with TTL expiration
  */
-#[MongoDB\Document(repositoryClass: GeocodingCacheRepository::class, collection: 'geocoding_cache')]
+#[MongoDB\Document(db: 'ecoride', repositoryClass: GeocodingCacheRepository::class, collection: 'geocoding_cache')]
 #[MongoDB\Index(keys: ['cityName' => 1], options: ['unique' => true])]
 #[MongoDB\Index(keys: ['expiresAt' => 1], options: ['expireAfterSeconds' => 0])]
 class GeocodingCache

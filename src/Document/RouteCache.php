@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * MongoDB cache for OSRM routes
  * Stores complete polylines with distance and duration to avoid repeated API calls
  */
-#[MongoDB\Document(collection: 'route_cache', repositoryClass: RouteCacheRepository::class)]
+#[MongoDB\Document(db: 'ecoride', collection: 'route_cache', repositoryClass: RouteCacheRepository::class)]
 #[MongoDB\Index(keys: ['departureCity' => 'asc', 'arrivalCity' => 'asc'], options: ['unique' => true])]
 #[MongoDB\Index(keys: ['expiresAt' => 'asc'], options: ['expireAfterSeconds' => 0])]
 class RouteCache
