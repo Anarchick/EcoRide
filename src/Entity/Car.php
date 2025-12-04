@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Enum\ColorEnum;
 use App\Enum\FuelTypeEnum;
 use App\Repository\CarRepository;
+use App\Validator\UniquePlate;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -36,9 +37,17 @@ class Car
 
     #[Encrypted]
     #[Assert\NotBlank()]
-    #[Assert\Length(max: 10)]
-    #[ORM\Column(length: 255, unique: true)]
+    #[Assert\Length(max: 9)]
+    #[Assert\Regex(
+        pattern: '/^[a-zA-Z]{2}-\d{3}-[a-zA-Z]{2}$/',
+        message: 'La plaque d\'immatriculation est invalide.'
+    )]
+    #[UniquePlate]
+    #[ORM\Column(length: 255)]
     private ?string $plate = null;
+
+    #[ORM\Column(length: 64, unique: true)]
+    private ?string $plateHash = null;
 
     #[ORM\Column(enumType: FuelTypeEnum::class)]
     private ?FuelTypeEnum $fuelType = null;
@@ -54,6 +63,7 @@ class Car
     #[ORM\Column(enumType: ColorEnum::class)]
     private ?ColorEnum $color = null;
 
+    #[Assert\Range(min: 2, max: 10)]
     #[ORM\Column(type: Types::SMALLINT)]
     private ?int $totalSeats = null;
 
@@ -62,6 +72,14 @@ class Car
      */
     #[ORM\OneToMany(targetEntity: Travel::class, mappedBy: 'car', orphanRemoval: true)]
     private Collection $travels;
+
+    #[Assert\Range(
+        min: '2000-01-01',
+        max: 'now',
+        notInRangeMessage: 'La date de première immatriculation doit être comprise entre {{ min }} et aujourd\'hui.' 
+    )]
+    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    private ?\DateTimeImmutable $firstRegistrationDate = null;
 
     public function __construct()
     {
@@ -110,9 +128,26 @@ class Car
         return $this->plate;
     }
 
+    /**
+     * Set plate and automatically update plateHash.
+     * @return $this
+     */
     public function setPlate(string $plate): static
     {
-        $this->plate = $plate;
+        $this->plate = strtoupper($plate);
+        $this->plateHash = hash('sha256', strtoupper($plate));
+
+        return $this;
+    }
+
+    public function getPlateHash(): ?string
+    {
+        return $this->plateHash;
+    }
+
+    public function setPlateHash(string $plateHash): static
+    {
+        $this->plateHash = $plateHash;
 
         return $this;
     }
@@ -203,6 +238,18 @@ class Car
                 $travel->setCar(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getFirstRegistrationDate(): ?\DateTimeImmutable
+    {
+        return $this->firstRegistrationDate;
+    }
+
+    public function setFirstRegistrationDate(\DateTimeImmutable $firstRegistrationDate): static
+    {
+        $this->firstRegistrationDate = $firstRegistrationDate;
 
         return $this;
     }

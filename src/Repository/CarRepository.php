@@ -19,6 +19,19 @@ class CarRepository extends ServiceEntityRepository
 
     use UuidFinderTrait;
 
+    /**
+     * Find a car by its plate using hash lookup (optimized for encrypted field)
+     * 
+     * @param string $plate The plate to search for
+     * @return Car|null
+     */
+    public function findOneByPlate(string $plate): ?Car
+    {
+        $plateHash = hash('sha256', strtoupper($plate));
+        
+        return $this->findOneBy(['plateHash' => $plateHash]);
+    }
+
 //    /**
 //     * @return Car[] Returns an array of Car objects
 //     */
