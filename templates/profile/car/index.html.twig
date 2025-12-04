@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}EcoRide - Voitures{% endblock %}
+
+{% block main %}
+{% include 'partials/_profile_nav.html.twig' %}
+<div class="eco-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="eco-title-text">Mes voitures</h1>
+        <a href="{{ path('app_car_new') }}" class="eco-btn">
+            Ajouter une voiture
+        </a>
+    </div>
+
+    {% for car in cars %}
+    <div class="d-flex align-items-center gap-2 p-3">
+        {# bouton supprimer #}
+        <form method="post" action="{{ path('app_car_remove', { 'uuid': car.uuid }) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('remove' ~ car.uuid) }}">
+            <button name="remove" class="btn btn-danger">X</button>
+        </form>
+
+        <div>
+            <h2>{{ car.brand.name }} {{ car.model.name }}</h2>
+            <p>Plaque d'immatriculation: {{ car.plate }}</p>
+        </div>
+    </div>
+{% endfor %}
+</div>
+{% endblock %}
