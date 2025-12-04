@@ -46,6 +46,14 @@ return [
         'path' => './assets/scripts/specific/admin.js',
         'entrypoint' => true,
     ],
+    'scripts/htmx-url-template' => [
+        'path' => './assets/scripts/htmx-url-template.js',
+        'entrypoint' => true,
+    ],
+    'scripts/form-regex-validation' => [
+        'path' => './assets/scripts/form-regex-validation.js',
+        'entrypoint' => true,
+    ],
     'travel.css' => [
         'path' => './assets/styles/specific/travel/travel.css',
         'type' => 'css',
