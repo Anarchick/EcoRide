@@ -1,10 +1,10 @@
-<nav id="profile-nav">
-    <ul class="profile-nav-list">
+<nav id="profile-nav" class="container navbar justify-content-start" aria-label="Navigation du profil utilisateur">
+    <ul class="navbar-nav flex-row gap-2">
         <li>
-            <a class="profile-nav-link" href="{{ path('app_profile_index') }}">Mon profil</a>
+            <a class="eco-nav-link eco-normal-text" href="{{ path('app_profile_index') }}">Mon profil</a>
         </li>
         <li>
-            <a class="profile-nav-link" href="{{ path('app_car_index') }}">Mes voitures</a>
+            <a class=" eco-nav-link eco-normal-text" href="{{ path('app_car_index') }}">Mes voitures</a>
         </li>
     </ul>
 </nav>
