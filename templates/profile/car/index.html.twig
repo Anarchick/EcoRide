@@ -4,27 +4,30 @@
 
 {% block main %}
 {% include 'partials/_profile_nav.html.twig' %}
-<div class="eco-container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="eco-title-text">Mes voitures</h1>
+<div class="eco-container d-flex flex-column gap-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <h1 class="eco-title-text d-block">Mes voitures</h1>
         <a href="{{ path('app_car_new') }}" class="eco-btn">
             Ajouter une voiture
         </a>
     </div>
 
     {% for car in cars %}
-    <div class="d-flex align-items-center gap-2 p-3">
-        {# bouton supprimer #}
-        <form method="post" action="{{ path('app_car_remove', { 'uuid': car.uuid }) }}">
-            <input type="hidden" name="_token" value="{{ csrf_token('remove' ~ car.uuid) }}">
-            <button name="remove" class="btn btn-danger">X</button>
-        </form>
+        <div class="car-card-index">
+            {% if car.isRemoved %}
+                <p class="ga-car-is-removed">supprimée</p>
+            {% else %}
+                {# bouton supprimer #}
+                <form method="post" action="{{ path('app_car_remove', { 'uuid': car.uuid }) }}" class="ga-car-btn">
+                    <input type="hidden" name="_token" value="{{ csrf_token('remove' ~ car.uuid) }}">
+                    <button name="remove" class="btn btn-danger">X</button>
+                </form>
+            {% endif %}
 
-        <div>
-            <h2>{{ car.brand.name }} {{ car.model.name }}</h2>
-            <p>Plaque d'immatriculation: {{ car.plate }}</p>
+            <h2 class="ga-car-brand">{{ car.brand.name }}</h2>
+            <h2 class="ga-car-model">{{ car.model.name }}</h2>
+            <p class="ga-car-plate">Plaque d'immatriculation: {{ car.plate }}</p>
         </div>
-    </div>
-{% endfor %}
+    {% endfor %}
 </div>
 {% endblock %}

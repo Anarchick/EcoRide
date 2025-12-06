@@ -1,0 +1,30 @@
+.car-card-index {
+    height: fit-content;
+    width: fit-content;
+    display: grid;
+    column-gap: 8px;
+    grid-template-areas:    "car-btn car-brand car-model car-is-removed"
+                            "car-btn car-plate car-plate .";
+}
+
+.ga-car-btn {
+    grid-area: car-btn;
+    align-content: center;
+}
+
+.ga-car-brand {
+    grid-area: car-brand;
+}
+
+.ga-car-model {
+    grid-area: car-model;
+}
+
+.ga-car-plate {
+    grid-area: car-plate;
+}
+
+.ga-car-is-removed {
+    grid-area: car-is-removed;
+    align-content: center;
+}
