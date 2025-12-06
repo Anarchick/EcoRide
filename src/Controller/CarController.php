@@ -6,6 +6,7 @@ use App\Entity\Car;
 use App\Entity\User;
 use App\Enum\RoleEnum;
 use App\Form\CarType;
+use App\Repository\CarRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -96,7 +97,8 @@ class CarController extends AbstractController
         #[CurrentUser()] User $user,
         #[MapEntity(mapping: ['uuid' => 'uuid'])]
         Car $car,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        CarRepository $carRepository
     ): Response
     {
         // Check if user owns this car
@@ -104,12 +106,25 @@ class CarController extends AbstractController
             throw $this->createAccessDeniedException('Vous ne pouvez supprimer que vos propres voitures.');
         }
 
+        if ($carRepository->findActiveTravelsFromCar($car)) {
+            $this->addFlash('error', 'Vous ne pouvez pas supprimer une voiture ayant des trajets associés.');
+            return $this->redirectToRoute('app_car_index');
+        }
+
         // Verify CSRF token
         if ($this->isCsrfTokenValid('remove' . $car->getUuid(), $request->request->get('_token'))) {
-            $em->remove($car);
+            // A car can still exist in travel history, so we soft delete it
+            $car->setIsRemoved(true);
+            $em->persist($car);
+
+            if (!$user->hasCar()) {
+                $user->removeRole(RoleEnum::DRIVER);
+            }
+
+            $em->persist($user);
             $em->flush();
 
-            $this->addFlash('success', 'Votre voiture a été supprimée avec succès.');
+            $this->addFlash('success', 'Votre voiture a été supprimée.');
         }
 
         return $this->redirectToRoute('app_car_index');

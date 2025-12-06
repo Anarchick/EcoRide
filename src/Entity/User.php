@@ -406,6 +406,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+     * Check if user has at least one car (not removed)
+     * @return bool
+     */
+    public function hasCar(): bool
+    {
+        foreach ($this->cars as $car) {
+            if (!$car->isRemoved()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * @return Collection<int, Transaction>
      */
     public function getTransactions(): Collection

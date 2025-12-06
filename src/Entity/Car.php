@@ -81,6 +81,9 @@ class Car
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     private ?\DateTimeImmutable $firstRegistrationDate = null;
 
+    #[ORM\Column]
+    private ?bool $isRemoved = false;
+
     public function __construct()
     {
         $this->user = new ArrayCollection();
@@ -250,6 +253,18 @@ class Car
     public function setFirstRegistrationDate(\DateTimeImmutable $firstRegistrationDate): static
     {
         $this->firstRegistrationDate = $firstRegistrationDate;
+
+        return $this;
+    }
+
+    public function isRemoved(): ?bool
+    {
+        return $this->isRemoved;
+    }
+
+    public function setIsRemoved(bool $isRemoved): static
+    {
+        $this->isRemoved = $isRemoved;
 
         return $this;
     }
