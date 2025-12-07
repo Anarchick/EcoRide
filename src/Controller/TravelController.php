@@ -100,9 +100,13 @@ final class TravelController extends AbstractController
                 $this->addFlash('info', 'Aucun trajet ne correspond à vos critères de recherche.');
             }
 
+            /** @var TravelCriteria */
+            $criteria = $searchForm->getData();
+
             return $this->render('travel/overviews.html.twig', [
                 'travels' => $travels,
-                'criteria' => $searchForm->getData(),
+                'criteria' => $criteria,
+                'totalTravels' => $travelRepository->countTravelsByCriteria($criteria),
             ]);
         }
 
