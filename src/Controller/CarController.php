@@ -107,7 +107,7 @@ class CarController extends AbstractController
         }
 
         if ($carRepository->findActiveTravelsFromCar($car)) {
-            $this->addFlash('error', 'Vous ne pouvez pas supprimer une voiture ayant des trajets associés.');
+            $this->addFlash('error', 'Vous ne pouvez pas supprimer une voiture ayant des trajets en cours.');
             return $this->redirectToRoute('app_car_index');
         }
 
