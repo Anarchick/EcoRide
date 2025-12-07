@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Travel;
+use App\Entity\User;
 use App\Enum\DateIntervalEnum;
 use App\Enum\FuelTypeEnum;
 use App\Enum\LuggageSizeEnum;
@@ -10,6 +11,7 @@ use App\Enum\TravelStateEnum;
 use App\Repository\Trait\UuidFinderTrait;
 use App\Model\Search\TravelCriteria;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Uid\Uuid;
 
@@ -90,9 +92,16 @@ class TravelRepository extends ServiceEntityRepository
             ->setParameter('dateMax', $criteria->getDateTime()->format('Y-m-d 23:59:59'))
             ->setParameter('minPassengers', $criteria->getMinPassengers())
             ->setParameter('electric', FuelTypeEnum::ELECTRIC);
-        
+
+        $this->applyFilters($criteria, $query);
+
+        return $query->getQuery()->getResult();
+    }
+
+    private function applyFilters(TravelCriteria $criteria, QueryBuilder $query): void {
         if ($criteria->isElectricPreferred()) {
-            $query->andWhere('c.fuelType = :electric');
+            $query->andWhere('c.fuelType = :electricFuelType')
+                ->setParameter('electricFuelType', FuelTypeEnum::ELECTRIC);
         }
 
         if ($criteria->isSmokingAllowed()) {
@@ -123,10 +132,50 @@ class TravelRepository extends ServiceEntityRepository
             $query->andWhere('t.duration <= :maxDuration')
                 ->setParameter('maxDuration', $criteria->getMaxDuration() * 60);
         }
-
-        return $query->getQuery()->getResult();
     }
 
+    /**
+     * Count travels matching the criteria (for pagination)
+     * 
+     * @param TravelCriteria $criteria The search criteria
+     * @return int Total number of travels matching the criteria
+     */
+    public function countTravelsByCriteria(TravelCriteria $criteria): int
+    {
+        $query = $this->createQueryBuilder('t')
+            ->select('t.uuid', 't.passengersMax')
+            ->addSelect('COALESCE(SUM(cp.slots), 0) as usedSlots')
+            ->innerJoin('t.driver', 'd')
+            ->innerJoin('t.travelPreference', 'tp')
+            ->innerJoin('t.car', 'c')
+            ->leftJoin('t.carpoolers', 'cp')
+            ->where('t.state = :state')
+            ->andWhere('t.departure = :departure')
+            ->andWhere('t.arrival = :arrival')
+            ->andWhere('t.date BETWEEN :dateMin AND :dateMax')
+            ->groupBy('t.uuid, t.passengersMax')
+            ->setParameter('state', TravelStateEnum::PENDING)
+            ->setParameter('departure', $criteria->getDeparture())
+            ->setParameter('arrival', $criteria->getArrival())
+            ->setParameter('dateMin', $criteria->getDateTime()->format('Y-m-d H:i:s'))
+            ->setParameter('dateMax', $criteria->getDateTime()->format('Y-m-d 23:59:59'));
+        
+        $this->applyFilters($criteria, $query);
+
+        // Filter by available places using HAVING clause
+        if ($criteria->getMinPassengers() > 0) {
+            $query->having('(t.passengersMax - usedSlots) >= :minPassengers')
+                ->setParameter('minPassengers', $criteria->getMinPassengers());
+        }
+
+        $results = $query->getQuery()->getResult();
+        
+        return count($results);
+    }
+
+    /**
+     * Get all carpoolers for a specific travel
+     */
     public function getCarpoolers(string|Uuid $uuid): array
     {
         $uuid = $this->toUuid($uuid);
@@ -190,5 +239,40 @@ class TravelRepository extends ServiceEntityRepository
      */
     private function aggregateByInterval(array $results, int $interval, DateIntervalEnum $intervalEnum, \DateTimeInterface $from, \DateTimeInterface $to): array {
         throw new \LogicException('Not implemented yet');
+    }
+
+    /**
+     * Find all Travels involving a specific User as driver or carpooler
+     * Ordered by date descending
+     * @param User $user
+     * @return array<Travel> Returns an array of Travel objects
+     */
+    public function findTravelsInvolvingUser(User $user, int $page): array
+    {
+        $firstResult = max($page - 1, 0) * 10;
+        return $this->createQueryBuilder('t')
+            ->leftJoin('t.carpoolers', 'cp')
+            ->where('t.driver = :user')
+            ->orWhere('cp = :user')
+            ->setParameter('user', $user)
+            ->orderBy('t.date', 'DESC')
+            ->setMaxResults(10)
+            ->setFirstResult($firstResult)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function CountTravelsInvolvingUser(User $user): int
+    {
+        return (int) $this->createQueryBuilder('t')
+            ->select('COUNT(DISTINCT t.uuid)')
+            ->leftJoin('t.carpoolers', 'cp')
+            ->where('t.driver = :user')
+            ->orWhere('cp = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getSingleScalarResult()
+        ;
     }
 }
