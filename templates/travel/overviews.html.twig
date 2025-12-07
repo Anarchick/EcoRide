@@ -19,4 +19,6 @@
         {{ travelMacro.overview(travel, criteria) }}
     {% endfor %}
 
+    {% include 'partials/_pagination.html.twig' with {'totalEntries': totalTravels} %}
+
 {% endif %}
