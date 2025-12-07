@@ -12,6 +12,8 @@
         </a>
     </div>
 
+    {% include 'partials/_flashes.html.twig' %}
+
     {% for car in cars %}
         <div class="car-card-index">
             {% if car.isRemoved %}
