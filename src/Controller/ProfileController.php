@@ -2,23 +2,20 @@
 
 namespace App\Controller;
 
-use App\Entity\Brand;
 use App\Entity\Car;
-use App\Entity\Model;
 use App\Entity\Travel;
 use App\Entity\TravelPreference;
 use App\Entity\User;
-use App\Enum\ColorEnum;
-use App\Enum\FuelTypeEnum;
 use App\Enum\LuggageSizeEnum;
 use App\Enum\RoleEnum;
-use App\Repository\BrandRepository;
-use App\Repository\ModelRepository;
+use App\Repository\TravelRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/profile', name: 'app_profile_')]
@@ -40,11 +37,43 @@ final class ProfileController extends AbstractController
         ]);
     }
 
+    #[Route('/travel_history', name: 'travel_history')]
+    public function travelHistory(
+        Request $request,
+        #[CurrentUser] User $user,
+        TravelRepository $travelRepository
+    ): Response
+    {
+        $page = max(1, (int) $request->query->get('page', 1));
+        $travels = $travelRepository->findTravelsInvolvingUser($user, $page);
+        $totalTravels = $travelRepository->CountTravelsInvolvingUser($user);
+
+        return $this->render('profile/travels_history/index.html.twig', [
+            'user' => $user,
+            'isDriver' => $this->isGranted(RoleEnum::DRIVER->value),
+            'travels' => $travels,
+            'totalTravels' => $totalTravels,
+        ]);
+    }
+
+    #[Route('/credits/buy', name: 'credits_buy')]
+    public function creditsBuy(
+    ): Response
+    {
+        throw new RuntimeException('Not implemented yet');
+    }
+
+    #[Route('/credits/history', name: 'credits_history')]
+    public function creditsHistory(
+    ): Response
+    {
+        throw new RuntimeException('Not implemented yet');
+    }
+
     #[Route('/action', name: 'action')]
-    public function action(Request $request,
-            EntityManagerInterface $em,
-            BrandRepository $brandRepository,
-            ModelRepository $modelRepository
+    public function action(
+        Request $request,
+        EntityManagerInterface $em,
     ): Response
     {
         /** @var User $user */
@@ -58,52 +87,11 @@ final class ProfileController extends AbstractController
 
         switch ($action) {
             case 'become_driver':
-                $brand = $brandRepository->findOneBy(['name' => 'Tesla']);
-
-                if (!$brand) {
-                    $brand = (new Brand())->setName('Tesla');
-                    $em->persist($brand);
-                    $this->addFlash('success', 'Marque Tesla créée');
-                }
-
-                $model = $modelRepository->findOneBy([
-                    'brand' => $brand,
-                    'name' => 'Model 3'
-                ]);
-
-                if (!$model) {
-                    $model = (new Model())->setBrand($brand)->setName('Model 3');
-                    $em->persist($model);
-                    $this->addFlash('success', 'Marque Model 3 créée');
-                }
-
-                $car = $user->getCars()->first();
-
-                if (!$car) {
-                    $car = (new Car())
-                        ->setColor(ColorEnum::GRAY)
-                        ->setFuelType(FuelTypeEnum::ELECTRIC)
-                        ->setTotalSeats(4)
-                        ->setPlate(uniqid())
-                        ->setBrand($brand)
-                        ->setModel($model);
-                    $em->persist($car);
-                    $user->addCar($car);
-                    $this->addFlash('success', 'Voiture créée et associée');
-                }
-
                 if ($this->isGranted(RoleEnum::DRIVER->value)) {
                     $this->addFlash('info', 'Vous êtes déjà conducteur.');
-                } else {
-                    $user->addRole(RoleEnum::DRIVER);
-                    $em->persist($user);
-                    $this->addFlash('success', 'Vous êtes maintenant conducteur !');
+                    return $this->redirectToRoute('app_profile_index');
                 }
-                
-                $em->flush();
-
-                // $token = new UsernamePasswordToken($user, 'main', $user->getRoles());
-                // $this->container->get('security.token_storage')->setToken($token);
+                return $this->redirectToRoute('app_car_new');
                 break;
             case 'create_trip':
                 if (!$this->isGranted(RoleEnum::DRIVER->value)) {

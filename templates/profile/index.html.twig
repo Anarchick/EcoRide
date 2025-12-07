@@ -3,6 +3,7 @@
 {% block title %}EcoRide - Profil{% endblock %}
 
 {% block main %}
+{% include 'partials/_profile_nav.html.twig' %}
 <div class="container">
 
     {% include 'partials/_flashes.html.twig' %}
@@ -16,6 +17,5 @@
         <button name="action" value="logout" class="btn btn-primary">Deconnexion</button>
     </form>
 </div>
-
 
 {% endblock %}

@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+{% import 'travel/macros/travelOverview.html.twig' as travelMacro %}
+{% block importmap %}
+    {{ importmap(['app', 'travel.css']) }}
+{% endblock %}
+
+{% block title %}EcoRide - Historique des trajets{% endblock %}
+
+{% block main %}
+{% include 'partials/_profile_nav.html.twig' %}
+<div class="eco-container d-flex flex-column gap-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <h1 class="eco-title-text d-block">Mes trajets</h1>
+        {% if isDriver %}
+        <a href="{{ path('app_travel_create') }}" class="eco-btn">
+            Créer un nouveau trajet
+        </a>
+        {% endif %}
+    </div>
+
+    {% set Month = null %}
+    {% for travel in travels %}
+        {% set travelData = {
+            'driverUuid': travel.driver.uuid,
+            'driverUsername': travel.driver.username,
+            'driverRating': travel.driver.ratingAverage,
+            'date': travel.date,
+            'duration': travel.duration,
+            'arrivalDateTime': travel.date|date_modify('+' ~ travel.duration ~ ' minutes'),
+            'cost': travel.cost,
+            'currentPassengers': travel.carpoolers|length,
+            'passengersMax': travel.passengersMax,
+            'travelUuid': travel.uuid,
+            'fuelType': travel.car.fuelType
+            }
+        %}
+        {% set criteria = {
+            'departure': travel.departure,
+            'arrival': travel.arrival,
+            'minPassengers': 1
+        } %}
+
+        {% set travelMonth = travel.date|date('F Y') %}
+        {% if travelMonth != Month %}
+            {% set Month = travelMonth %}
+            <h2 class="eco-title-text mb-1 mt-3">{{ travel.date | date('F Y') | format_datetime(locale='fr', pattern='MMMM Y') }}</h2>
+        {% endif %}
+
+        {{ travelMacro.overview(travelData, criteria) }}
+    {% endfor %}
+    {% include 'partials/_pagination.html.twig' with {'totalEntries': totalTravels} %}
+{% endblock %}
