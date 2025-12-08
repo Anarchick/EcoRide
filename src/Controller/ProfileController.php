@@ -10,7 +10,6 @@ use App\Enum\LuggageSizeEnum;
 use App\Enum\RoleEnum;
 use App\Repository\TravelRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -54,20 +53,6 @@ final class ProfileController extends AbstractController
             'travels' => $travels,
             'totalTravels' => $totalTravels,
         ]);
-    }
-
-    #[Route('/credits/buy', name: 'credits_buy')]
-    public function creditsBuy(
-    ): Response
-    {
-        throw new RuntimeException('Not implemented yet');
-    }
-
-    #[Route('/credits/history', name: 'credits_history')]
-    public function creditsHistory(
-    ): Response
-    {
-        throw new RuntimeException('Not implemented yet');
     }
 
     #[Route('/action', name: 'action')]

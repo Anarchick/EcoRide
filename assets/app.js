@@ -5,6 +5,7 @@ import { Tooltip } from 'bootstrap';
 import './styles/app.css';
 import './scripts/travel-search-bar.js'
 import './styles/home/home.css';
+import './styles/specific/profile/profile.css';
 import htmx from 'htmx.org';
 
 window.htmx = htmx;

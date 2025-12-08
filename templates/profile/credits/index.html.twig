@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}EcoRide - Mes crédits{% endblock %}
+
+{% block main %}
+{% include 'partials/_profile_nav.html.twig' %}
+<div class="eco-container d-flex flex-column gap-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <h1 class="eco-title-text d-block">Mes Crédits</h1>
+        <a href="{{ path('app_credits_buy') }}" class="eco-btn">
+            Acheter des crédits
+        </a>
+    </div>
+
+    {% include 'partials/_flashes.html.twig' %}
+    <h2>Solde actuel : {{ credits }} crédits</h2>
+
+    {% for transaction in transactions %}
+        <div class="transaction-card-index">
+            <div class="ga-transaction-date eco-bold-text justify-self-center">
+                <time datetime="{{ transaction.createAt | date('Y-m-d H:i') }}">{{ transaction.createAt | date('d-m-Y H:i') }}</time>
+            </div>
+            <p class="ga-transaction-info">+{{ transaction.credits }} crédits pour {{ transaction.price }} {{ transaction.currency.value }}</p>
+            {% if transaction.comment %}
+            <p class="ga-transaction-comment eco-small-text">commentaire: {{ transaction.comment }}</p>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+    {% include 'partials/_pagination.html.twig' with {'totalEntries': totalTransactions} %}
+</div>
+{% endblock %}

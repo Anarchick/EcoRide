@@ -282,6 +282,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function addCredits(int $amount): static
+    {
+        $this->credits += $amount;
+
+        return $this;
+    }
+
     public function getBio(): ?string
     {
         return $this->bio;
