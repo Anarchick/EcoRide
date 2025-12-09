@@ -52,6 +52,7 @@ class DriverFixtures extends Fixture implements DependentFixtureInterface
                 ->setColor(ColorEnum::cases()[array_rand(ColorEnum::cases())])
                 ->setFuelType(FuelTypeEnum::cases()[array_rand(FuelTypeEnum::cases())])
                 ->setPlate($this->faker->vehicleRegistration('[A-Z]{2}-[0-9]{3}-[A-Z]{2}'))
+                ->setFirstRegistrationDate(\DateTimeImmutable::createFromMutable($this->faker->dateTimeBetween('-20 years', 'now')))
                 ->setTotalSeats($this->faker->numberBetween(2, 7))
                 ->addUser($user);
             $this->addReference('car_' . $i, $car);

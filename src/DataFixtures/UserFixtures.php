@@ -35,10 +35,9 @@ class UserFixtures extends Fixture
                 ->setLastName($this->faker->lastName())
                 ->setUsername($this->faker->userName())
                 ->setPhone('+33 6 12 34 56 ' . sprintf('%02d', $i))
-                ->setEmail($this->faker->email())
+                ->setEmail($i . '@gmail.com')
                 ->setPassword($this->passwordHasher->hashPassword($user, $password))
-                ->setBio($this->faker->paragraph())
-                ->setCredits($this->faker->numberBetween(0, 3000));
+                ->setBio($this->faker->paragraph());
             $manager->persist($user);
             $this->addReference('user_' . $i, $user);
         }
