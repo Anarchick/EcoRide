@@ -10,6 +10,7 @@ use App\Enum\LuggageSizeEnum;
 use App\Enum\TravelStateEnum;
 use App\Repository\Trait\UuidFinderTrait;
 use App\Model\Search\TravelCriteria;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -96,6 +97,43 @@ class TravelRepository extends ServiceEntityRepository
         $this->applyFilters($criteria, $query);
 
         return $query->getQuery()->getResult();
+    }
+
+    /**
+     * Used if getTravelsByCriteria() is called when no results are found.
+     * Get the nearest (date) travels by criteria.
+     * 
+     * @param TravelCriteria $criteria The search criteria
+     * @return DateTimeImmutable|null The nearest travel date matching the criteria, null if no travel found
+     */
+    public function getNearestTravelDateByCriteria(TravelCriteria $criteria): ?DateTimeImmutable
+    {
+        $query = $this->createQueryBuilder('t')
+            ->select('t.date')
+            ->addSelect('COALESCE(SUM(cp.slots), 0) AS usedSlots')
+            ->innerJoin('t.driver', 'd')
+            ->innerJoin('t.travelPreference', 'tp')
+            ->innerJoin('t.car', 'c')
+            ->leftJoin('t.carpoolers', 'cp')
+            ->where('t.state = :state')
+            ->andWhere('t.departure = :departure')
+            ->andWhere('t.arrival = :arrival')
+            ->andWhere('t.date > :currentDate')
+            ->groupBy('t.uuid, t.passengersMax, t.date')
+            ->having('(t.passengersMax - usedSlots) >= :minPassengers')
+            ->orderBy('t.date', 'ASC')
+            ->setMaxResults(1)
+            ->setParameter('state', TravelStateEnum::PENDING)
+            ->setParameter('departure', $criteria->getDeparture())
+            ->setParameter('arrival', $criteria->getArrival())
+            ->setParameter('currentDate', $criteria->getDateTime()->format('Y-m-d H:i:s'))
+            ->setParameter('minPassengers', $criteria->getMinPassengers());
+
+        $this->applyFilters($criteria, $query);
+
+        $result = $query->getQuery()->getOneOrNullResult();
+
+        return $result ? $result['date'] : null;
     }
 
     private function applyFilters(TravelCriteria $criteria, QueryBuilder $query): void {

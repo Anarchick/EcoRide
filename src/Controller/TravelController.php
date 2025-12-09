@@ -97,7 +97,12 @@ final class TravelController extends AbstractController
         
         if ($isHtmx) {
             if (count($travels) === 0) {
-                $this->addFlash('info', 'Aucun trajet ne correspond à vos critères de recherche.');
+                $nearestDate = $travelRepository->getNearestTravelDateByCriteria($searchForm->getData());
+                if ($nearestDate) {
+                    $this->addFlash('info', 'Aucun trajet ne correspond à vos critères de recherche. Le trajet le plus proche est le ' . $nearestDate->format('d/m/Y'));
+                } else {
+                    $this->addFlash('info', 'Aucun trajet ne correspond à vos critères de recherche.');
+                }
             }
 
             /** @var TravelCriteria */
