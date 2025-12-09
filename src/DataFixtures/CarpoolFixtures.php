@@ -22,6 +22,7 @@ class CarpoolFixtures extends Fixture implements DependentFixtureInterface
     {
         return [
             TravelFixtures::class,
+            TransactionFixtures::class,
         ];
     }
 
