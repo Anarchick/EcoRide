@@ -13,6 +13,7 @@ use App\Form\TravelSearchType;
 use App\Repository\TravelRepository;
 use App\Model\Search\TravelCriteria;
 use App\Repository\CarRepository;
+use App\Repository\ReviewRepository;
 use App\Security\Voter\TravelVoter;
 use App\Service\MapService;
 use App\Service\SessionTTLService;
@@ -264,6 +265,7 @@ final class TravelController extends AbstractController
         Request $request,
         String $uuid,
         TravelRepository $travelRepository,
+        ReviewRepository $reviewRepository,
         MapService $mapService
         ): Response
     {
@@ -294,6 +296,8 @@ final class TravelController extends AbstractController
         return $this->render('travel/show.html.twig', [
             'travel' => $travel,
             'arrivalDateTime' => (new \DateTime($travel->getDate()->format('Y-m-d H:i:s')))->add(new \DateInterval('PT' . $travel->getDuration() . 'M')),
+            'driverReviewsCount' => $reviewRepository->count(['user' => $travel->getDriver()]),
+            'driverReviews' => $reviewRepository->findBy(['user' => $travel->getDriver()], ['createdAt' => 'DESC'], 3),
             'carpoolers' => $carpoolers,
             'usedSlots' => $travel->getUsedSlots(),
             'slot' => $slot,

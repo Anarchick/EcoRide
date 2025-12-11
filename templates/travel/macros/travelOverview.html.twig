@@ -1,6 +1,5 @@
 {# Single travel overview #}
 {% macro overview(travel, criteria) %}
-
 {% set isEcological = travel.fuelType.value == 'electric' %}
 <article class="travel-card travel-card-index{{ isEcological ? ' border-interactive' : '' }}">
 
@@ -8,7 +7,7 @@
     <div class="ga-profile">
         {% include 'components/profile.html.twig' with {
             'userUuid': travel.driverUuid,
-            'userName': travel.driverUsername,
+            'username': travel.driverUsername,
             'userRating': travel.driverRating
         } %}
     </div>

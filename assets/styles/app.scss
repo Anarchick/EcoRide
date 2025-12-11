@@ -71,6 +71,11 @@ h1 {
     font-size: utils.rem(44) !important;
 }
 
+.h2 {
+    font-weight: 400;
+    font-size: utils.rem(20) !important;
+}
+
 a, p {
     font-style: normal;
     font-weight: 400;
@@ -151,4 +156,25 @@ a, button {
 
 .justify-self-center {
     justify-self: center !important;
+}
+
+.h-12 {
+    height: utils.rem(12) !important;
+}
+
+.h-16 {
+    height: utils.rem(16) !important;
+}
+
+.h-44 {
+    height: utils.rem(44) !important;
+}
+
+.w-44 {
+    width: utils.rem(44) !important;
+}
+
+.icon {
+    max-height: utils.rem(24);
+    max-width: utils.rem(24);
 }

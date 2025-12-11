@@ -1,0 +1,71 @@
+@use '../../_utils' as utils;
+@use '../../_variables' as vars;
+
+#map {
+    width: 100%;
+    height: 40vh;
+    min-height: 300px;
+    background-color: vars.$third-background-color;
+    overflow: hidden;
+}
+
+.travel-card-show {
+    margin-top: 2rem;
+    height: fit-content;
+    grid-template-rows: 24px auto;
+    grid-template-areas:    "date schedule schedule places"
+                            ". address address properties";
+}
+
+.ga-properties {
+    grid-area: properties;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+}
+
+.travel-interaction {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: 24px auto;
+    column-gap: 20px;
+    grid-template-areas:    ". . . price"
+                            "message . . book";
+}
+
+.ga-message {
+    grid-area: message;
+    align-self: center;
+    justify-self: center;
+}
+
+.ga-book {
+    grid-area: book;
+    align-self: center;
+    justify-self: center;
+}
+
+.user-card {
+    height: fit-content;
+    width: fit-content;
+    width: 100%;
+    display: grid;
+    column-gap: 20px;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: 18px auto;
+    grid-template-areas:"user-img user-resume user-resume user-resume"
+                        "user-img user-bio user-bio user-bio";
+}
+
+.ga-user-img {
+    grid-area: user-img;
+}
+
+.ga-user-resume {
+    grid-area: user-resume;
+}
+
+.ga-user-bio {
+    grid-area: user-bio;
+}

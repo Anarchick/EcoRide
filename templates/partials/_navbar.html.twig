@@ -27,8 +27,9 @@
             {% if app.user %}
                 <a href="{{ path('app_profile_index') }}" target="_self">
                     <div class="profile-picture">
-                        {# TODO Replace with scroll menu #}
-                        <img src="{{ asset('images/ui/profile-placeholder.jpg') }}" alt="Image de profil">
+                        {% include 'partials/_user_img.html.twig' with {
+                                username: app.user.username,
+                        } %}
                     </div>
                 </a>
             {% else %}
