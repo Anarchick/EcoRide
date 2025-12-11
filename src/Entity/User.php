@@ -87,8 +87,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?bool $isVerified = false;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 3, scale: 2, nullable: true)]
-    private ?string $ratingAverage = null;
+    #[ORM\Column(type: Types::DECIMAL, precision: 2, scale: 1, nullable: true)]
+    private ?float $ratingAverage = null;
 
     /**
      * @var Collection<int, Review>
@@ -313,12 +313,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getRatingAverage(): ?string
+    public function getRatingAverage(): ?float
     {
         return $this->ratingAverage;
     }
 
-    public function setRatingAverage(?string $ratingAverage): static
+    public function setRatingAverage(?float $ratingAverage): static
     {
         $this->ratingAverage = $ratingAverage;
 
