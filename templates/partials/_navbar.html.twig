@@ -29,6 +29,7 @@
                     <div class="profile-picture">
                         {% include 'partials/_user_img.html.twig' with {
                                 username: app.user.username,
+                                avatar: app.user.avatarUrl
                         } %}
                     </div>
                 </a>

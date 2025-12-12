@@ -2,6 +2,7 @@
     <a href="{{ path('app_member_show', { uuid: userUuid }) }}" target="_blank" class="eco-small-text h-100 d-flex flex-column align-items-center justify-content-between">
         {% include('partials/_user_img.html.twig') with {
                 username: username,
+                avatar: avatar
         } %}
         
         <div class="profile-info">

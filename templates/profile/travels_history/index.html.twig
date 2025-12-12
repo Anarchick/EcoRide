@@ -22,6 +22,7 @@
     {% for travel in travels %}
         {% set travelData = {
             'driverUuid': travel.driver.uuid,
+            'avatar': travel.driver.avatarUrl,
             'driverUsername': travel.driver.username,
             'driverRating': travel.driver.ratingAverage,
             'date': travel.date,

@@ -6,6 +6,7 @@
     {# Profile #}
     <div class="ga-profile">
         {% include 'components/profile.html.twig' with {
+            'avatar': travel.avatar | default(null),
             'userUuid': travel.driverUuid,
             'username': travel.driverUsername,
             'userRating': travel.driverRating

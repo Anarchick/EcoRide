@@ -70,7 +70,7 @@ class TravelRepository extends ServiceEntityRepository
             ->addSelect('COALESCE(SUM(cp.slots), 0) AS currentPassengers')
             ->addSelect('(t.passengersMax - COALESCE(SUM(cp.slots), 0)) AS availablePlaces')
             ->addSelect('DATE_ADD(t.date, t.duration, \'MINUTE\') AS arrivalDateTime')
-            ->addSelect('d.uuid AS driverUuid, d.username AS driverUsername, d.ratingAverage AS driverRating')
+            ->addSelect('d.uuid AS driverUuid, d.username AS driverUsername, d.ratingAverage AS driverRating, d.avatarUrl AS avatar')
             ->addSelect('tp.isSmokingAllowed AS isSmokingAllowed, tp.isPetsAllowed AS isPetsAllowed, tp.luggageSize AS luggageSize')
             ->innerJoin('t.driver', 'd')
             ->innerJoin('t.travelPreference', 'tp')
