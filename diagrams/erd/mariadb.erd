@@ -4,9 +4,9 @@
   "settings": {
     "width": 2400,
     "height": 2400,
-    "scrollTop": -1099,
-    "scrollLeft": -758.4398,
-    "zoomLevel": 0.82,
+    "scrollTop": -596.8922,
+    "scrollLeft": -360.4469,
+    "zoomLevel": 0.85,
     "show": 431,
     "database": 1,
     "databaseName": "ecoride",
@@ -81,7 +81,8 @@
           "OJYeRDII6n2ak6U7ikIAv",
           "lPlQ9zpa8w_JhZ-1CcrBc",
           "6DdxjHsrS-Fzfi2-QBX4d",
-          "3yzvX6FS9RlUDdnCXSujh"
+          "3yzvX6FS9RlUDdnCXSujh",
+          "8qV3r2TYdVAhnSckogFVZ"
         ],
         "seqColumnIds": [
           "su3WeeNs_OLcLtcBhNwWb",
@@ -101,18 +102,19 @@
           "lPlQ9zpa8w_JhZ-1CcrBc",
           "6DdxjHsrS-Fzfi2-QBX4d",
           "3yzvX6FS9RlUDdnCXSujh",
-          "Cg_U532E1CP4OblVv-gAZ"
+          "Cg_U532E1CP4OblVv-gAZ",
+          "8qV3r2TYdVAhnSckogFVZ"
         ],
         "ui": {
           "x": 667.0327,
-          "y": 275.0712,
+          "y": 262.8762,
           "zIndex": 2,
           "widthName": 60,
           "widthComment": 60,
           "color": ""
         },
         "meta": {
-          "updateAt": 1755797079299,
+          "updateAt": 1765568988769,
           "createAt": 1754243433948
         }
       },
@@ -191,15 +193,15 @@
           "XuLRu2CNIJnFq7gIaleJ7"
         ],
         "ui": {
-          "x": 764.3789,
-          "y": 751.5671,
+          "x": 770.6959,
+          "y": 755.2256,
           "zIndex": 62,
           "widthName": 60,
           "widthComment": 60,
           "color": ""
         },
         "meta": {
-          "updateAt": 1760693454108,
+          "updateAt": 1765569038474,
           "createAt": 1754250553881
         }
       },
@@ -2360,6 +2362,26 @@
           "updateAt": 1765012450945,
           "createAt": 1765012435764
         }
+      },
+      "8qV3r2TYdVAhnSckogFVZ": {
+        "id": "8qV3r2TYdVAhnSckogFVZ",
+        "tableId": "o2q_Vhpr3SCFGeFEvIStd",
+        "name": "avatar_url",
+        "comment": "",
+        "dataType": "VARCHAR",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1765568977955,
+          "createAt": 1765568968964
+        }
       }
     },
     "relationshipEntities": {
@@ -2374,7 +2396,7 @@
             "su3WeeNs_OLcLtcBhNwWb"
           ],
           "x": 758.2827,
-          "y": 643.0712,
+          "y": 654.8761999999999,
           "direction": 8
         },
         "end": {
@@ -2402,7 +2424,7 @@
             "su3WeeNs_OLcLtcBhNwWb"
           ],
           "x": 940.7827,
-          "y": 643.0712,
+          "y": 654.8761999999999,
           "direction": 8
         },
         "end": {
@@ -2410,8 +2432,8 @@
           "columnIds": [
             "mwhKm43saL9vk0Gwr6-yn"
           ],
-          "x": 950.8789,
-          "y": 751.5671,
+          "x": 957.1959,
+          "y": 755.2256,
           "direction": 4
         },
         "meta": {
@@ -2458,7 +2480,7 @@
             "su3WeeNs_OLcLtcBhNwWb"
           ],
           "x": 667.0327,
-          "y": 413.0712,
+          "y": 409.8762,
           "direction": 1
         },
         "end": {
@@ -2486,7 +2508,7 @@
             "su3WeeNs_OLcLtcBhNwWb"
           ],
           "x": 667.0327,
-          "y": 321.0712,
+          "y": 311.8762,
           "direction": 1
         },
         "end": {
@@ -2634,8 +2656,8 @@
           "columnIds": [
             "LRyOPEUn3JJqNZym-dlC6"
           ],
-          "x": 950.8789,
-          "y": 951.5671,
+          "x": 957.1959,
+          "y": 955.2256,
           "direction": 8
         },
         "meta": {
@@ -2654,7 +2676,7 @@
             "su3WeeNs_OLcLtcBhNwWb"
           ],
           "x": 667.0327,
-          "y": 597.0712,
+          "y": 605.8761999999999,
           "direction": 1
         },
         "end": {
@@ -2710,7 +2732,7 @@
             "su3WeeNs_OLcLtcBhNwWb"
           ],
           "x": 667.0327,
-          "y": 505.0712,
+          "y": 507.8762,
           "direction": 1
         },
         "end": {
@@ -2738,7 +2760,7 @@
             "su3WeeNs_OLcLtcBhNwWb"
           ],
           "x": 849.5327,
-          "y": 275.0712,
+          "y": 262.8762,
           "direction": 4
         },
         "end": {
