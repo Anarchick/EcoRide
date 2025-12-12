@@ -90,6 +90,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::DECIMAL, precision: 2, scale: 1, nullable: true)]
     private ?float $ratingAverage = null;
 
+    #[ORM\Column(length: 500, nullable: true)]
+    private ?string $avatarUrl = null;
+
     /**
      * @var Collection<int, Review>
      */
@@ -321,6 +324,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setRatingAverage(?float $ratingAverage): static
     {
         $this->ratingAverage = $ratingAverage;
+
+        return $this;
+    }
+
+    public function getAvatarUrl(): ?string
+    {
+        return $this->avatarUrl;
+    }
+
+    public function setAvatarUrl(?string $avatarUrl): static
+    {
+        $this->avatarUrl = $avatarUrl;
 
         return $this;
     }

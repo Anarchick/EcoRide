@@ -13,6 +13,10 @@ class UserFixtures extends Fixture
 {
     public const BATCH_SIZE = 10;
     private Generator $faker;
+    private const AVATARS = [
+        "https://res.cloudinary.com/dd7wacbqq/image/upload/v1765568381/ecoride/avatars/user_1f0d6c98-1815-689e-9948-cd45c32788d5.jpg",
+        null,
+    ];
 
     public function __construct(
         private readonly UserPasswordHasherInterface $passwordHasher
@@ -30,6 +34,8 @@ class UserFixtures extends Fixture
         }
 
         for ($i=0; $i < self::BATCH_SIZE; $i++) { 
+            $avatar = self::AVATARS[array_rand(self::AVATARS)];
+
             $user = new User();
             $user->setFirstName($this->faker->firstName())
                 ->setLastName($this->faker->lastName())
@@ -38,7 +44,8 @@ class UserFixtures extends Fixture
                 ->setEmail($i . '@gmail.com')
                 ->setPassword($this->passwordHasher->hashPassword($user, $password))
                 ->setBio($this->faker->paragraph())
-                ->setRatingAverage($this->faker->randomFloat(1, 0, 5));
+                ->setRatingAverage($this->faker->randomFloat(1, 0, 5))
+                ->setAvatarUrl($avatar);
             $manager->persist($user);
             $this->addReference('user_' . $i, $user);
         }
