@@ -39,6 +39,10 @@ class CarpoolFixtures extends Fixture implements DependentFixtureInterface
                 break;
             }
 
+            if ($this->faker->boolean(30)) {
+                continue; // Skip some travels to have zero carpools
+            }
+
             $travel = $this->getReference('travel_' .$j, Travel::class);
 
             for ($i = 0; $i < UserFixtures::BATCH_SIZE; $i++) {

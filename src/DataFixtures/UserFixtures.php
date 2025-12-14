@@ -50,6 +50,19 @@ class UserFixtures extends Fixture
             $this->addReference('user_' . $i, $user);
         }
 
+        // Add a specific user for tests
+        $user = new User();
+        $user->setFirstName('John')
+            ->setLastName('Wick')
+            ->setUsername('John.Wick')
+            ->setPhone('+33 6 12 34 56 78')
+            ->setEmail('john.wick@gmail.com')
+            ->setPassword($this->passwordHasher->hashPassword($user, $password))
+            ->setBio($this->faker->paragraph())
+            ->setRatingAverage(null)
+            ->setAvatarUrl(null);
+        $manager->persist($user);
+
         $manager->flush();
     }
 }
