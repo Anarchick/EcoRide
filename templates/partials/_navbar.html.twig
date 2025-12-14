@@ -25,7 +25,12 @@
 
             {# If the user is logged in #}
             {% if app.user %}
-                <a href="{{ path('app_profile_index') }}" target="_self">
+                <a href="{{ path('app_profile_index') }}" target="_self" class="d-flex">
+                    <div class="pe-2">
+                        <p class="eco-normal-text eco-bold-text">{{ app.user.username }}</p>
+                        <p class="eco-small-text text-end">{{ ux_icon('mdi:storm', {class: 'h-16'}) }}{{ app.user.credits }}</p>
+                    </div>
+                    
                     <div class="profile-picture">
                         {% include 'partials/_user_img.html.twig' with {
                                 username: app.user.username,

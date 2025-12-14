@@ -27,6 +27,11 @@ services:
         tags:
             - twig.extension
 
+    # Cloudinary service for image upload
+    App\Service\CloudinaryService:
+        arguments:
+            $cloudinaryUrl: '%env(CLOUDINARY_URL)%'
+
     # Custom MariaDB platform for UUID support
     App\Doctrine\Platform\MariaDBUuidPlatform:
         public: true
