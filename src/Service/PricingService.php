@@ -41,9 +41,9 @@ class PricingService
         $estimatedPrice = $this->getEstimatedPrice();
 
         return match (true) {
-            $estimatedPrice < 20 => 1,
-            $estimatedPrice < 100 => 5,
-            $estimatedPrice < 500 => 10,
+            $estimatedPrice < 300 => 1,
+            $estimatedPrice < 500 => 5,
+            $estimatedPrice < 1000 => 10,
             default => 50,
         };
     }
