@@ -11,10 +11,11 @@ final class TravelVoter extends Voter
 {
     public const EDIT = 'TRAVEL_EDIT';
     public const REMOVE = 'TRAVEL_REMOVE';
+    public const UNBOOK = 'TRAVEL_UNBOOK';
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return in_array($attribute, [self::EDIT, self::REMOVE])
+        return in_array($attribute, [self::EDIT, self::REMOVE, self::UNBOOK])
             && $subject instanceof Travel;
     }
 
@@ -41,6 +42,10 @@ final class TravelVoter extends Voter
             case self::REMOVE:
                 return $subject->getDriver()->getUuid() === $user->getUuid();
                 break;
+            case self::UNBOOK:
+                return $subject->isCarpooler($user)
+                        && $subject->getDriver()->getUuid() !== $user->getUuid()
+                        && $subject->getState()->isStarted() === false;
         }
 
         return false;
