@@ -158,6 +158,10 @@ a, button {
     justify-self: center !important;
 }
 
+.h-fit {
+    height: fit-content !important;
+}
+
 .h-12 {
     height: utils.rem(12) !important;
 }

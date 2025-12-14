@@ -1,21 +1,17 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}EcoRide - Voyager{% endblock %}
-
-{% block importmap %}
-    {{ importmap(['app', 'travel.css']) }}
-{% endblock %}
+{% block title %}EcoRide - Créer un trajet{% endblock %}
 
 {% block main %}
-<div class="form-header eco-page-text text-center">
-    <h1>Créer un trajet</h1>
-</div>
-
-<section class="eco-container-main">
-    {% include 'partials/_flashes.html.twig' %}
-
-    {{ form_start(form, {'attr': {'class': 'eco-form'}}) }}
-    {{ form_end(form) }}
-</section>
-
+{% include 'partials/_base_form.html.twig' with {
+    'title': "Créer un trajet",
+    'form': form,
+    'labels': {
+        'departure': 'Ville de départ',
+        'arrival': 'Ville d\'arrivée',
+        'date': 'Date',
+        'car': 'Voiture',
+    },
+    'submit_label': "suivant"
+} %}
 {% endblock %}

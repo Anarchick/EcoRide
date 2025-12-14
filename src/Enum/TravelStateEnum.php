@@ -8,4 +8,9 @@ enum TravelStateEnum: int
     case PENDING = 2;
     case FULL = 3;
     case IN_PROGRESS = 4;
+
+    public function isStarted(): bool
+    {
+        return $this === self::IN_PROGRESS || $this === self::COMPLETED || $this === self::CANCELLED;
+    }
 }

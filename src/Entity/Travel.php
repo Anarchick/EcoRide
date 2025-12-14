@@ -247,19 +247,30 @@ class Travel
         return $this;
     }
 
-    public function removeCarpooler(Carpooler $carpooler): static
+    // LOGIC METHODS
+
+    public function removeCarpooler(Carpooler|User $carpooler): ?Carpooler
     {
-        if ($this->carpoolers->removeElement($carpooler)) {
+        if ($carpooler instanceof User) {
+            $carpooler = $this->carpoolers->filter(
+                fn(Carpooler $c) => $c->getUser()->getUuid() === $carpooler->getUuid()
+            )->first();
+        }
+
+        if ($carpooler && $this->carpoolers->removeElement($carpooler)) {
+            $user = $carpooler->getUser();
+            $cost = $carpooler->getCost();
+            $user->addCredits($cost);
             // set the owning side to null (unless already changed)
             if ($carpooler->getTravel() === $this) {
                 $carpooler->setTravel(null);
             }
+
+            return $carpooler;
         }
 
-        return $this;
+        return null;
     }
-
-    // LOGIC METHODS
 
     public function getUsedSlots(): int
     {
@@ -287,14 +298,39 @@ class Travel
         return max(1, min((int)$slot, $availablePlaces));
     }
 
-    public function isCarpooler(User $user): bool
+    public function isCarpooler(?User $user): bool
     {
+        if (!$user) {
+            return false;
+        }
+
         foreach ($this->carpoolers as $carpooler) {
             if ($carpooler->getUser()->getUuid() === $user->getUuid()) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Check if a user is involved in the travel (as driver or carpooler)
+     */
+    public function isInvolved(?User $user): bool
+    {
+        if (!$user) {
+            return false;
+        }
+
+        if ($this->driver && $this->driver->getUuid() === $user->getUuid()) {
+            return true;
+        }
+
+        return $this->isCarpooler($user);
+    }
+
+    public function getArrivalDateTime(): \DateTimeImmutable
+    {
+        return $this->date->modify("+{$this->duration} minutes");
     }
 
     public function join(User $user, int $slot, int $cost): Carpooler|null

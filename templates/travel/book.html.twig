@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}EcoRide - Réserver{% endblock %}
+
+{% block importmap %}
+    {{ importmap(['app', 'travel.css']) }}
+{% endblock %}
+
+{% block main %}
+<div class="form-header eco-page-text text-center">
+    <h1>Réserver un trajet</h1>
+</div>
+
+<section class="eco-container-main">
+    {% include 'partials/_flashes.html.twig' %}
+
+    {% include 'travel/partials/_travel_card_show.html.twig' with {
+        travel: travel,
+    } %}
+
+    {{ form_start(form, {'attr': {'class': 'eco-form mt-3'}}) }}
+    {{ form_row(form.slots, {'label': 'Nombre de places :', 'label_attr': {'class': 'eco-bold-text'}}) }}
+    <div class="d-flex justify-content-between">
+        <a href="{{ path('app_travel_show', {'uuid': travel.uuid, 'slot': form.slots.vars.data}) }}" class="btn btn-danger text-white h-fit">Annuler</a>
+        {{ form_row(form.submit, {'label': 'Réserver', 'attr': {'class': 'eco-btn', 'data-cost-per-slot': travel.cost}}) }}
+    </div>
+    {{ form_errors(form) }}
+    {{ form_end(form) }}
+
+    <script>
+        const slotsInput = document.querySelector('#{{ form.slots.vars.id }}');
+        const bookBtn = document.querySelector('#{{ form.submit.vars.id }}');
+        const costPerSlot = parseInt(bookBtn.dataset.costPerSlot);
+
+        slotsInput.addEventListener('input', function() {
+            updateButtonText();
+        });
+
+        updateButtonText();
+
+        function updateButtonText() {
+            const slots = parseInt(slotsInput.value) || 1;
+            const totalCost = slots * costPerSlot;
+            bookBtn.textContent = `Réserver pour ${totalCost} crédits`;
+        }
+    </script>
+</section>
+
+{% endblock %}

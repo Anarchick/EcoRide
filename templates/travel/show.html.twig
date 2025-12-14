@@ -15,49 +15,16 @@
 
     {% include 'partials/_flashes.html.twig' %}
 
-    <article class="travel-card travel-card-show">
-        {# Date #}
-        <div class="ga-date eco-small-text justify-self-center">
-            <time datetime="{{ travel.date | date('Y-m-d H:i') }}">{{ travel.date | format_datetime(locale='fr', pattern='EEEE d MMMM Y') }}</time>
-        </div>
-
-        {# Schedule #}
-        <div class="ga-schedule">
-            {% include 'travel/partials/_schedule.html.twig' with {
-                date: travel.date,
-                duration: travel.duration,
-                arrivalDateTime: arrivalDateTime
-            } %}
-        </div>
-
-        {# Passengers #}
-        <div class="ga-places">
-            {{ ux_icon('ion:people', {class: 'h-75'}) }}
-            <p class="eco-bold-text">{{ usedSlots }}/{{ travel.passengersMax }}</p>
-        </div>
-
-        {# Addresses #}
-        <div class="ga-address">
-            <p>{{ travel.departure }}</p>
-            <p>{{ travel.arrival }}</p>
-        </div>
-
-        {# Properties #}
-        <div class="ga-properties">
-            {% include('travel/partials/_properties.html.twig') with {
-                ecologic: travel.car.fuelType.value == 'electric',
-                animals: travel.getTravelPreference().isPetsAllowed(),
-                smoking: travel.getTravelPreference().isSmokingAllowed(),
-                luggage: travel.getTravelPreference().getLuggageSizeEnum()
-            } %}
-        </div>
-    </article>
+    {% include 'travel/partials/_travel_card_show.html.twig' with {
+        travel: travel,
+    } %}
 
     <article id="driver">
         <h2 class="h2 eco-normal-text eco-bold-text">Conducteur :</h2>
         <section class="user-card">
             <a class="ga-user-img" href="{{ path('app_member_show', { uuid: travel.driver.uuid }) }}" target="_blank">
                 {% include('partials/_user_img.html.twig') with {
+                        avatar: travel.driver.avatarUrl,
                         username: travel.driver.username,
                 } %}
             </a>
@@ -121,12 +88,27 @@
                 slot: slot
             } %}
         </div>
-        <form action="{{ path('app_travel_book', { 'uuid': travel.uuid }) }}" method="POST" class="ga-book">
+
+        {% if isCarpooler %}
+            {% set method = 'POST' %}
+            {% set path = path('app_travel_unbook', { 'uuid': travel.uuid }) %}
+            {% set text = 'Annuler la réservation' %}
+            {% set class = 'btn btn-danger text-white' %}
+        {% else %}
+            {% set method = 'GET' %}
+            {% set path = path('app_travel_book', { 'uuid': travel.uuid }) %}
+            {% set text = 'Réserver' %}
+            {% set class = 'eco-btn eco-normal-text' %}
+        {% endif %}
+
+        <form action="{{ path }}" method={{ method }} class="ga-book">
             <input type="hidden" name="slot" value="{{ slot }}">
-            <button type="submit" class="eco-btn eco-normal-text">
-                Réserver {{ slot }} place{% if slot > 1 %}s{% endif %}
+            <button type="submit" class="{{ class }}">
+                {{ text }}
             </button>
         </form>
+
+        
     </article>
 </div>
 {% endblock %}

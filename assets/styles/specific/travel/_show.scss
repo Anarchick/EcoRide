@@ -11,7 +11,7 @@
 
 .travel-card-show {
     margin-top: 2rem;
-    height: fit-content;
+    height: fit-content !important;
     grid-template-rows: 24px auto;
     grid-template-areas:    "date schedule schedule places"
                             ". address address properties";

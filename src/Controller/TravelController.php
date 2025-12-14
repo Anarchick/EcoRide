@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Enum\RoleEnum;
 use App\Enum\TravelStateEnum;
 use App\Form\Travel2Type;
+use App\Form\TravelBookType;
 use App\Form\TravelType;
 use App\Form\TravelSearchType;
 use App\Repository\TravelRepository;
@@ -26,6 +27,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/travel', name: 'app_travel_')]
@@ -266,8 +268,9 @@ final class TravelController extends AbstractController
         String $uuid,
         TravelRepository $travelRepository,
         ReviewRepository $reviewRepository,
-        MapService $mapService
-        ): Response
+        MapService $mapService,
+        #[CurrentUser] ?User $user
+    ): Response
     {
         /** @var Travel|null */
         $travel = $travelRepository->getByUuid($uuid);
@@ -277,14 +280,12 @@ final class TravelController extends AbstractController
             return $this->redirectToRoute('app_travel_index');
         }
 
-        if ($travel->getState() !== TravelStateEnum::PENDING) {
+        if (!$travel->isInvolved($user) && $travel->getState() !== TravelStateEnum::PENDING) {
             $this->addFlash('error', 'Ce trajet n\'est plus disponible pour la réservation.');
             return $this->redirectToRoute('app_travel_index');
         }
 
-        $passengersCount = $travelRepository->getTravelPassengersCount($travel);
         $requestData = $request->query->all();
-        $carpoolers = $travel->getCarpoolers();
         $slot = $travel->getValidatedSlotCount($requestData['slot'] ?? 1);
         
         // Create map with Symfony UX Map
@@ -295,13 +296,10 @@ final class TravelController extends AbstractController
         
         return $this->render('travel/show.html.twig', [
             'travel' => $travel,
-            'arrivalDateTime' => (new \DateTime($travel->getDate()->format('Y-m-d H:i:s')))->add(new \DateInterval('PT' . $travel->getDuration() . 'M')),
             'driverReviewsCount' => $reviewRepository->count(['user' => $travel->getDriver()]),
             'driverReviews' => $reviewRepository->findBy(['user' => $travel->getDriver()], ['createdAt' => 'DESC'], 3),
-            'carpoolers' => $carpoolers,
-            'usedSlots' => $travel->getUsedSlots(),
             'slot' => $slot,
-            'passengersCount' => $passengersCount,
+            'isCarpooler' => $travel->isCarpooler($this->getUser()),
             'map' => $map, // Pass map to template
         ]);
     }
@@ -325,8 +323,6 @@ final class TravelController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em->persist($travel);
-            $em->persist($travel->getTravelPreference());
             $em->flush();
 
             $this->addFlash('success', 'Trajet mis à jour avec succès');
@@ -342,51 +338,106 @@ final class TravelController extends AbstractController
         ]);
     }
 
-    #[Route('/{uuid}/book', name: 'book', methods: ['POST'], requirements: ['uuid' => Requirement::UID_RFC4122])]
+    #[Route('/{uuid}/book', name: 'book', methods: ['GET', 'POST'], requirements: ['uuid' => Requirement::UID_RFC4122])]
+    #[IsGranted(RoleEnum::USER->value)]
     public function book(
         Request $request,
         String $uuid,
-        TravelRepository $travelRepository,
+        #[MapEntity(mapping: ['uuid' => 'uuid'])]
+        ?Travel $travel,
+        #[CurrentUser] User $user,
         EntityManagerInterface $em
     ): Response
     {
-        /** @var Travel|null */
-        $travel = $travelRepository->getByUuid($uuid);
-        /** @var User|null */
-        $user = $this->getUser();
-        
         if (!$travel) {
             $this->addFlash('error', 'Trajet non trouvé');
             return $this->redirectToRoute('app_travel_index');
         }
 
-        // Check user authentication
-        if (!$user) {
-            $this->addFlash('error', 'Vous devez être connecté pour réserver un trajet.');
-            return $this->redirectToRoute('app_login');
+        if ($travel->getState() !== TravelStateEnum::PENDING) {
+            $this->addFlash('error', 'Ce trajet n\'est plus disponible pour la réservation.');
+            return $this->redirectToRoute('app_travel_index');
         }
 
-        try {
-            $slot = $request->request->getInt('slot', 1);
-            $cost = $slot * $travel->getCost();
-            $carpool = $travel->join($user, $slot, $cost);
-            
-            if ($carpool) {
-                $em->persist($carpool);
-                $em->persist($travel);
-                // $em->persist($user);
-                $em->flush();
+        if ($travel->isCarpooler($user)) {
+            $this->addFlash('error', 'Vous avez déjà réservé ce trajet.');
+            return $this->redirectToRoute('app_travel_show', ['uuid' => $uuid]);
+        }
+
+        $form = $this->createForm(TravelBookType::class, null, [
+            'default_slot' => 1,
+            'max_slot' => $travel->getAvailableSlots(),
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid())  {
+            try {
+                $slot = $form->get('slots')->getData();
+                $cost = $slot * $travel->getCost();
+                $carpool = $travel->join($user, $slot, $cost);
+                
+                if ($carpool) {
+                    if ($travel->getAvailableSlots() <= 0) {
+                        $travel->setState(TravelStateEnum::FULL);
+                    }
+                    $em->persist($carpool);
+                    $em->flush();
+                }
+
+                $this->addFlash('success', "Réservation de $slot place(s) effectuée avec succès");
+            } catch (\InvalidArgumentException $e) {
+                $this->addFlash('error', $e->getMessage());
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Une erreur est survenue lors de la réservation. Veuillez réessayer plus tard.');
+                // TODO log
             }
 
-            $this->addFlash('success', "Réservation de $slot place(s) effectuée avec succès");
-        } catch (\InvalidArgumentException $e) {
-            $this->addFlash('error', $e->getMessage());
-        } catch (\Exception $e) {
-            $this->addFlash('error', 'Une erreur est survenue lors de la réservation. Veuillez réessayer plus tard.');
-            // TODO log
+            return $this->redirectToRoute('app_travel_show', ['uuid' => $uuid]);
         }
         
+        return $this->render('travel/book.html.twig', [
+            'travel' => $travel,
+            'form' => $form,
+        ]);
+    }
+
+    #[Route('/{uuid}/unbook', name: 'unbook', methods: ['POST'], requirements: ['uuid' => Requirement::UID_RFC4122])]
+    #[IsGranted(TravelVoter::UNBOOK, subject: 'travel')]
+    public function unbook(
+        String $uuid,
+        #[MapEntity(mapping: ['uuid' => 'uuid'])]
+        ?Travel $travel,
+        #[CurrentUser] User $user,
+        EntityManagerInterface $em
+    ): Response
+    {
+        $carpooler = $travel->removeCarpooler($user);
+        $em->remove($carpooler);
+        $travel->setState(TravelStateEnum::PENDING);
+        $em->flush();
+
+        $this->addFlash('success', 'Réservation annulée');
         return $this->redirectToRoute('app_travel_show', ['uuid' => $uuid]);
+    }
+
+    #[Route('/{uuid}/cancel', name: 'cancel', methods: ['POST'], requirements: ['uuid' => Requirement::UID_RFC4122])]
+    #[IsGranted(TravelVoter::EDIT, subject: 'travel')]
+    public function cancel(
+        #[MapEntity(mapping: ['uuid' => 'uuid'])]
+        ?Travel $travel,
+        EntityManagerInterface $em
+    ): Response
+    {
+        foreach ($travel->getCarpoolers()->toArray() as $carpooler) {
+            $travel->removeCarpooler($carpooler);
+            $em->remove($carpooler);
+        }
+
+        $travel->setState(TravelStateEnum::CANCELLED);
+        $em->flush();
+
+        $this->addFlash('success', 'Trajet annulé');
+        return $this->redirectToRoute('app_home');
     }
 
 }
