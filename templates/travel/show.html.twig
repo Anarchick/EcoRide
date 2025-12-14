@@ -100,6 +100,12 @@
             {% set text = 'Réserver' %}
             {% set class = 'eco-btn eco-normal-text' %}
         {% endif %}
+        {% if isDriver %}
+            {% set method = 'POST' %}
+            {% set path = path('app_travel_cancel', { 'uuid': travel.uuid }) %}
+            {% set text = 'Annuler le trajet' %}
+            {% set class = 'btn btn-danger text-white' %}
+        {% endif %}
 
         <form action="{{ path }}" method={{ method }} class="ga-book">
             <input type="hidden" name="slot" value="{{ slot }}">

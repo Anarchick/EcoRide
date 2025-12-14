@@ -241,6 +241,26 @@ final class TravelController extends AbstractController
         ]);
     }
 
+    #[Route('/{uuid}/cancel', name: 'cancel', methods: ['POST'], requirements: ['uuid' => Requirement::UID_RFC4122])]
+    #[IsGranted(TravelVoter::EDIT, subject: 'travel')]
+    public function cancel(
+        #[MapEntity(mapping: ['uuid' => 'uuid'])]
+        ?Travel $travel,
+        EntityManagerInterface $em
+    ): Response
+    {
+        foreach ($travel->getCarpoolers()->toArray() as $carpooler) {
+            $travel->removeCarpooler($carpooler);
+            $em->remove($carpooler);
+        }
+
+        $travel->setState(TravelStateEnum::CANCELLED);
+        $em->flush();
+
+        $this->addFlash('success', 'Trajet annulé');
+        return $this->redirectToRoute('app_home');
+    }
+
     #[Route('/{uuid}/remove', name: 'remove', methods: ['POST'],
         requirements: ['uuid' => Requirement::UID_RFC4122]
     )]
@@ -280,9 +300,8 @@ final class TravelController extends AbstractController
             return $this->redirectToRoute('app_travel_index');
         }
 
-        if (!$travel->isInvolved($user) && $travel->getState() !== TravelStateEnum::PENDING) {
-            $this->addFlash('error', 'Ce trajet n\'est plus disponible pour la réservation.');
-            return $this->redirectToRoute('app_travel_index');
+        if ($travel->getState() !== TravelStateEnum::PENDING) {
+            $this->addFlash('warning', 'Ce trajet n\'est plus disponible pour la réservation.');
         }
 
         $requestData = $request->query->all();
@@ -300,6 +319,7 @@ final class TravelController extends AbstractController
             'driverReviews' => $reviewRepository->findBy(['user' => $travel->getDriver()], ['createdAt' => 'DESC'], 3),
             'slot' => $slot,
             'isCarpooler' => $travel->isCarpooler($this->getUser()),
+            'isDriver' => $travel->getDriver() === $this->getUser(),
             'map' => $map, // Pass map to template
         ]);
     }
@@ -419,25 +439,4 @@ final class TravelController extends AbstractController
         $this->addFlash('success', 'Réservation annulée');
         return $this->redirectToRoute('app_travel_show', ['uuid' => $uuid]);
     }
-
-    #[Route('/{uuid}/cancel', name: 'cancel', methods: ['POST'], requirements: ['uuid' => Requirement::UID_RFC4122])]
-    #[IsGranted(TravelVoter::EDIT, subject: 'travel')]
-    public function cancel(
-        #[MapEntity(mapping: ['uuid' => 'uuid'])]
-        ?Travel $travel,
-        EntityManagerInterface $em
-    ): Response
-    {
-        foreach ($travel->getCarpoolers()->toArray() as $carpooler) {
-            $travel->removeCarpooler($carpooler);
-            $em->remove($carpooler);
-        }
-
-        $travel->setState(TravelStateEnum::CANCELLED);
-        $em->flush();
-
-        $this->addFlash('success', 'Trajet annulé');
-        return $this->redirectToRoute('app_home');
-    }
-
 }
