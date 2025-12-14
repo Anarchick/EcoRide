@@ -87,7 +87,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?bool $isVerified = false;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 2, scale: 1, nullable: true)]
+    #[ORM\Column(type: Types::FLOAT, precision: 2, scale: 1, nullable: true)]
     private ?float $ratingAverage = null;
 
     #[ORM\Column(length: 500, nullable: true)]
@@ -594,6 +594,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function isModerator(): bool
     {
         return $this->hasRole(RoleEnum::MODERATOR) || $this->hasRole(RoleEnum::ADMIN);
+    }
+
+    public function isDriver(): bool
+    {
+        return $this->hasRole(RoleEnum::DRIVER);
     }
 
     /**
