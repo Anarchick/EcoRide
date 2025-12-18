@@ -57,7 +57,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Encrypted]
     #[Assert\NotBlank()]
     #[Assert\Length(min:3, max: 20)]
-    #[Assert\Regex(pattern: '/^[a-zA-ZÀ-ÿ\d _\-]+$/', message: 'Votre pseudonyme ne doit contenir que des lettres, des chiffres, des tirets ou des underscores.')]
+    #[Assert\Regex(pattern: '/^[a-zA-ZÀ-ÿ\d \._\-]+$/', message: 'Votre pseudonyme ne doit contenir que des lettres, chiffres, tirets, points ou des underscores.')]
     #[ORM\Column(length: 255)]
     private ?string $username = null;
 
