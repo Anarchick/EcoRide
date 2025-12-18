@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Review;
+use App\Entity\Travel;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -24,14 +25,18 @@ class ReviewFixtures extends Fixture implements DependentFixtureInterface
     {
         return [
             UserFixtures::class,
+            TravelFixtures::class,
         ];
     }
 
     // Add some reviews to each user
     public function load(ObjectManager $manager): void
     {
+        $travel = $this->getReference('travel_0', Travel::class);
+
         for ($i = 0; $i < UserFixtures::BATCH_SIZE; $i++) {
             $author = $this->getReference('user_' . $i, User::class);
+
 
             for ($j = 0; $j < UserFixtures::BATCH_SIZE; $j++) {
 
@@ -42,6 +47,7 @@ class ReviewFixtures extends Fixture implements DependentFixtureInterface
                 $user = $this->getReference('user_' . $j, User::class);
 
                 $review = (new Review())
+                    ->setTravel($travel)
                     ->setAuthor($author)
                     ->setUser($user)
                     ->setRate($this->faker->numberBetween(1, 5))
