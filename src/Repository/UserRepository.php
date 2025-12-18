@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\User;
+use App\Enum\RoleEnum;
 use App\Repository\Trait\UuidFinderTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -30,6 +31,21 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     {
         $emailHash = hash('sha256', $email);
         return $this->findOneBy(['emailHash' => $emailHash]);
+    }
+
+    /**
+     * Find Users by their role.
+     * @return array<User> Returns an array of User objects
+     */
+    public function findByRole(RoleEnum $role): array
+    {
+        return $this->createQueryBuilder('u')
+            ->innerJoin('u.roles', 'r')
+            ->where('r.role = :role')
+            ->setParameter('role', $role)
+            ->orderBy('u.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
     }
 
     /**
