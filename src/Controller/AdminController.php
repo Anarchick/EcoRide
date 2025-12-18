@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Enum\DateIntervalEnum;
 use App\Enum\RoleEnum;
 use App\Form\RegistrationType;
+use App\Repository\PlatformCommissionRepository;
 use App\Repository\TravelRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,27 +21,38 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted(RoleEnum::ADMIN->value)]
 final class AdminController extends AbstractController
 {
-    #[Route('/', name: 'index')]
-    public function index(TravelRepository $travelRepository, UserRepository $userRepository): Response
+    #[Route('/', name: 'graphics')]
+    public function graphics(TravelRepository $travelRepository, PlatformCommissionRepository $platformCommissionRepository): Response
     {
+        $from = new \DateTimeImmutable('-30 days');
+        $to = new \DateTimeImmutable('now');
+
         $chartTravels = $travelRepository->getCountsByPeriod(
             interval: 1,
             intervalEnum: DateIntervalEnum::DAY,
-            from: new \DateTimeImmutable('-30 days'),
-            to: new \DateTimeImmutable('now')
+            from: $from,
+            to: $to
         );
 
-        return $this->render('admin/index.html.twig', [
+        $creditsEarned = $platformCommissionRepository->getSumByDay(
+            from: $from,
+            to: $to
+        );
+
+        return $this->render('admin/graphics.html.twig', [
             'chartTravels' => $chartTravels,
+            'creditsEarned' => $creditsEarned,
+            'totalCredits' => $platformCommissionRepository->getCreditSum(),
+            'totalCreditsPeriod' => $platformCommissionRepository->getCreditSum($from, $to),
         ]);
     }
 
-    #[Route('/moderator', name: 'moderator_index')]
+    #[Route('/moderator', name: 'moderators')]
     public function moderator(UserRepository $userRepository): Response
     {
         $moderators = $userRepository->findByRole(RoleEnum::MODERATOR);
 
-        return $this->render('admin/moderator/index.html.twig', [
+        return $this->render('admin/moderators.html.twig', [
             'moderators' => $moderators,
         ]);
     }
@@ -68,11 +80,12 @@ final class AdminController extends AbstractController
 
             $this->addFlash('success', 'Le modérateur a été créé.');
 
-            return $this->redirectToRoute('app_admin_moderator_index');
+            return $this->redirectToRoute('app_admin_moderators');
         }
 
         return $this->render('registration/register.html.twig', [
             'registrationForm' => $form,
         ]);
     }
+
 }
