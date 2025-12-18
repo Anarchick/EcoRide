@@ -1,4 +1,5 @@
 <?php
+namespace App\Tests\Repository;
 
 use App\Entity\User;
 use App\Tests\Utils\TestUtils;
