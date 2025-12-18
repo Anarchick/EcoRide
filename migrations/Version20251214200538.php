@@ -21,10 +21,17 @@ final class Version20251214200538 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         
-        // Step 1: Clean orphaned travel_uuid references
+        // Step 1: Add travel_uuid column if it doesn't exist
+        $this->addSql('ALTER TABLE reviews ADD COLUMN travel_uuid UUID DEFAULT NULL COMMENT \'(DC2Type:uuid)\'');
+        
+        // Step 2: Clean orphaned travel_uuid references
         $this->addSql('DELETE FROM reviews WHERE travel_uuid IS NOT NULL AND travel_uuid NOT IN (SELECT uuid FROM travels)');
         
-        // Step 2: Add foreign key constraint
+        // Step 3: Make the column NOT NULL (all existing reviews without travel will be deleted)
+        $this->addSql('DELETE FROM reviews WHERE travel_uuid IS NULL');
+        $this->addSql('ALTER TABLE reviews MODIFY travel_uuid UUID NOT NULL COMMENT \'(DC2Type:uuid)\'');
+        
+        // Step 4: Add foreign key constraint
         $this->addSql('ALTER TABLE reviews ADD CONSTRAINT FK_6970EB0F1A27B30B FOREIGN KEY (travel_uuid) REFERENCES travels (uuid)');
         $this->addSql('CREATE INDEX IDX_6970EB0F1A27B30B ON reviews (travel_uuid)');
         $this->addSql('CREATE UNIQUE INDEX unique_review_per_travel ON reviews (author_uuid, user_uuid, travel_uuid)');
@@ -36,5 +43,6 @@ final class Version20251214200538 extends AbstractMigration
         $this->addSql('ALTER TABLE reviews DROP FOREIGN KEY FK_6970EB0F1A27B30B');
         $this->addSql('DROP INDEX IDX_6970EB0F1A27B30B ON reviews');
         $this->addSql('DROP INDEX unique_review_per_travel ON reviews');
+        $this->addSql('ALTER TABLE reviews DROP COLUMN travel_uuid');
     }
 }
