@@ -12,10 +12,12 @@ final class TravelVoter extends Voter
     public const EDIT = 'TRAVEL_EDIT';
     public const REMOVE = 'TRAVEL_REMOVE';
     public const UNBOOK = 'TRAVEL_UNBOOK';
+    public const START = 'TRAVEL_START';
+    public const COMPLETE = 'TRAVEL_COMPLETE';
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return in_array($attribute, [self::EDIT, self::REMOVE, self::UNBOOK])
+        return in_array($attribute, [self::EDIT, self::REMOVE, self::UNBOOK, self::START, self::COMPLETE])
             && $subject instanceof Travel;
     }
 
@@ -31,23 +33,17 @@ final class TravelVoter extends Voter
             return false;
         }
 
-        if ($user->isModerator()) {
-            return true;
-        }
+        $isDriver = $user->isDriver();
+        $isCarpooler = $subject->isCarpooler($user);
+        $isModerator = $user->isModerator();
 
-        switch ($attribute) {
-            case self::EDIT:
-                return $subject->getDriver()->getUuid() === $user->getUuid();
-                break;
-            case self::REMOVE:
-                return $subject->getDriver()->getUuid() === $user->getUuid();
-                break;
-            case self::UNBOOK:
-                return $subject->isCarpooler($user)
-                        && $subject->getDriver()->getUuid() !== $user->getUuid()
-                        && $subject->getState()->isStarted() === false;
-        }
-
-        return false;
+        return match ($attribute) {
+            self::EDIT => $isDriver || $isModerator,
+            self::REMOVE => $isModerator,
+            self::UNBOOK => $isCarpooler && !$isDriver && $subject->getState()->isStarted() === false,
+            self::START => $isDriver,
+            self::COMPLETE => $isDriver,
+            default => false,
+        };
     }
 }
