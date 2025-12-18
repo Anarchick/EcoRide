@@ -158,6 +158,10 @@ a, button {
     justify-self: center !important;
 }
 
+.w-fill {
+    width: -webkit-fill-available !important;
+}
+
 .w-fit {
     width: fit-content !important;
 }
