@@ -10,6 +10,7 @@ enum RoleEnum: string
     case DRIVER = 'ROLE_DRIVER';
     case MODERATOR = 'ROLE_MODERATOR';
     case ADMIN = 'ROLE_ADMIN';
+    case BANNED = 'ROLE_BANNED';
 
     /**
      * Check if the role is a user or driver.
