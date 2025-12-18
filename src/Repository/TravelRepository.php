@@ -313,4 +313,59 @@ class TravelRepository extends ServiceEntityRepository
             ->getSingleScalarResult()
         ;
     }
+
+    /**
+     * Find a Travel ready to start for a specific driver
+     * (state PENDING or FULL, date within +/- 2 hours from now)
+     */
+    public function findReadyToStartTravel(User $driver): ?Travel
+    {
+        return $this->createQueryBuilder('t')
+            ->where('(t.driver = :driver)')
+            ->andWhere('t.state IN (:states)')
+            ->andWhere('t.date BETWEEN DATE_SUB(:now, 120, \'MINUTE\') AND DATE_ADD(:now, 120, \'MINUTE\')')
+            ->setParameter('driver', $driver)
+            ->setParameter('states', [TravelStateEnum::PENDING, TravelStateEnum::FULL])
+            ->setParameter('now', new \DateTimeImmutable())
+            ->orderBy('t.date', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
+    public function findInProgressTravel(User $user): ?Travel
+    {
+        return $this->createQueryBuilder('t')
+            ->where('(t.driver = :user)')
+            ->andWhere('t.state = :state')
+            ->setParameter('user', $user)
+            ->setParameter('state', TravelStateEnum::IN_PROGRESS)
+            ->orderBy('t.date', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
+    /**
+     * Find all Travels completed involving User without review yet
+     * @return array<Travel> Returns an array of Travel objects
+     */
+    public function findTravelsWithPendingReviews(User $user): array
+    {
+        return $this->createQueryBuilder('t')
+            ->leftJoin('t.carpoolers', 'cp')
+            ->leftJoin('t.reviews', 'r', 'WITH', 'r.author = :user AND r.travel = t')
+            ->where('(cp.user = :user)')
+            ->andWhere('t.state = :state')
+            ->andWhere('r.id IS NULL')
+            ->setParameter('user', $user)
+            ->setParameter('state', TravelStateEnum::COMPLETED)
+            ->orderBy('t.date', 'DESC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
 }
