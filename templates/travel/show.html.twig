@@ -75,13 +75,12 @@
         </section>
     </article>
 
+    {% if travel.isCancellable() %}
     <article class="travel-interaction">
-        <form action="" method="POST" class="ga-message">
-            <button type="submit" class="eco-btn eco-normal-text color-interact">
-                Envoyer un message
-            </button>
-        </form>
-
+        {% if not isDriver %}
+            <a href="#" class="ga-message eco-btn">Envoyer un message</a>
+        {% endif %}
+        
         <div class="ga-price">
             {% include 'travel/partials/_price.html.twig' with {
                 cost: travel.cost,
@@ -113,8 +112,9 @@
                 {{ text }}
             </button>
         </form>
-
         
     </article>
+    {% endif %}
+    
 </div>
 {% endblock %}

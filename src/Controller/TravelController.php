@@ -3,12 +3,14 @@
 namespace App\Controller;
 
 use App\Entity\Car;
+use App\Entity\Review;
 use App\Entity\Travel;
 use App\Entity\User;
 use App\Enum\RoleEnum;
 use App\Enum\TravelStateEnum;
 use App\Form\Travel2Type;
 use App\Form\TravelBookType;
+use App\Form\TravelCompleteType;
 use App\Form\TravelType;
 use App\Form\TravelSearchType;
 use App\Repository\TravelRepository;
@@ -224,7 +226,7 @@ final class TravelController extends AbstractController
 
             $sessionTTL->remove('travel_create_data');
 
-            $this->addFlash('success', 'Trajet créé avec succès');
+            $this->addFlash('success', 'Trajet créé.');
             return $this->redirectToRoute('app_travel_show', [
                 'uuid' => $travel->getUuid()->toRfc4122(),
             ], Response::HTTP_SEE_OTHER);
@@ -249,6 +251,11 @@ final class TravelController extends AbstractController
         EntityManagerInterface $em
     ): Response
     {
+        if (!$travel->isCancellable()) {
+            $this->addFlash('error', 'Le trajet ne peut pas être annulé.');
+            return $this->redirectToRoute('app_home');
+        }
+
         foreach ($travel->getCarpoolers()->toArray() as $carpooler) {
             $travel->removeCarpooler($carpooler);
             $em->remove($carpooler);
@@ -274,7 +281,7 @@ final class TravelController extends AbstractController
         $entityManager->remove($travel);
         $entityManager->flush();
 
-        $this->addFlash('success', 'Trajet supprimé avec succès');
+        $this->addFlash('success', 'Trajet supprimé.');
         return $this->redirectToRoute('app_travel_index', [],
             Response::HTTP_SEE_OTHER
         );
@@ -289,7 +296,6 @@ final class TravelController extends AbstractController
         TravelRepository $travelRepository,
         ReviewRepository $reviewRepository,
         MapService $mapService,
-        #[CurrentUser] ?User $user
     ): Response
     {
         /** @var Travel|null */
@@ -345,7 +351,7 @@ final class TravelController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
 
-            $this->addFlash('success', 'Trajet mis à jour avec succès');
+            $this->addFlash('success', 'Trajet mis à jour.');
 
             return $this->redirectToRoute('app_travel_show', [
                 'uuid' => $travel->getUuid()->toRfc4122(),
@@ -385,15 +391,16 @@ final class TravelController extends AbstractController
         }
 
         $form = $this->createForm(TravelBookType::class, null, [
-            'default_slot' => 1,
+            'default_slot' => $request->query->getInt('slot', 1),
             'max_slot' => $travel->getAvailableSlots(),
         ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())  {
+            $slot = $form->get('slots')->getData();
+            $cost = $slot * $travel->getCost();
+
             try {
-                $slot = $form->get('slots')->getData();
-                $cost = $slot * $travel->getCost();
                 $carpool = $travel->join($user, $slot, $cost);
                 
                 if ($carpool) {
@@ -404,7 +411,7 @@ final class TravelController extends AbstractController
                     $em->flush();
                 }
 
-                $this->addFlash('success', "Réservation de $slot place(s) effectuée avec succès");
+                $this->addFlash('success', "Réservation de $slot place(s) effectuée.");
             } catch (\InvalidArgumentException $e) {
                 $this->addFlash('error', $e->getMessage());
             } catch (\Exception $e) {
@@ -412,7 +419,7 @@ final class TravelController extends AbstractController
                 // TODO log
             }
 
-            return $this->redirectToRoute('app_travel_show', ['uuid' => $uuid]);
+            return $this->redirectToRoute('app_travel_show', ['uuid' => $uuid, 'slot' => $slot]);
         }
         
         return $this->render('travel/book.html.twig', [
@@ -439,4 +446,79 @@ final class TravelController extends AbstractController
         $this->addFlash('success', 'Réservation annulée');
         return $this->redirectToRoute('app_travel_show', ['uuid' => $uuid]);
     }
+
+    #[Route('/{uuid}/start', name: 'start', methods: ['POST'], requirements: ['uuid' => Requirement::UID_RFC4122])]
+    #[IsGranted(TravelVoter::START, subject: 'travel')]
+    public function start(
+        Request $request,
+        #[MapEntity(mapping: ['uuid' => 'uuid'])]
+        ?Travel $travel,
+        EntityManagerInterface $em
+    ): Response
+    {
+        $travel->setState(TravelStateEnum::IN_PROGRESS);
+        $em->flush();
+
+        $this->addFlash('success', 'Trajet démarré');
+        return $this->redirect($request->getUri());
+    }
+
+    #[Route('/{uuid}/complete', name: 'complete', methods: ['GET', 'POST'], requirements: ['uuid' => Requirement::UID_RFC4122])]
+    #[IsGranted(TravelVoter::COMPLETE, subject: 'travel')]
+    public function complete(
+        Request $request,
+        #[MapEntity(mapping: ['uuid' => 'uuid'])]
+        ?Travel $travel,
+        #[CurrentUser] User $driver,
+        EntityManagerInterface $em
+    ): Response
+    {
+        if ($travel->getState() !== TravelStateEnum::IN_PROGRESS) {
+            $this->addFlash('error', 'Le trajet doit être en cours pour le valider.');
+            return $this->redirectToRoute('app_profile_index');
+        }
+
+        $carpoolers = $travel->getCarpoolers();
+
+        if ($carpoolers->count() === 0) {
+            $travel->setState(TravelStateEnum::COMPLETED);
+            $em->flush();
+
+            $this->addFlash('success', 'Trajet terminé');
+            return $this->redirectToRoute('app_profile_index');
+        }
+
+        $formData = ['reviews' => []];
+        
+        foreach ($carpoolers as $carpooler) {
+            $review = new Review();
+            $review->setAuthor($driver);
+            $review->setUser($carpooler->getUser());
+            $review->setTravel($travel);
+            $formData['reviews'][] = $review;
+        }
+
+        $form = $this->createForm(TravelCompleteType::class, $formData);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            
+            foreach ($data['reviews'] as $review) {
+                $em->persist($review);
+            }
+
+            $travel->setState(TravelStateEnum::COMPLETED);
+            $em->flush();
+
+            $this->addFlash('success', 'Trajet terminé. Les covoitureurs peuvent maintenant vous laisser un avis.');
+            return $this->redirectToRoute('app_profile_index');
+        }
+
+        return $this->render('travel/complete.html.twig', [
+            'travel' => $travel,
+            'form' => $form,
+        ]);
+    }
+    
 }
