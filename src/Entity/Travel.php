@@ -75,9 +75,16 @@ class Travel
     #[ORM\OneToMany(targetEntity: Carpooler::class, mappedBy: 'travel', orphanRemoval: true)]
     private Collection $carpoolers;
 
+    /**
+     * @var Collection<int, Review>
+     */
+    #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'travel', orphanRemoval: true)]
+    private Collection $reviews;
+
     public function __construct()
     {
         $this->carpoolers = new ArrayCollection();
+        $this->reviews = new ArrayCollection();
     }
 
     public function getUuid(): ?Uuid
@@ -379,6 +386,41 @@ class Travel
         }
 
         return null;
+    }
+
+    /**
+     * @return Collection<int, Review>
+     */
+    public function getReviews(): Collection
+    {
+        return $this->reviews;
+    }
+
+    public function addReview(Review $review): static
+    {
+        if (!$this->reviews->contains($review)) {
+            $this->reviews->add($review);
+            $review->setTravel($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReview(Review $review): static
+    {
+        if ($this->reviews->removeElement($review)) {
+            // set the owning side to null (unless already changed)
+            if ($review->getTravel() === $this) {
+                $review->setTravel(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function isCancellable(): bool
+    {
+        return $this->state === TravelStateEnum::PENDING || $this->state === TravelStateEnum::FULL;
     }
 
 }
