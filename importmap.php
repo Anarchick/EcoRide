@@ -59,6 +59,11 @@ return [
         'type' => 'css',
         'entrypoint' => true,
     ],
+    'admin.css' => [
+        'path' => './assets/styles/specific/admin/admin.css',
+        'type' => 'css',
+        'entrypoint' => true,
+    ],
     'leaflet' => [
         'version' => '1.9.4',
     ],

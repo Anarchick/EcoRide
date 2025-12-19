@@ -1,0 +1,31 @@
+.banned-user-card {
+    height: fit-content;
+    width: fit-content;
+    display: grid;
+    column-gap: 20px;
+    row-gap: 8px;
+    grid-template-columns: auto repeat(3, 1fr);
+    grid-template-areas:    "user-img userban-info userban-info unban-btn"
+                            "user-img reason reason reason";
+}
+
+.ga-unban-btn {
+    grid-area: unban-btn;
+    justify-self: end;
+}
+
+.ga-userban-info {
+    grid-area: userban-info;
+}
+
+.ga-reason {
+    grid-area: reason;
+}
+
+.ga-date-banned {
+    grid-area: date-banned;
+}
+
+.ga-user-img {
+    grid-area: user-img;
+}
