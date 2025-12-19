@@ -6,13 +6,14 @@ use App\Repository\UserBanRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use SpecShaper\EncryptBundle\Annotations\Encrypted;
 
 #[ORM\Table(name: 'user_bans')]
 #[ORM\Entity(repositoryClass: UserBanRepository::class)]
 class UserBan
 {
     #[ORM\Id]
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(inversedBy: 'userBan', cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false, referencedColumnName: 'uuid')]
     private ?User $user = null;
 
@@ -20,12 +21,20 @@ class UserBan
     #[Gedmo\Timestampable(on: 'create')]
     private ?\DateTimeImmutable $createAt = null;
 
+    #[Encrypted]
     #[ORM\Column(type: Types::TEXT, nullable: false)]
     private ?string $reason = null;
 
     public function getUser(): ?User
     {
         return $this->user;
+    }
+
+    public function setUser(User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
     }
 
     public function getCreateAt(): ?\DateTimeImmutable
