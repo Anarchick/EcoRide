@@ -10,6 +10,8 @@
 {% include 'partials/_profile_nav.html.twig' %}
 <div class="eco-container-main">
 
+    {% include 'partials/_flashes.html.twig' %}
+    
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
         <h1 class="eco-title-text d-block">Mon profil</h1>
         <section class="d-flex align-items-center gap-2">
@@ -21,8 +23,6 @@
                 <a href="{{ path('app_logout') }}" class="eco-btn">Déconnexion</a>
         </section>
     </div>
-
-    {% include 'partials/_flashes.html.twig' %}
 
     <p>Pseudo : {{ user.username }}</p>
     <p>Roles : [{{ user.roles|join(', ') }}]</p>
