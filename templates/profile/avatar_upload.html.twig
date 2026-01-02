@@ -1,0 +1,85 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier ma photo de profil - EcoRide{% endblock %}
+
+{% block main %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h1 class="h3 mb-4">Modifier ma photo de profil</h1>
+
+            {# Flash messages #}
+            {% for type, messages in app.flashes() %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ type == 'error' ? 'danger' : type }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            {# Current avatar preview #}
+            {% if current_avatar %}
+                <div class="text-center mb-4">
+                    <p class="text-muted">Photo actuelle :</p>
+                    <img src="{{ current_avatar }}" alt="Avatar actuel" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                    
+                    <form method="post" action="{{ path('app_avatar_delete') }}" class="d-inline">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete-avatar') }}">
+                        <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                onclick="return confirm('Êtes-vous sûr de vouloir supprimer votre photo de profil ?')">
+                            Supprimer la photo
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+
+            {# Upload form #}
+            <div class="card">
+                <div class="card-body">
+                    {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+                    
+                    <div class="mb-3">
+                        {{ form_label(form.avatar) }}
+                        {{ form_widget(form.avatar, {'attr': {'class': 'form-control', 'accept': 'image/jpeg,image/png,image/webp'}}) }}
+                        {{ form_errors(form.avatar) }}
+                        <div class="form-text">
+                            Formats acceptés : JPEG, PNG, WebP. Taille maximale : 5 Mo.
+                            <br>L'image sera automatiquement redimensionnée en 400x400 pixels.
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ path('app_profile_index') }}" class="btn btn-secondary">Annuler</a>
+                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+
+            {# Preview on file selection (optional) #}
+            <script>
+                document.querySelector('input[type="file"]').addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            const preview = document.getElementById('preview');
+                            if (!preview) {
+                                const img = document.createElement('img');
+                                img.id = 'preview';
+                                img.className = 'rounded-circle mt-3';
+                                img.style.cssText = 'width: 150px; height: 150px; object-fit: cover; display: block; margin: 0 auto;';
+                                e.target.closest('.mb-3').appendChild(img);
+                            }
+                            document.getElementById('preview').src = event.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            </script>
+        </div>
+    </div>
+</div>
+{% endblock %}
