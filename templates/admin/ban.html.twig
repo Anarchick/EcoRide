@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}EcoRide - Bannir l'utilisateur {{ user.username }}{% endblock %}
+
+{% block main %}
+{% include 'partials/_base_form.html.twig' with {
+    'title': 'Bannir l\'utilisateur ' ~ user.username,
+    'form': form,
+    'labels': {
+        'reason': 'Raison du bannissement',
+    },
+    'submit_label': "Bannir"
+} %}
+{% endblock %}

@@ -3,27 +3,33 @@
 {% block title %}EcoRide - Voyager{% endblock %}
 
 {% block importmap %}
-    {{ importmap(['app', 'scripts/specific/travel']) }}
+    {{ importmap(['app', 'scripts/specific/travel', 'travel.css']) }}
 {% endblock %}
 
 {% block main %}
 <twig:TravelSearchBar :form="search_form" />
 
-<div class="container mt-4">
+<div class="eco-container-main">
     <!-- Loading animation -->
     <div id="loading" class="htmx-indicator">
         <div class="d-flex flex-column justify-content-center align-items-center m-4">
             <div class="spinner-border text-success" role="status"></div>
-            <span class="sr-only mt-2">Recherche en cours...</span>
+            <span class="eco-small-text sr-only mt-2">Recherche en cours...</span>
         </div>
     </div>
     
     <!-- results area -->
-    <div id="travel-results">
-        <div class="text-center text-muted">
-            <i class="bi bi-search"></i>
-            <p>Utilisez la barre de recherche pour trouver des trajets</p>
-        </div>
+    <div id="travel-results" class="text-center text-muted mb-3">
+        <i class="bi bi-search"></i>
+        <p class="eco-small-text">Utilisez la barre de recherche pour trouver des trajets</p>
+    </div>
+
+    <div class="d-flex justify-self-center">
+        {% if app.user and app.user.isDriver() %}
+        <a href="{{ path('app_travel_create') }}" class="eco-btn">
+            Créer un nouveau trajet
+        </a>
+        {% endif %}
     </div>
 </div>
 

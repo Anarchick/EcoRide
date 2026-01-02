@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}EcoRide - Utilisateurs bannis{% endblock %}
+
+{% block importmap %}
+    {{ importmap(['app', 'admin.css']) }}
+{% endblock %}
+
+{% block main %}
+{% include 'partials/_profile_nav.html.twig' %}
+<div class="eco-container-main d-flex flex-column gap-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <h1 class="eco-title-text d-block">Utilisateurs bannis</h1>
+    </div>
+
+    {% for user in users %}
+        <article aria-label="Utilisateur banni {{ user.username | decrypt }}" class="card banned-user-card w-100 p-3">
+            <a class="ga-user-img" href="{{ path('app_member_show', { uuid: user.uuid }) }}" target="_blank">
+                {% include('partials/_user_img.html.twig') with {
+                        avatar: user.avatarUrl,
+                        username: user.username | decrypt,
+                } %}
+            </a>
+            <p class="ga-userban-info eco-normal-text"><span class="eco-bold-text">{{ user.username | decrypt }}</span>
+                <span><time datetime="{{ user.bannedAt.date | date('Y-m-d H:i') }}">{{ user.bannedAt.date | format_datetime(locale='fr', pattern='EEEE d MMMM Y à MM:HH') }}</time></span>
+            </p>
+            <p class="ga-reason eco-normal-text"><span class="eco-bold-text">Raison : </span>{{ user.reason | decrypt }}</p>
+            <form action="{{ path('app_admin_unban', { 'uuid': user.uuid }) }}" method="POST" class="ga-unban-btn">
+                <input type="hidden" name="_token" value="{{ csrf_token('unban' ~ user.uuid) }}">
+                <button type="submit" class="btn btn-warning">
+                    Débannir
+                </button>
+            </form>
+        </article>
+    {% endfor %}
+    {% include 'partials/_pagination.html.twig' with {'totalEntries': count} %}
+{% endblock %}

@@ -1,18 +1,26 @@
 flowchart LR
+visitor((Visiteur))
 modo((Modérateur))
 admin((Administrateur))
 
-modo --> /login[Se connecter]
-/login --> /logout[Se déconnecter]
+visitor --> /login[Se connecter]
+modo -->|&lt;require&gt;| visitor
+
+modo --> /logout[Se déconnecter]
 modo --> /profil[Acceder au profil et aux paramètres]
 /profil --> /profil/edit[Modifier profil]
 modo --> /travels/edit[Modifier un trajet]
 modo --> /profils/edit[Modifier un profil d'utilisateur]
 modo --> /contact/view[Voir les messages]
 /contact/view --> /contact/reply[Répondre à un message]
+modo--> /modo/review[Voir les avis]
+/modo/review --> /modo/review/edit[Valider ou modifier un avis]
 
 admin --> /admin/dashboard[Accéder au tableau de bord]
 /admin/dashboard --> /admin/modo/create[Créer un compte modérateur]
-/admin/dashboard --> /admin/modo/delete[Supprimer un compte modérateur]
+/admin/modo/create --> /admin/modo/delete[Supprimer un compte modérateur]
+/admin/dashboard --> /admin/ban[ Bannir utilisateurs]
+/admin/ban --> /admin/unban[Débannir utilisateurs]
+/admin/dashboard --> /admin/charts[Voir les statistiques]
 
 admin -->|&lt;extends&gt;| modo

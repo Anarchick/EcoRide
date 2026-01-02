@@ -45,6 +45,8 @@ class TravelFixtures extends Fixture implements DependentFixtureInterface
 
     public function load(ObjectManager $manager): void
     {
+        $j = 0; // travel counter for reference
+
         for ($i = 0; $i < UserFixtures::BATCH_SIZE; $i++) {
             $departure = self::CITIES[array_rand(self::CITIES)];
             // arrival without departure
@@ -79,19 +81,30 @@ class TravelFixtures extends Fixture implements DependentFixtureInterface
                     ->setArrival($arrival)
                     ->setDate($dateTime)
                     ->setCost($this->faker->numberBetween(350, 500))
-                    ->setPassengersMax($this->faker->numberBetween(1, $passengersmax))
+                    ->setPassengersMax($this->faker->numberBetween(2, $passengersmax))
                     ->setCar($car)
                     ->setDriver($user)
                     ->setDistance($this->faker->numberBetween(450, 530))
-                    ->setDuration($this->faker->numberBetween(60*4, 60*5))
+                    ->setDuration($this->faker->numberBetween(60*4, 60*7))
                     ->setTravelPreference($travelPreference);
 
                 $travelPreference->setLuggageSize(LuggageSizeEnum::cases()[array_rand(LuggageSizeEnum::cases())])
                     ->setComment($this->faker->paragraph())
                     ->setTravel($travel);
 
+                if ($this->faker->boolean(30)) {
+                    $travelPreference->setIsSmokingAllowed(true);
+                }
+
+                if ($this->faker->boolean(30)) {
+                    $travelPreference->setIsPetsAllowed(true);
+                }
+
                 $manager->persist($travel);
                 $manager->persist($travelPreference);
+
+                $this->addReference('travel_' . $j, $travel);
+                $j++;
             }
         }
 

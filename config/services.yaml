@@ -4,6 +4,8 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    env(MONGODB_URI): ''
+    env(MONGODB_DB): ''
 
 services:
     # default configuration for services in *this* file
@@ -24,6 +26,11 @@ services:
             $environment: '%kernel.environment%'
         tags:
             - twig.extension
+
+    # Cloudinary service for image upload
+    App\Service\CloudinaryService:
+        arguments:
+            $cloudinaryUrl: '%env(CLOUDINARY_URL)%'
 
     # Custom MariaDB platform for UUID support
     App\Doctrine\Platform\MariaDBUuidPlatform:

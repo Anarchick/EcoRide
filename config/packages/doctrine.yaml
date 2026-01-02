@@ -32,6 +32,11 @@ doctrine:
         dql:
             string_functions:
                 DATE_FORMAT: DoctrineExtensions\Query\Mysql\DateFormat
+            # numeric_functions:
+            #     FLOOR: DoctrineExtensions\Query\Mysql\Floor
+            datetime_functions:
+                DATE_ADD: DoctrineExtensions\Query\Mysql\DateAdd
+                # SEC_TO_TIME: DoctrineExtensions\Query\Mysql\SecToTime
 
 when@test:
     doctrine:

@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}EcoRide - Créer un trajet{% endblock %}
+
+{% block importmap %}
+    {{ importmap(['app', 'travel.css']) }}
+{% endblock %}
+
+{% block main %}
+<div class="form-header eco-page-text text-center">
+    <h1>Créer un trajet</h1>
+</div>
+
+<section class="eco-container-main">
+
+    {% if map %}
+        {{ ux_map(map, {'id': 'map', 'class': 'mb-3'}) }}
+    {% endif %}
+
+    {% include 'partials/_flashes.html.twig' %}
+
+    {{ form_start(form, {'attr': {'class': 'eco-form'}}) }}
+    {{ form_row(form.passengersMax, {'label': 'Nombre de passagers :', 'label_attr': {'class': 'eco-bold-text'}}) }}
+    
+    <div class="mb-3">
+        {{ form_label(form.cost, null, {'label_attr': {'class': 'eco-bold-text', 'id': 'cost-label'}}) }}
+        {{ form_widget(form.cost, {'attr': {'id': 'cost-input'}}) }}
+        {{ form_errors(form.cost) }}
+        <p class="eco-small-text">La plateforme prend une commission de 2 crédits par passager.</p>
+    </div>
+    
+    {{ form_row(form.travelPreference.luggageSize, {'label': 'Taille des bagages :', 'label_attr': {'class': 'eco-bold-text'}}) }}
+    {{ form_row(form.travelPreference.comment, {'label': 'Commentaire :', 'label_attr': {'class': 'eco-bold-text'}}) }}
+    {{ form_row(form.travelPreference.isSmokingAllowed, {'label': 'Fumeur autorisé', 'label_attr': {'class': 'eco-normal-text'}}) }}
+    {{ form_row(form.travelPreference.isPetsAllowed, {'label': 'Animaux autorisés', 'label_attr': {'class': 'eco-normal-text'}}) }}
+    {{ form_row(form.submit, {'label': 'Créer le trajet', 'attr': {'class': 'eco-btn'}}) }}
+    {{ form_errors(form) }}
+    {{ form_end(form) }}
+
+    <script>
+        const costInput = document.querySelector('#{{ form.cost.vars.id }}');
+        const costLabel = document.querySelector('#cost-label');
+
+        function updateCostLabel() {
+            const cost = parseInt(costInput.value) || 0;
+            costLabel.textContent = `Coût par passager : ${cost} crédits`;
+        }
+
+        updateCostLabel();
+
+        costInput.addEventListener('input', updateCostLabel);
+    </script>
+</section>
+
+{% endblock %}

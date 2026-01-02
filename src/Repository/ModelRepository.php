@@ -16,20 +16,22 @@ class ModelRepository extends ServiceEntityRepository
         parent::__construct($registry, Model::class);
     }
 
-    //    /**
-    //     * @return Model[] Returns an array of Model objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('m')
-    //            ->andWhere('m.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('m.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * Find all models for a specific brand
+     * 
+     * @param int $brandId
+     * @return Model[] Returns an array of Model objects
+     */
+    public function findByBrand(int $brandId): array
+    {
+        return $this->createQueryBuilder('m')
+            ->andWhere('m.brand = :brandId')
+            ->setParameter('brandId', $brandId)
+            ->orderBy('m.name', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 
     //    public function findOneBySomeField($value): ?Model
     //    {

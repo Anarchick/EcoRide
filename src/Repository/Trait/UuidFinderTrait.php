@@ -10,14 +10,15 @@ use Symfony\Component\Uid\Uuid;
 trait UuidFinderTrait
 {
     /**
-     * Find an entity by their UUID.
-     * Accepts both 32-character string (without dashes) and standard UUID format.
-     * Returns null if the UUID is invalid or not found.
+     * return null if the UUID is invalid
      * @param string|Uuid $uuid
-     * @return T|null
      */
-    public function getByUuid(string|Uuid $uuid): mixed
+    public function toUuid(string|Uuid $uuid): Uuid|null
     {
+        if ($uuid instanceof Uuid) {
+            return $uuid;
+        }
+
         if (is_string($uuid) && strlen($uuid) == 32) {
             $uuid = sprintf(
                 '%s-%s-%s-%s-%s', // RFC4122
@@ -35,6 +36,22 @@ trait UuidFinderTrait
             return null;
         }
 
-        return $this->findOneBy(['uuid' => $uuid]);
+        return $uuid;
+    }
+
+    /**
+     * Find an entity by their UUID.
+     * Accepts both 32-character string (without dashes) and standard UUID format.
+     * Returns null if the UUID is invalid or not found.
+     * @param string|Uuid $uuid
+     * @return T|null
+     */
+    public function getByUuid(string|Uuid|null $uuid): mixed
+    {
+        if (!$uuid) {
+            return null;
+        }
+
+        return $this->findOneBy(['uuid' => $this->toUuid($uuid)]);
     }
 }

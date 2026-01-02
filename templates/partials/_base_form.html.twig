@@ -1,9 +1,8 @@
-
-<div class="text-center bg-success text-white p-3 mb-4">
+<div class="form-header eco-page-text text-center">
     <h1>{{ title }}</h1>
 </div>
 
-<div class="container">
+<div class="eco-container-main">
 
     {% include 'partials/_flashes.html.twig' %}
 
@@ -21,7 +20,7 @@
         {% endif %}
     {% endfor %}
 
-    {{ form_row(form.submit, {'label': submit_label, 'attr': {'class': 'btn btn-success'}}) }}
+    {{ form_row(form.submit, {'label': submit_label, 'attr': {'class': 'eco-btn'}}) }}
     {{ form_errors(form) }}
     {{ form_end(form) }}
 </div>

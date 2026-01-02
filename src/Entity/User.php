@@ -57,7 +57,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Encrypted]
     #[Assert\NotBlank()]
     #[Assert\Length(min:3, max: 20)]
-    #[Assert\Regex(pattern: '/^[a-zA-ZÀ-ÿ\d _\-]+$/', message: 'Votre pseudonyme ne doit contenir que des lettres, des chiffres, des tirets ou des underscores.')]
+    #[Assert\Regex(pattern: '/^[a-zA-ZÀ-ÿ\d \._\-]+$/', message: 'Votre pseudonyme ne doit contenir que des lettres, chiffres, tirets, points ou des underscores.')]
     #[ORM\Column(length: 255)]
     private ?string $username = null;
 
@@ -87,8 +87,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?bool $isVerified = false;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 3, scale: 2, nullable: true)]
-    private ?string $ratingAverage = null;
+    #[ORM\Column(type: Types::FLOAT, precision: 2, scale: 1, nullable: true)]
+    private ?float $ratingAverage = null;
+
+    #[ORM\Column(length: 500, nullable: true)]
+    private ?string $avatarUrl = null;
 
     /**
      * @var Collection<int, Review>
@@ -121,19 +124,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $travels;
 
     /**
-     * @var Collection<int, Travel>
-     */
-    #[ORM\ManyToMany(targetEntity: Travel::class, inversedBy: 'carpoolers')]
-    #[ORM\JoinTable(name: 'user_travel')]
-    #[ORM\JoinColumn(name: 'user_uuid', referencedColumnName: 'uuid')]
-    #[ORM\InverseJoinColumn(name: 'travel_uuid', referencedColumnName: 'uuid')]
-    private Collection $carpools;
-
-    /**
      * @var Collection<int, Role>
      */
     #[ORM\OneToMany(targetEntity: Role::class, mappedBy: 'user', orphanRemoval: true, cascade: ['persist'])]
     private Collection $roles;
+
+    /**
+     * @var Collection<int, Carpooler>
+     */
+    #[ORM\OneToMany(targetEntity: Carpooler::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $carpoolers;
+
+    #[ORM\OneToOne(targetEntity: UserBan::class, mappedBy: 'user', cascade: ['persist'])]
+    private ?UserBan $userBan = null;
 
     public function __construct()
     {
@@ -142,8 +145,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->cars = new ArrayCollection();
         $this->transactions = new ArrayCollection();
         $this->travels = new ArrayCollection();
-        $this->carpools = new ArrayCollection();
         $this->roles = new ArrayCollection();
+        $this->carpoolers = new ArrayCollection();
     }
 
     public function getUuid(): ?Uuid
@@ -285,6 +288,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function addCredits(int $amount): static
+    {
+        $this->credits += $amount;
+
+        return $this;
+    }
+
     public function getBio(): ?string
     {
         return $this->bio;
@@ -309,14 +319,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getRatingAverage(): ?string
+    public function getRatingAverage(): ?float
     {
         return $this->ratingAverage;
     }
 
-    public function setRatingAverage(?string $ratingAverage): static
+    public function setRatingAverage(?float $ratingAverage): static
     {
         $this->ratingAverage = $ratingAverage;
+
+        return $this;
+    }
+
+    public function getAvatarUrl(): ?string
+    {
+        return $this->avatarUrl;
+    }
+
+    public function setAvatarUrl(?string $avatarUrl): static
+    {
+        $this->avatarUrl = $avatarUrl;
 
         return $this;
     }
@@ -409,6 +431,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+     * Check if user has at least one car (not removed)
+     * @return bool
+     */
+    public function hasCar(): bool
+    {
+        foreach ($this->cars as $car) {
+            if (!$car->isRemoved()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * @return Collection<int, Transaction>
      */
     public function getTransactions(): Collection
@@ -464,30 +500,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $travel->setDriver(null);
             }
         }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Travel>
-     */
-    public function getCarpools(): Collection
-    {
-        return $this->carpools;
-    }
-
-    public function addCarpool(Travel $carpool): static
-    {
-        if (!$this->carpools->contains($carpool)) {
-            $this->carpools->add($carpool);
-        }
-
-        return $this;
-    }
-
-    public function removeCarpool(Travel $carpool): static
-    {
-        $this->carpools->removeElement($carpool);
 
         return $this;
     }
@@ -565,6 +577,80 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmailHash(string $emailHash): static
     {
         $this->emailHash = $emailHash;
+
+        return $this;
+    }
+
+    // LOGIC METHODS
+
+    public function hasRole(RoleEnum $role): bool
+    {
+        foreach ($this->roles as $roleEntity) {
+            if ($roleEntity->getRole() === $role) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function isModerator(): bool
+    {
+        return $this->hasRole(RoleEnum::MODERATOR) || $this->hasRole(RoleEnum::ADMIN);
+    }
+
+    public function isDriver(): bool
+    {
+        return $this->hasRole(RoleEnum::DRIVER);
+    }
+
+    public function isBanned(): bool
+    {
+        return $this->hasRole(RoleEnum::BANNED);
+    }
+
+    /**
+     * @return Collection<int, Carpooler>
+     */
+    public function getCarpoolers(): Collection
+    {
+        return $this->carpoolers;
+    }
+
+    public function addCarpooler(Carpooler $carpooler): static
+    {
+        if (!$this->carpoolers->contains($carpooler)) {
+            $this->carpoolers->add($carpooler);
+            $carpooler->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCarpooler(Carpooler $carpooler): static
+    {
+        if ($this->carpoolers->removeElement($carpooler)) {
+            // set the owning side to null (unless already changed)
+            if ($carpooler->getUser() === $this) {
+                $carpooler->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getUserBan(): ?UserBan
+    {
+        return $this->userBan;
+    }
+
+    public function setUserBan(?UserBan $userBan): static
+    {
+        if ($userBan !== null && $userBan->getUser() !== $this) {
+            $userBan->setUser($this);
+        }
+
+        $this->userBan = $userBan;
 
         return $this;
     }

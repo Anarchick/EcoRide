@@ -2,12 +2,13 @@
 const DELAY_MS = 100;
 document.addEventListener('DOMContentLoaded', function () {
     setTimeout(() => {
-        const form = document.getElementById('travel-search-bar');
+        const form = document.getElementById('travel-search'); // templates/components/TravelSearchBar.html.twig
+        // @ts-expect-error htmx is loaded globally
         if (form && window.htmx) {
             const departure = form.querySelector('input[name="travel_search[departure]"]');
             const arrival = form.querySelector('input[name="travel_search[arrival]"]');
             const date = form.querySelector('input[name="travel_search[date]"]');
-            const passengers = form.querySelector('input[name="travel_search[passengersMin]"]');
+            const passengers = form.querySelector('input[name="travel_search[minPassengers]"]');
             const allRequiredFilled = Boolean(departure?.value.trim() &&
                 arrival?.value.trim() &&
                 date?.value.trim() &&
@@ -23,6 +24,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         searchParams.append(key, value.toString());
                     });
                     const fullUrl = `${htmxUrl}?${searchParams.toString()}`;
+                    console.log('Manual HTMX ajax call to:', fullUrl);
+                    // manual HTMX request
+                    // @ts-expect-error htmx is loaded globally
                     window.htmx.ajax('GET', fullUrl, {
                         target: htmxTarget,
                         swap: 'innerHTML'

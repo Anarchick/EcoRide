@@ -7,13 +7,13 @@
 {% set current_route = app.request.get('_route') %}
 {% set is_travel_page = current_route == 'app_travel_index' %}
 
-<section class="container">
+<section class="eco-container-main">
     {{ form_start(form, {
             'method': 'GET',
             'action': path('app_travel_index'), 
             'attr': {
-                'id': 'travel-search-bar',
-                'hx-trigger': 'change delay:500ms from:input',
+                'id': 'travel-search',
+                'hx-trigger': 'change delay:500ms',
             } | merge(is_travel_page ? {
                 'hx-get': path('app_travel_index'),
                 'hx-target': '#travel-results',
@@ -23,48 +23,118 @@
                 'hx-get': path('app_home')
             })
     }) }}
-        <div class="travel-search-inputs">
-            <div class="travel-search-input">
-                {{ ux_icon('ion:location-outline', {class: 'travel-search-icon'}) }}
-                {{ form_widget(form.departure, {
-                    'attr': {
-                        'class': 'travel-search-field',
-                        'placeholder': 'Départ'
-                    }
-                }) }}
+
+    <div id="travel-search-bar">
+        <div id="travel-search-inputs">
+            <div>
+                <div class="travel-search-input">
+                    {{ ux_icon('ion:location-outline', {class: 'travel-search-icon'}) }}
+                    {{ form_widget(form.departure, {
+                        'attr': {
+                            'class': 'travel-search-field',
+                            'placeholder': 'Départ'
+                        }
+                    }) }}
+                </div>
             </div>
 
-            <div class="travel-search-input">
-                {{ ux_icon('ion:location', {class: 'travel-search-icon'})}}
-                {{ form_widget(form.arrival, {
-                    'attr': {
-                        'class': 'travel-search-field',
-                        'placeholder': 'Destination'
-                    }
-                }) }}
+            <div>
+                <div class="line-separator" aria-hidden="true"></div>
+                <div class="travel-search-input">
+                    {{ ux_icon('ion:location', {class: 'travel-search-icon'})}}
+                    {{ form_widget(form.arrival, {
+                        'attr': {
+                            'class': 'travel-search-field',
+                            'placeholder': 'Destination'
+                        }
+                    }) }}
+                </div>
+            </div>
+
+            <div>
+                <div class="line-separator" aria-hidden="true"></div>
+                <div class="travel-search-input">
+                    {{ ux_icon('ion:calendar', {class: 'travel-search-icon'})}}
+                    {{ form_widget(form.date, {
+                        'attr': {
+                            'class': 'travel-search-field',
+                            'placeholder': 'Date'
+                        }
+                    }) }}
+                </div>
             </div>
             
-            <div class="travel-search-input">
-                {{ ux_icon('ion:calendar', {class: 'travel-search-icon'})}}
-                {{ form_widget(form.date, {
-                    'attr': {
-                        'class': 'travel-search-field',
-                        'placeholder': 'Date'
-                    }
-                }) }}
-            </div>
-            
-            <div class="travel-search-input">
-                {{ ux_icon('ion:people', {class: 'travel-search-icon'})}}
-                {{ form_widget(form.passengersMin, {
-                    'attr': {
-                        'class': 'travel-search-field',
-                        'placeholder': 'Passager(s)'
-                    }
-                }) }}
+            <div>
+                <div class="line-separator" aria-hidden="true"></div>
+                <div class="travel-search-input">
+                    {{ ux_icon('ion:people', {class: 'travel-search-icon'})}}
+                    {{ form_widget(form.minPassengers, {
+                        'attr': {
+                            'class': 'travel-search-field',
+                            'placeholder': 'Passager(s)'
+                        }
+                    }) }}
+                </div>
             </div>
             
         </div>
-        {{ form_errors(form) }}
+    </div>
+
+    <div id="travel-search-filters">
+        <button id="travel-search-filters-button" type="button" data-bs-toggle="collapse" data-bs-target="#travel-search-filters-collapse" aria-expanded="false" aria-controls="travel-search-filters-collapse">
+            <div class="d-flex align-items-center">
+                {{ ux_icon('ion:filter', {class: 'travel-search-icon'}) }}
+                <p class="eco-normal-text m-0">Filtres</p>
+            </div>
+            {{ ux_icon('ion:chevron-down', {class: 'travel-search-icon'}) }}
+        </button>
+
+        <div id="travel-search-filters-collapse" class="collapse">
+            <div id="filters">
+            
+                <div>
+                    <h2 class="eco-normal-text eco-bold-text">Services</h2>
+                    <div class="eco-normal-text">
+                        {{ form_widget(form.isElectricPreferred, {'label': 'Électrique seulement'}) }}
+                        {{ form_widget(form.isSmokingAllowed, {'label': 'Fumeur autorisé'}) }}
+                        {{ form_widget(form.isPetsAllowed, {'label': 'Animaux autorisés'}) }}
+                    </div>
+                </div>
+                
+                <div>
+                    <div>
+                        <h2 class="eco-normal-text eco-bold-text">Prix max.</h2>
+                        <div class="filter-slider">
+                            {{ ux_icon('mdi:storm', {class: 'travel-search-icon'}) }}
+                            <p id="filter-price-text" class="filter-range-text eco-normal-text m-0">999</p>
+                            {{ form_widget(form.maxCost, {id: 'filter-price-input'}) }}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h2 class="eco-normal-text eco-bold-text">Bagages</h2>
+                        {{ form_widget(form.luggageSizeMin) }}
+                    </div>
+                </div>
+                
+                <div>
+                    <h2 class="eco-normal-text eco-bold-text">Note min.</h2>
+                    {{ form_widget(form.minScore) }}
+                </div>
+                
+                <div>
+                    <h2 class="eco-normal-text eco-bold-text">Durée max.</h2>
+                    <div class="filter-slider">
+                        <p id="filter-duration-text" class="filter-range-text eco-normal-text m-0">24h</p>
+                        {{ form_widget(form.maxDuration, {id: 'filter-duration-input'}) }}
+                    </div>
+                </div>
+            
+            </div>
+        </div>
+
+    </div>
+    {{ form_errors(form) }}
     {{ form_end(form) }}
+    
 </section>

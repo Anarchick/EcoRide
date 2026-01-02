@@ -2,20 +2,74 @@
 
 {% block title %}EcoRide - Profil{% endblock %}
 
+{% block importmap %}
+    {{ importmap(['app', 'travel.css']) }}
+{% endblock %}
+
 {% block main %}
-<div class="container">
+{% include 'partials/_profile_nav.html.twig' %}
+<div class="eco-container-main">
 
     {% include 'partials/_flashes.html.twig' %}
-    {# {{ dump(user) }} #}
+    
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <h1 class="eco-title-text d-block">Mon profil</h1>
+        <section class="d-flex align-items-center gap-2">
+            {% if isDriver %}
+                <a href="{{ path('app_travel_create') }}" class="eco-btn">Créer un trajet</a>
+            {% else %}
+                <a href="{{ path('app_car_new') }}" class="eco-btn">Devenir conducteur</a>
+            {% endif %}
+                <a href="{{ path('app_logout') }}" class="eco-btn">Déconnexion</a>
+        </section>
+    </div>
+
     <p>Pseudo : {{ user.username }}</p>
     <p>Roles : [{{ user.roles|join(', ') }}]</p>
 
-    <form method="post" action="{{ path('app_profile_action') }}">
-        <button name="action" value="become_driver" class="btn btn-primary">Devenir conducteur</button>
-        <button name="action" value="create_trip" class="btn btn-primary">Créer un trajet</button>
-        <button name="action" value="logout" class="btn btn-primary">Deconnexion</button>
-    </form>
-</div>
+    {% if travelReadyToStart %}
+    <section id="readyToStart">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>Trajet prêt à démarrer</h2>
+            <div class='d-flex gap-2'>
+                <form action="{{ path('app_travel_start', { 'uuid': travelReadyToStart.uuid }) }}" method="POST">
+                    <button type="submit" class="eco-btn">
+                        Démarrer
+                    </button>
+                </form>
+                <a href="{{ path('app_travel_show', { 'uuid': travelReadyToStart.uuid }) }}" class="eco-btn">Détails</a>
+                <a href="{{ path('app_travel_cancel', { 'uuid': travelReadyToStart.uuid }) }}" class="btn btn-danger text-white">Annuler</a>
+            </div>
+        </div>
+        {% include 'travel/partials/_travel_card_show.html.twig' with {
+            travel: travelReadyToStart,
+        } %}
+    </section>
+    {% endif %}
 
+    {% if travelInProgress %}
+    <section id="completed">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>Trajets en cours</h2>
+            <a href="{{ path('app_travel_complete', { 'uuid': travelInProgress.uuid }) }}" class="eco-btn">Arrivée à destination</a>
+        </div>
+        {% include 'travel/partials/_travel_card_show.html.twig' with {
+            travel: travelInProgress,
+        } %}
+    </section>
+    {% endif %}
+
+    {% if travelsWithPendingReviews %}
+    <section id="completed">
+        <h2>Trajets en attente d'avis</h2>
+            {% for travel in travelsWithPendingReviews %}
+                {% include 'travel/partials/_travel_card_show.html.twig' with {
+                    travel: travel,
+                } %}
+            {% endfor %}
+    </section>
+    {% endif %}
+    
+</div>
 
 {% endblock %}

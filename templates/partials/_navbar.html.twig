@@ -1,15 +1,16 @@
 {% set route = app.request.get('_route') %}
-<header>
-    <nav class="navbar navbar-expand-lg bg-light container" aria-label="Navigation principale">
-        <a class="navbar-brand text-success eco-title-text" href="{{ path('app_home') }}">
+<header> 
+{# navbar navbar-expand-lg bg-light  #}
+    <nav id="navbar" class="container navbar navbar-expand-md" aria-label="Navigation principale">
+        <a id="nav-brand" class="eco-title-text text-decoration-none color-interact" href="{{ path('app_home') }}">
             EcoRide
         </a>
         
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" title="Menu">
-            <span class="navbar-toggler-icon"></span>
+            {{ ux_icon('ion:menu-outline', {class: 'travel-search-icon'}) }}
         </button>
         
-        <div class="collapse navbar-collapse" id="navbarNav">
+        <div id="navbarNav" class="collapse navbar-collapse">
             <ul class="navbar-nav me-auto">
                 <li>
                     <a class="eco-nav-link eco-normal-text {{ route == 'app_home' ? 'eco-nav-active' : '' }}" href="{{ path('app_home') }}">Accueil</a>
@@ -24,19 +25,26 @@
 
             {# If the user is logged in #}
             {% if app.user %}
-                <div class="profile-picture">
-                    {# TODO Replace with scroll menu #}
-                    <a href="{{ path('app_profile_index') }}"> 
-                        <img src="{{ asset('images/ui/profile-placeholder.jpg') }}" alt="Image de profil">
-                    </a>
-                </div>
+                <a href="{{ path('app_profile_index') }}" target="_self" class="d-flex">
+                    <div class="pe-2">
+                        <p class="eco-normal-text eco-bold-text">{{ app.user.username }}</p>
+                        <p class="eco-small-text text-end">{{ ux_icon('mdi:storm', {class: 'h-16'}) }}{{ app.user.credits }}</p>
+                    </div>
+                    
+                    <div class="profile-picture">
+                        {% include 'partials/_user_img.html.twig' with {
+                                username: app.user.username,
+                                avatar: app.user.avatarUrl
+                        } %}
+                    </div>
+                </a>
             {% else %}
                 {# Disable hx-boost on login/register links #}
                 <div class="d-inline-flex align-items-center" hx-boost="false">
                     <div>
                         <a class="eco-nav-link eco-normal-text" href="{{ path('app_login') }}">Connexion</a>
                     </div>
-                    <a class="btn btn-outline-success ms-2" href="{{ path('app_register') }}">Inscription</a>
+                    <a class="eco-btn ms-2" href="{{ path('app_register') }}">Inscription</a>
                 </div>
             {% endif %}
             

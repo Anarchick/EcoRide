@@ -1,7 +1,7 @@
 {% set flash_messages = app.flashes() %}
 {% for type, messages in flash_messages %}
     {% for message in messages %}
-        <div class="alert alert-{{ type == 'error' ? 'danger' : (type == 'success' ? 'success' : 'info') }}">
+        <div class="mt-3 alert alert-{{ type == 'error' ? 'danger' : (type == 'success' ? 'success' : 'info') }}">
             {{ message }}
         </div>
     {% endfor %}

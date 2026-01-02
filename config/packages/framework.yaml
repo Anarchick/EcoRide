@@ -10,6 +10,21 @@ framework:
 
     #esi: true
     #fragments: true
+    
+    # HTTP Client configuration
+    http_client:
+        scoped_clients:
+            nominatim.client:
+                base_uri: 'https://nominatim.openstreetmap.org'
+                headers:
+                    User-Agent: 'EcoRide/1.0 (Symfony; Student Project; Contact: github.com/Anarchick/EcoRide)'
+                timeout: 10
+            
+            osrm.client:
+                base_uri: 'https://router.project-osrm.org'
+                headers:
+                    User-Agent: 'EcoRide/1.0 (Symfony; Student Project; Contact: github.com/Anarchick/EcoRide)'
+                timeout: 15  # Routing can take longer than geocoding
 
 when@test:
     framework:

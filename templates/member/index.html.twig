@@ -1,17 +1,28 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello MemberController!{% endblock %}
+{% block title %}Ecoride - {{ user.username }}{% endblock %}
 
 {% block main %}
-<div class="container">
-{# <h1>User déchiffré :</h1>
-{{ dump(user) }}
+<div class="eco-container-main">
 
-<h1>User dans la bdd :</h1>
-{{ dump(cryptedUser)}} #}
+    {% include 'partials/_flashes.html.twig' %}
+    
     <p>Prénom : {{ user.firstName }}</p>
     <p>Nom : {{ user.lastName }}</p>
     <p>Pseudo : {{ user.username }}</p>
+
+    {% if is_granted('ROLE_ADMIN') %}
+        {% if isBanned%}
+            <form action="{{ path('app_admin_unban', { 'uuid': user.uuid }) }}" method="POST">
+                <input type="hidden" name="_token" value="{{ csrf_token('unban' ~ user.uuid) }}">
+                <button type="submit" class="btn btn-warning">
+                    Débannir
+                </button>
+            </form>
+        {% else %}
+            <a href="{{ path('app_admin_ban', {'uuid': user.uuid}) }}" class="btn btn-danger text-white">Bannir</a>
+        {% endif %}
+    {% endif %}
 </div>
 
 {% endblock %}

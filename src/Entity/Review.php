@@ -6,8 +6,10 @@ use App\Repository\ReviewRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'reviews')]
+#[ORM\UniqueConstraint(name: 'unique_review_per_travel', columns: ['author_uuid', 'user_uuid', 'travel_uuid'])]
 #[ORM\Entity(repositoryClass: ReviewRepository::class)]
 class Review
 {
@@ -21,9 +23,10 @@ class Review
     private ?User $author = null;
 
     #[ORM\ManyToOne(inversedBy: 'reviews')]
-    #[ORM\JoinColumn(name: 'user_uuid', referencedColumnName: 'uuid')]
+    #[ORM\JoinColumn(name: 'user_uuid', referencedColumnName: 'uuid', nullable: false)]
     private ?User $user = null;
 
+    #[Assert\Range(min: 1, max: 5)]
     #[ORM\Column(type: Types::SMALLINT)]
     private ?int $rate = null;
 
@@ -31,8 +34,17 @@ class Review
     #[Gedmo\Timestampable(on: 'create')]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[Assert\Length(min: 10, max: 500)]
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $content = null;
+
+    #[ORM\ManyToOne(inversedBy: 'reviews')]
+    #[ORM\JoinColumn(name: 'travel_uuid', referencedColumnName: 'uuid', nullable: false)]
+    private ?Travel $travel = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(name: 'moderator_uuid', referencedColumnName: 'uuid')]
+    private ?User $moderator = null;
 
     public function getId(): ?int
     {
@@ -95,6 +107,30 @@ class Review
     public function setContent(?string $content): static
     {
         $this->content = $content;
+
+        return $this;
+    }
+
+    public function getTravel(): ?Travel
+    {
+        return $this->travel;
+    }
+
+    public function setTravel(?Travel $travel): static
+    {
+        $this->travel = $travel;
+
+        return $this;
+    }
+
+    public function getModerator(): ?User
+    {
+        return $this->moderator;
+    }
+
+    public function setModerator(?User $moderator): static
+    {
+        $this->moderator = $moderator;
 
         return $this;
     }

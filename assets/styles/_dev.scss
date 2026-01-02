@@ -1,0 +1,80 @@
+// Dev-only layout guide
+:root {
+    --dev-grid-columns-mobile: 4;
+    --dev-grid-columns-tablet: 8;
+    --dev-grid-columns-desktop: 12;
+    --dev-grid-gutter: 20px;
+    --dev-grid-margin-mobile: 16px;
+    --dev-grid-margin-tablet: 32px;
+    --dev-grid-margin-desktop: 160px;
+    --dev-grid-color: rgba(233, 80, 80, 0.18);
+}
+
+.dev-layout-guide {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    display: grid;
+    grid-template-columns: repeat(var(--dev-grid-columns-mobile), 1fr);
+    gap: var(--dev-grid-gutter);
+    padding-left: var(--dev-grid-margin-mobile);
+    padding-right: var(--dev-grid-margin-mobile);
+    align-items: stretch;
+
+    > div {
+        background-color: var(--dev-grid-color);
+        height: 100%;
+        box-sizing: border-box;
+    }
+}
+
+@media (min-width: 768px) {
+    .dev-layout-guide {
+        padding-left: var(--dev-grid-margin-tablet);
+        padding-right: var(--dev-grid-margin-tablet);
+    }
+
+    .dev-layout-guide > div { display: none; }
+
+    .dev-layout-guide::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: var(--dev-grid-margin-tablet);
+        right: var(--dev-grid-margin-tablet);
+        pointer-events: none;
+        /* calc width of one column accounting for gutters:
+             colWidth = (100% - (columns - 1) * gutter) / columns
+        */
+        background-image: repeating-linear-gradient(
+            to right,
+            var(--dev-grid-color),
+            var(--dev-grid-color) calc((100% - ((var(--dev-grid-columns-tablet) - 1) * var(--dev-grid-gutter))) / var(--dev-grid-columns-tablet)),
+            transparent calc((100% - ((var(--dev-grid-columns-tablet) - 1) * var(--dev-grid-gutter))) / var(--dev-grid-columns-tablet)),
+            transparent calc((100% - ((var(--dev-grid-columns-tablet) - 1) * var(--dev-grid-gutter))) / var(--dev-grid-columns-tablet) + var(--dev-grid-gutter))
+        );
+        background-repeat: repeat-x;
+        background-size: auto 100%;
+    }
+}
+
+@media (min-width: 1200px) {
+    .dev-layout-guide {
+        padding-left: var(--dev-grid-margin-desktop);
+        padding-right: var(--dev-grid-margin-desktop);
+    }
+
+    .dev-layout-guide::before {
+        left: var(--dev-grid-margin-desktop);
+        right: var(--dev-grid-margin-desktop);
+        background-image: repeating-linear-gradient(
+            to right,
+            var(--dev-grid-color),
+            var(--dev-grid-color) calc((100% - ((var(--dev-grid-columns-desktop) - 1) * var(--dev-grid-gutter))) / var(--dev-grid-columns-desktop)),
+            transparent calc((100% - ((var(--dev-grid-columns-desktop) - 1) * var(--dev-grid-gutter))) / var(--dev-grid-columns-desktop)),
+            transparent calc((100% - ((var(--dev-grid-columns-desktop) - 1) * var(--dev-grid-gutter))) / var(--dev-grid-columns-desktop) + var(--dev-grid-gutter))
+        );
+    }
+}

@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}EcoRide - Créer un trajet{% endblock %}
+
+{% block main %}
+{% include 'partials/_base_form.html.twig' with {
+    'title': "Créer un trajet",
+    'form': form,
+    'labels': {
+        'departure': 'Ville de départ',
+        'arrival': 'Ville d\'arrivée',
+        'date': 'Date',
+        'car': 'Voiture',
+    },
+    'submit_label': "suivant"
+} %}
+{% endblock %}

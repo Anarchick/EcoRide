@@ -2,46 +2,57 @@
 @use '../_variables' as vars;
 
 #travel-search-bar {
-    padding: utils.px-size(3) utils.px-size(4);
+    padding: utils.px-size(2) utils.px-size(4);
     margin-top: utils.px-size(4);
     border-radius: vars.$border-radius;
     background: vars.$third-background-color;
 }
 
-.travel-search-inputs {
+#travel-search-inputs {
     width: 100%;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     gap: 2px;
-    background: vars.$interactive-color;
-}
 
-@media (max-width: 767px) {
-    .travel-search-inputs {
+    > div {
+        display: flex;
         flex-direction: column;
     }
 }
 
+.line-separator {
+    width: 100%;
+    height: 1px;
+    background: vars.$interactive-color;
+}
+
 .travel-search-input {
     width: 100%;
+    height: utils.rem(24);
     border: 0;
     border-radius: 0;
     color: vars.$interactive-color;
     display: inline-flex;
     align-items: center;
+
+    .travel-search-icon {
+        background: vars.$third-background-color;
+    }
 }
 
 .travel-search-icon {
     padding: 0 2px;
-    background: vars.$third-background-color;
-    height: 1.5rem;
+    height: 100%;
 }
 
 .travel-search-field {
+    height: 100%;
     padding: 0 8px;
     border: 0;
     border-radius: 0;
     background: vars.$third-background-color;
+    color: vars.$interactive-color;
+    opacity: 1;
     box-shadow: none !important;
     position: relative;
 
@@ -67,5 +78,83 @@
         box-shadow: none;
         color: vars.$interactive-color;
         opacity: 0.6;
+    }
+
+    /* date input https://www.tjvantoll.com/2013/04/15/list-of-pseudo-elements-to-style-form-controls/#input_date */
+    &::-webkit-datetime-edit,
+    &::-webkit-datetime-edit-text,
+    &::-webkit-datetime-edit-month-field,
+    &::-webkit-datetime-edit-day-field,
+    &::-webkit-datetime-edit-year-field {
+        color: vars.$interactive-color;
+        -webkit-text-fill-color: vars.$interactive-color;
+    }
+    
+}
+
+#travel-search-filters {
+    margin-top: utils.px-size(1);
+}
+
+#travel-search-filters-button {
+    width: 100%;
+    height: utils.rem(20);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 0;
+    padding: 0 utils.px-size(4);
+    border: none;
+    background: none;
+}
+
+#filters {
+    padding: utils.px-size(2) 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    column-gap: 20px;
+}
+
+.filter-slider {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 38px;
+    padding: 4px 0;
+
+    > .travel-search-icon {
+        padding: 0;
+        margin-left: -6px; 
+    }
+
+    > .filter-range-text {
+        min-width: 24px;
+    }
+
+    > .form-range {
+        margin-left: 4px;
+        width: 100%;
+    }
+}
+
+@media (min-width: 768px) {
+
+    .line-separator {
+        width: 1px;
+        height: 100%;
+    }
+
+    #travel-search-bar {
+        padding: utils.px-size(2) 0;
+    }
+
+    #travel-search-inputs {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        column-gap: 20px;
+        
+        > div {
+            flex-direction: row;
+        }
     }
 }

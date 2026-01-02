@@ -1,0 +1,37 @@
+<article class="travel-card travel-card-show">
+    {# Date #}
+    <div class="ga-date eco-small-text justify-self-center">
+        <time datetime="{{ travel.date | date('Y-m-d H:i') }}">{{ travel.date | format_datetime(locale='fr', pattern='EEEE d MMMM Y') }}</time>
+    </div>
+
+    {# Schedule #}
+    <div class="ga-schedule">
+        {% include 'travel/partials/_schedule.html.twig' with {
+            date: travel.date,
+            duration: travel.duration,
+            arrivalDateTime: travel.getArrivalDateTime()
+        } %}
+    </div>
+
+    {# Passengers #}
+    <div class="ga-places">
+        {{ ux_icon('ion:people', {class: 'h-75'}) }}
+        <p class="eco-bold-text">{{ travel.getUsedSlots() }}/{{ travel.passengersMax }}</p>
+    </div>
+
+    {# Addresses #}
+    <div class="ga-address">
+        <p>{{ travel.departure }}</p>
+        <p>{{ travel.arrival }}</p>
+    </div>
+
+    {# Properties #}
+    <div class="ga-properties">
+        {% include('travel/partials/_properties.html.twig') with {
+            ecologic: travel.car.fuelType.value == 'electric',
+            animals: travel.getTravelPreference().isPetsAllowed(),
+            smoking: travel.getTravelPreference().isSmokingAllowed(),
+            luggage: travel.getTravelPreference().getLuggageSizeEnum()
+        } %}
+    </div>
+</article>

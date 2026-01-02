@@ -1,0 +1,7 @@
+{% if is_granted('ROLE_ADMIN') %}
+    {% include 'partials/profileNav/_admin_nav.html.twig' %}
+{% elseif is_granted('ROLE_MODERATOR') %}
+    {% include 'partials/profileNav/_moderator_nav.html.twig' %}
+{% else %}
+    {% include 'partials/profileNav/_user_nav.html.twig' %}
+{% endif %}

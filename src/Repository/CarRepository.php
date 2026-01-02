@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Car;
+use App\Entity\Travel;
+use App\Enum\TravelStateEnum;
 use App\Repository\Trait\UuidFinderTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -18,6 +20,40 @@ class CarRepository extends ServiceEntityRepository
     }
 
     use UuidFinderTrait;
+
+    /**
+     * Find a car by its plate using hash lookup (optimized for encrypted field)
+     * 
+     * @param string $plate The plate to search for
+     * @return Car|null
+     */
+    public function findOneByPlate(string $plate): ?Car
+    {
+        $plateHash = hash('sha256', strtoupper($plate));
+        
+        return $this->findOneBy(['plateHash' => $plateHash]);
+    }
+
+    /**
+     * Find all Travel associated to a Car that are not completed or cancelled
+     * 
+     * @param Car $car
+     * @return array<Travel> Returns an array of Travel objects
+     */
+    public function findActiveTravelsFromCar(Car $car): array
+    {
+        return $this->getEntityManager()->getRepository(Travel::class)
+            ->createQueryBuilder('t')
+            ->andWhere('t.car = :car')
+            ->andWhere('t.state BETWEEN :pending AND :inProgress')
+            ->setParameter('car', $car)
+            ->setParameter('pending', TravelStateEnum::PENDING->value)
+            ->setParameter('inProgress', TravelStateEnum::IN_PROGRESS->value)
+            ->orderBy('t.departure', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 
 //    /**
 //     * @return Car[] Returns an array of Car objects

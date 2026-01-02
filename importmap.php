@@ -46,4 +46,38 @@ return [
         'path' => './assets/scripts/specific/admin.js',
         'entrypoint' => true,
     ],
+    'scripts/htmx-url-template' => [
+        'path' => './assets/scripts/htmx-url-template.js',
+        'entrypoint' => true,
+    ],
+    'scripts/form-regex-validation' => [
+        'path' => './assets/scripts/form-regex-validation.js',
+        'entrypoint' => true,
+    ],
+    'travel.css' => [
+        'path' => './assets/styles/specific/travel/travel.css',
+        'type' => 'css',
+        'entrypoint' => true,
+    ],
+    'admin.css' => [
+        'path' => './assets/styles/specific/admin/admin.css',
+        'type' => 'css',
+        'entrypoint' => true,
+    ],
+    'leaflet' => [
+        'version' => '1.9.4',
+    ],
+    'leaflet/dist/leaflet.min.css' => [
+        'version' => '1.9.4',
+        'type' => 'css',
+    ],
+    '@symfony/ux-leaflet-map' => [
+        'path' => './vendor/symfony/ux-leaflet-map/assets/dist/map_controller.js',
+    ],
+    'chart.js' => [
+        'version' => '4.5.1',
+    ],
+    '@kurkle/color' => [
+        'version' => '0.3.4',
+    ],
 ];

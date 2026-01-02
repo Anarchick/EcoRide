@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}EcoRide - Terminer le trajet{% endblock %}
+
+{% block importmap %}
+    {{ importmap(['app', 'travel.css']) }}
+{% endblock %}
+
+{% block main %}
+<div class="form-header eco-page-text text-center">
+    <h1>Terminer le trajet</h1>
+</div>
+
+<section class="eco-container-main">
+    {% include 'partials/_flashes.html.twig' %}
+
+    {% include 'travel/partials/_travel_card_show.html.twig' with {
+        travel: travel,
+    } %}
+
+    {{ form_start(form, {'attr': {'class': 'eco-form'}}) }}
+    
+    <div class="mb-4">
+        <h2 class="mb-3">Évaluez vos covoitureurs</h2>
+        
+        {% for reviewForm in form.reviews %}
+            {% set carpooler = travel.carpoolers[loop.index0] %}
+            <article class="card mb-3">
+                <div class="card-body">
+                    <a href="{{ path('app_member_show', { uuid: carpooler.user.uuid }) }}" target="_blank" class="d-flex align-items-center gap-2 w-fit">
+                        {% include 'partials/_user_img.html.twig' with {
+                                username: carpooler.user.username,
+                                avatar: carpooler.user.avatarUrl
+                        } %}
+                        <h4>{{ carpooler.user.username }}</h4>
+                        <span class="badge bg-secondary">{{ carpooler.slots }} place(s)</span>
+                    </a>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            {{ form_row(reviewForm.rate, {'label': 'Note', 'label_attr': {'class': 'eco-bold-text'}}) }}
+                        </div>
+                        <div class="col-md-8">
+                            {{ form_row(reviewForm.content, {'label': 'Commentaire', 'label_attr': {'class': 'eco-bold-text'},
+                                'attr': {
+                                    'rows': 3,
+                                    'placeholder': 'Laissez un commentaire'
+                                }
+                            }) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="d-flex justify-content-between">
+        <a href="{{ path('app_profile_index') }}" target="_self" class="btn btn-danger text-white h-fit">Annuler</a>
+        {{ form_row(form.submit, {'label': 'Terminer le trajet', 'attr': {'class': 'eco-btn'}}) }}
+    </div>
+    
+    {{ form_errors(form) }}
+    {{ form_end(form) }}
+</section>
+{% endblock %}

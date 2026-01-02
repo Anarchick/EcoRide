@@ -2,16 +2,119 @@
 
 {% block title %}EcoRide - Voyager{% endblock %}
 
-{% block main %}
+{% block importmap %}
+    {{ importmap(['app', 'travel.css']) }}
+{% endblock %}
 
-<div class="container">
-    <h1>Détails du trajet</h1>
-    {# {{ dump(travel) }} #}
-    <div class="border">
-        <p>travel uuid : {{ travel.travelUuid }}</p>
-        <p>usern uuid : {{ travel.driverUuid }}</p>
-        <p>datetime : {{ travel.date.date}}</p>
-        <p>fuelType : {{ travel.fuelType.value }}</p>
-    </div>
+{% block main %}
+{% if map %}
+    {{ ux_map(map, {'id': 'map'}) }}
+{% endif %}
+
+<div class="eco-container-main d-flex flex-column gap-3">
+
+    {% include 'partials/_flashes.html.twig' %}
+
+    {% include 'travel/partials/_travel_card_show.html.twig' with {
+        travel: travel,
+    } %}
+
+    <article id="driver">
+        <h2 class="h2 eco-normal-text eco-bold-text">Conducteur :</h2>
+        <section class="user-card">
+            <a class="ga-user-img" href="{{ path('app_member_show', { uuid: travel.driver.uuid }) }}" target="_blank">
+                {% include('partials/_user_img.html.twig') with {
+                        avatar: travel.driver.avatarUrl,
+                        username: travel.driver.username,
+                } %}
+            </a>
+
+            <div class="ga-user-resume d-flex gap-2">
+                <p class="eco-bold-text m-0">{{ travel.driver.username }}</p>
+                {% if travel.driver.ratingAverage > 0 %}
+                    <p class="d-inline-flex">{{ ux_icon('ion:star', {class: 'icon h-16'}) }}{{ travel.driver.ratingAverage }}</p>
+                {% endif %}
+                <a href="#">({{driverReviewsCount}} avis)</a>
+            </div>
+
+            <p class="ga-user-bio">{{ travel.driver.bio }}</p>
+
+        </section>
+    </article>
+
+    {% if driverReviews %}
+    <article id="reviews">
+        <h2 class="h2 eco-normal-text eco-bold-text" type="button" data-bs-toggle="collapse" data-bs-target="#reviews-collapse" aria-expanded="false" aria-controls="reviews-collapse">Derniers avis {{ ux_icon('ion:chevron-down', {class: 'icon'}) }}</h2>
+        <section id="reviews-collapse" class="collapse">
+            <div class="d-flex flex-column gap-2 p-3">
+                {% for review in driverReviews %}
+                <div class="border-bottom pb-2">
+                    <p class="eco-normal-text eco-bold-text"> {{ ux_icon('ion:star', {class: 'icon h-16'}) }} {{ review.rate }} Le {{ review.createdAt | date('d/m/Y') }} par <a href="{{ path('app_member_show', { uuid: review.author.uuid }) }}" target="_blank">{{ review.author.username }}</a></p>
+                    <p>{{ review.content }}</p>
+                </div>
+                {% endfor %}
+
+                <a href="#">voir plus</a>
+            </div>
+        </section>
+    </article>
+    {% endif %}
+
+    <article id="car">
+        <h2 class="h2 eco-normal-text eco-bold-text">Véhicule :</h2>
+        <section class="p-3">
+            <p>{{ travel.car.brand }} {{ travel.car.model }} - {{ travel.car.color.value }}</p>
+            <p>{{ travel.car.fuelType.value }} - {{ travel.car.totalSeats }} places</p>
+        </section>
+    </article>
+
+    <article id="comment">
+        <h2 class="h2 eco-normal-text eco-bold-text">Commentaire du conducteur :</h2>
+        <section class="p-3">
+            <p>{{ travel.travelPreference.comment }}</p>
+        </section>
+    </article>
+
+    {% if travel.isCancellable() %}
+    <article class="travel-interaction">
+        {% if not isDriver %}
+            <a href="#" class="ga-message eco-btn">Envoyer un message</a>
+        {% endif %}
+        
+        <div class="ga-price">
+            {% include 'travel/partials/_price.html.twig' with {
+                cost: travel.cost,
+                slot: slot
+            } %}
+        </div>
+
+        {% if isCarpooler %}
+            {% set method = 'POST' %}
+            {% set path = path('app_travel_unbook', { 'uuid': travel.uuid }) %}
+            {% set text = 'Annuler la réservation' %}
+            {% set class = 'btn btn-danger text-white' %}
+        {% else %}
+            {% set method = 'GET' %}
+            {% set path = path('app_travel_book', { 'uuid': travel.uuid }) %}
+            {% set text = 'Réserver' %}
+            {% set class = 'eco-btn eco-normal-text' %}
+        {% endif %}
+        {% if isDriver %}
+            {% set method = 'POST' %}
+            {% set path = path('app_travel_cancel', { 'uuid': travel.uuid }) %}
+            {% set text = 'Annuler le trajet' %}
+            {% set class = 'btn btn-danger text-white' %}
+        {% endif %}
+
+        <form action="{{ path }}" method={{ method }} class="ga-book">
+            <input type="hidden" name="slot" value="{{ slot }}">
+            <button type="submit" class="{{ class }}">
+                {{ text }}
+            </button>
+        </form>
+        
+    </article>
+    {% endif %}
+    
 </div>
 {% endblock %}

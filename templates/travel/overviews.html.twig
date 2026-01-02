@@ -3,10 +3,22 @@
 
 {% include 'partials/_flashes.html.twig' %}
 
+{% set currentTravel = null %}
+
 {% if travels is not empty %}
-    <div class="row">
-        {% for travel in travels %}
-            {{ travelMacro.overview(travel) }}
-        {% endfor %}
-    </div>
+    {% set currentFuelType = null %}
+    
+    {% for travel in travels %}
+        {% set fuelCategory = travel.fuelType.value == 'electric' ? 'Écologique' : 'Carburant' %}
+
+        {% if currentFuelType != fuelCategory %}
+            <h2 class="eco-title-text mb-1 mt-3">{{ fuelCategory }}</h2>
+            {% set currentFuelType = fuelCategory %}
+        {% endif %}
+
+        {{ travelMacro.overview(travel, criteria) }}
+    {% endfor %}
+
+    {% include 'partials/_pagination.html.twig' with {'totalEntries': totalTravels} %}
+
 {% endif %}

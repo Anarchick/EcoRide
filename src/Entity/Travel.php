@@ -8,9 +8,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'travels')]
 #[ORM\Index(name: 'idx_search_criteria', columns: ['departure', 'arrival', 'date', 'passengers_max'])]
@@ -37,19 +39,27 @@ class Travel
     #[ORM\Column(length: 90, index: true)] // Index for stats
     private ?string $arrival = null;
 
-    #[ORM\Column(index: true)] // Index for stats
+    #[ORM\Column(index: true)]
+    #[Gedmo\Timestampable(on: 'create')]
     private ?\DateTimeImmutable $date = null;
 
     #[ORM\Column]
+    #[Assert\Positive()]
     private ?int $duration = null;
 
     #[ORM\Column]
+    #[Assert\Positive()]
     private ?int $distance = null;
 
     #[ORM\Column(type: Types::SMALLINT)] // No index Needed
+    #[Assert\Range(
+        min: 1,
+        max: 8
+    )]
     private ?int $passengersMax = null;
 
     #[ORM\Column]
+    #[Assert\PositiveOrZero()]
     private ?int $cost = null;
 
     #[ORM\Column(enumType: TravelStateEnum::class, index: true)]
@@ -59,14 +69,28 @@ class Travel
     private ?TravelPreference $travelPreference = null;
 
     /**
-     * @var Collection<int, User>
+     * @var Collection<int, Carpooler>
      */
-    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'carpools')]
+    #[ORM\OneToMany(targetEntity: Carpooler::class, mappedBy: 'travel', orphanRemoval: true)]
     private Collection $carpoolers;
+
+    /**
+     * @var Collection<int, Review>
+     */
+    #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'travel', orphanRemoval: true)]
+    private Collection $reviews;
+
+    /**
+     * @var Collection<int, PlatformCommission>
+     */
+    #[ORM\OneToMany(targetEntity: PlatformCommission::class, mappedBy: 'travel')]
+    private Collection $platformCommission;
 
     public function __construct()
     {
         $this->carpoolers = new ArrayCollection();
+        $this->reviews = new ArrayCollection();
+        $this->platformCommission = new ArrayCollection();
     }
 
     public function getUuid(): ?Uuid
@@ -219,29 +243,220 @@ class Travel
     }
 
     /**
-     * @return Collection<int, User>
+     * @return Collection<int, Carpooler>
      */
     public function getCarpoolers(): Collection
     {
         return $this->carpoolers;
     }
 
-    public function addCarpooler(User $carpooler): static
+    public function addCarpooler(Carpooler $carpooler): static
     {
         if (!$this->carpoolers->contains($carpooler)) {
             $this->carpoolers->add($carpooler);
-            $carpooler->addCarpool($this);
+            $carpooler->setTravel($this);
         }
-
+        
         return $this;
     }
 
-    public function removeCarpooler(User $carpooler): static
+        /**
+     * @return Collection<int, PlatformCommission>
+     */
+    public function getPlatformCommission(): Collection
     {
-        if ($this->carpoolers->removeElement($carpooler)) {
-            $carpooler->removeCarpool($this);
+        return $this->platformCommission;
+    }
+
+    public function addPlatformCommission(PlatformCommission $platformCommission): static
+    {
+        if (!$this->platformCommission->contains($platformCommission)) {
+            $this->platformCommission->add($platformCommission);
+            $platformCommission->setTravel($this);
         }
 
         return $this;
     }
+
+    public function removePlatformCommission(PlatformCommission $platformCommission): static
+    {
+        if ($this->platformCommission->removeElement($platformCommission)) {
+            // set the owning side to null (unless already changed)
+            if ($platformCommission->getTravel() === $this) {
+                $platformCommission->setTravel(null);
+            }
+        }
+
+        return $this;
+    }
+
+    // LOGIC METHODS
+
+    public function removeCarpooler(Carpooler|User $carpooler): ?Carpooler
+    {
+        if ($carpooler instanceof User) {
+            $carpooler = $this->carpoolers->filter(
+                fn(Carpooler $c) => $c->getUser()->getUuid() === $carpooler->getUuid()
+            )->first();
+        }
+
+        if ($carpooler && $this->carpoolers->removeElement($carpooler)) {
+            $user = $carpooler->getUser();
+            $cost = $carpooler->getCost();
+            $user->addCredits($cost);
+            // set the owning side to null (unless already changed)
+            if ($carpooler->getTravel() === $this) {
+                $carpooler->setTravel(null);
+            }
+
+            return $carpooler;
+        }
+
+        return null;
+    }
+
+    public function getUsedSlots(): int
+    {
+        $usedSlots = 0;
+        foreach ($this->carpoolers as $carpooler) {
+            $usedSlots += $carpooler->getSlots();
+        }
+        return $usedSlots;
+    }
+    
+    public function getAvailableSlots(): int
+    {
+        return $this->passengersMax - $this->getUsedSlots();
+    }
+
+    /**
+     * Validate and return a slot count between 1 and the number of available places.
+     * If there are no available places, return 1.
+     * @param int $slot The requested slot count
+     * @return int The validated slot count
+     */
+    public function getValidatedSlotCount(int $slot): int
+    {
+        $availablePlaces = $this->getAvailableSlots();
+        return max(1, min((int)$slot, $availablePlaces));
+    }
+
+    public function isCarpooler(?User $user): bool
+    {
+        if (!$user) {
+            return false;
+        }
+
+        foreach ($this->carpoolers as $carpooler) {
+            if ($carpooler->getUser()->getUuid() === $user->getUuid()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check if a user is involved in the travel (as driver or carpooler)
+     */
+    public function isInvolved(?User $user): bool
+    {
+        if (!$user) {
+            return false;
+        }
+
+        if ($this->driver && $this->driver->getUuid() === $user->getUuid()) {
+            return true;
+        }
+
+        return $this->isCarpooler($user);
+    }
+
+    public function getArrivalDateTime(): \DateTimeImmutable
+    {
+        return $this->date->modify("+{$this->duration} minutes");
+    }
+
+    public function join(User $user, int $slot, int $cost): Carpooler|null
+    {
+        if (!$this->isCarpooler($user)) {
+
+            if ($this->state !== TravelStateEnum::PENDING) {
+                throw new \InvalidArgumentException('Le trajet n\'est plus disponible pour la réservation.');
+            }
+
+            if ($this->isCarpooler($user)) {
+                throw new \InvalidArgumentException('L\'utilisateur est déjà covoitureur de ce trajet.');
+            }
+
+            $validatedSlot = $this->getValidatedSlotCount($slot);
+            if ($validatedSlot < $slot) {
+                throw new \InvalidArgumentException('Le nombre de places demandées dépasse le nombre de places disponibles.');
+            }
+
+            if ($validatedSlot <= 0) {
+                throw new \InvalidArgumentException('Le nombre de places réservées doit être au moins de 1.');
+            }
+
+            if ($user->getCredits() < $cost) {
+                throw new \InvalidArgumentException('L\'utilisateur n\'a pas assez de crédits pour réserver ce trajet.');
+            }
+
+            if ($user->getUuid() === $this->driver?->getUuid()) {
+                throw new \InvalidArgumentException('Le conducteur ne peut pas être covoitureur de son propre trajet.');
+            }
+
+            if ($user->isModerator()) {
+                throw new \InvalidArgumentException('Un administrateur ou modérateur ne peut pas être covoitureur.');
+            }
+
+            $carpooler = new Carpooler();
+            $carpooler->setTravel($this)
+                ->setUser($user)
+                ->setSlots($slot)
+                ->setCost($cost);
+            $this->addCarpooler($carpooler);
+
+            $user->setCredits($user->getCredits() - $cost);
+
+            return $carpooler;
+        }
+
+        return null;
+    }
+
+    /**
+     * @return Collection<int, Review>
+     */
+    public function getReviews(): Collection
+    {
+        return $this->reviews;
+    }
+
+    public function addReview(Review $review): static
+    {
+        if (!$this->reviews->contains($review)) {
+            $this->reviews->add($review);
+            $review->setTravel($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReview(Review $review): static
+    {
+        if ($this->reviews->removeElement($review)) {
+            // set the owning side to null (unless already changed)
+            if ($review->getTravel() === $this) {
+                $review->setTravel(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function isCancellable(): bool
+    {
+        return $this->state === TravelStateEnum::PENDING || $this->state === TravelStateEnum::FULL;
+    }
+
 }

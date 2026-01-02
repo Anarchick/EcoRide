@@ -1,8 +1,33 @@
 @use './_utils' as utils;
 @use './_variables' as vars;
 
-.navbar {
-    min-height: 50px;
+#navbar {
+    min-height: 54px;
+}
+
+.navbar-toggler {
+    width: 44px;
+    padding: 0;
+}
+
+@media (min-width: 768px) {
+    #navbarNav > ul {
+        gap: utils.px-size(16);
+    }
+}
+
+/* tablet */
+@media (min-width: 768px) {
+    #navbarNav {
+        margin-left: calc(-88.16px + 22px + (100% - 64px - 140px) / 8);
+    }
+}
+
+/* desktop */
+@media (min-width: 1200px) {
+    #navbarNav {
+        margin-left: calc(-88.16px + 52px + (100% - 320px) / 6);
+    }
 }
 
 .navbar-toggler:focus {
@@ -22,18 +47,8 @@
     text-underline-offset: 4px;
 }
 
-@media (min-width: 992px) {
+@media (min-width: 768px) {
     .eco-nav-link {
         margin: 0 utils.px-size(3);
-    }
-}
-
-.profile-picture {
-    height: 40px;
-    border-radius: 50%;
-    overflow: hidden;
-    img {
-        height: 100%;
-        object-fit: cover;
     }
 }

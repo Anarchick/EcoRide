@@ -1,8 +1,10 @@
 @use './_utils' as utils;
 @use './_variables' as vars;
 @use './_nav-bar';
+@use './_footer';
 @use './_form';
 @use './_htmx';
+@use './_dev';
 
 
 // Police personnalisée EcoRide
@@ -26,7 +28,61 @@ html, body {
     height: 100%;
 }
 
+// Containers
+$container-padding-mobile: 16px;
+$container-padding-tablet: 32px;
+$container-padding-desktop: 160px;
+$container-main-padding-desktop: 310px;
+
+@mixin eco-container($left: $container-padding-mobile, $right: $container-padding-mobile) {
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: $left;
+    padding-right: $right;
+}
+
+@function eco-container-desktop-padding() {
+    @return calc($container-padding-desktop + 40px + (100% - ($container-padding-desktop * 2) - 220px) / 6);
+}
+
+.eco-container { @include eco-container(); }
+.eco-container-main { @include eco-container(); }
+
+@media (min-width: 768px) {
+    .eco-container { @include eco-container($container-padding-tablet, $container-padding-tablet); }
+    .eco-container-main { @include eco-container($container-padding-tablet, $container-padding-tablet); }
+}
+
+@media (min-width: 1200px) {
+    .eco-container { @include eco-container($container-padding-desktop, $container-padding-desktop); }
+    .eco-container-main { @include eco-container(eco-container-desktop-padding(), eco-container-desktop-padding()); }
+}
+
 // Typography
+
+h1, h2, h3, h4, h5, h6 {
+    margin-bottom: 0;
+}
+
+h1 {
+    font-family: vars.$eco-title-font-family;
+    color: vars.$background-color;
+    font-weight: 400;
+    font-size: utils.rem(44) !important;
+}
+
+.h2 {
+    font-weight: 400;
+    font-size: utils.rem(20) !important;
+}
+
+a, p {
+    font-style: normal;
+    font-weight: 400;
+    text-decoration: none;
+    margin: 0;
+}
+
 .eco-small-text {
     font-size: utils.rem(12);
 }
@@ -41,11 +97,96 @@ html, body {
 
 .eco-title-text {
     font-family: vars.$eco-title-font-family;
-    color: vars.$title-color;
+    color: vars.$ecologic-color;
     font-size: utils.rem(24);
 }
 
 // S'assurer que le footer reste en bas
 .min-vh-100 {
     min-height: 100vh !important;
+}
+
+// colors
+a, button {
+    color: vars.$interactive-color !important;
+}
+
+.color-interact {
+    color: vars.$interactive-color !important;
+}
+
+.color-light {
+    color: vars.$text-light-color !important;
+}
+
+.color-ecologic {
+    color: vars.$ecologic-color !important;
+}
+
+// button
+
+.eco-btn {
+    padding: utils.px-size(3) utils.px-size(6);
+    color: vars.$interactive-color;
+    background-color: transparent;
+    border: 1px solid vars.$interactive-color;
+    border-radius: utils.px-size(4);
+    text-align: center;
+    vertical-align: middle;
+    text-decoration: none;
+    line-height: 1.5;
+    transition: .15s ease-in-out;
+
+    &:hover {
+        background-color: vars.$interactive-color !important;
+        color: vars.$text-light-color !important;
+    }
+}
+
+.eco-btn-filled {
+    background-color: vars.$interactive-color !important;
+    color: vars.$text-light-color !important;
+}
+
+// Class utils
+
+.border-interactive {
+    border: 1px solid vars.$interactive-color;
+}
+
+.justify-self-center {
+    justify-self: center !important;
+}
+
+.w-fill {
+    width: -webkit-fill-available !important;
+}
+
+.w-fit {
+    width: fit-content !important;
+}
+
+.h-fit {
+    height: fit-content !important;
+}
+
+.h-12 {
+    height: utils.rem(12) !important;
+}
+
+.h-16 {
+    height: utils.rem(16) !important;
+}
+
+.h-44 {
+    height: utils.rem(44) !important;
+}
+
+.w-44 {
+    width: utils.rem(44) !important;
+}
+
+.icon {
+    max-height: utils.rem(24);
+    max-width: utils.rem(24);
 }

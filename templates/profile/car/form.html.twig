@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}EcoRide - {{ car is defined and car.uuid ? 'Modifier' : 'Ajouter' }} une voiture{% endblock %}
+
+{% block importmap %}
+    {{ importmap(['app', 'scripts/htmx-url-template', 'scripts/form-regex-validation']) }}
+{% endblock %}
+
+{% block main %}
+{% include 'partials/_profile_nav.html.twig' %}
+<div class="text-center bg-success text-white p-3 mb-4">
+    <h1>{{ car is defined and car.uuid ? 'Modifier' : 'Ajouter' }} une voiture</h1>
+</div>
+
+<div class="container">
+    {% include 'partials/_flashes.html.twig' %}
+
+    {{ form_start(form, {'attr': {'class': 'eco-form'}}) }}
+
+    <div class="mb-3">
+        {{ form_label(form.plate, 'Plaque d\'immatriculation', {'label_attr': {'class': 'eco-bold-text'}}) }}
+        {{ form_widget(form.plate) }}
+        {{ form_errors(form.plate) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.brand, null, {'label_attr': {'class': 'eco-bold-text'}}) }}
+        {{ form_widget(form.brand) }}
+        {{ form_errors(form.brand) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.model, null, {'label_attr': {'class': 'eco-bold-text'}}) }}
+        <div id="model-select-wrapper">
+            {{ form_widget(form.model) }}
+        </div>
+        {{ form_errors(form.model) }}
+        <div class="form-text">Le modèle se met à jour automatiquement selon la marque sélectionnée</div>
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.fuelType, null, {'label_attr': {'class': 'eco-bold-text'}}) }}
+        {{ form_widget(form.fuelType) }}
+        {{ form_errors(form.fuelType) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.color, null, {'label_attr': {'class': 'eco-bold-text'}}) }}
+        {{ form_widget(form.color) }}
+        {{ form_errors(form.color) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.totalSeats, null, {'label_attr': {'class': 'eco-bold-text'}}) }}
+        {{ form_widget(form.totalSeats) }}
+        {{ form_errors(form.totalSeats) }}
+    </div>
+
+    <div class="text-center">
+        {{ form_widget(form.submit) }}
+    </div>
+
+    {{ form_end(form) }}
+</div>
+{% endblock %}

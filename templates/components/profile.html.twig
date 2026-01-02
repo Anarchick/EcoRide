@@ -1,0 +1,22 @@
+<article class="profile-component w-100 h-100">
+    <a href="{{ path('app_member_show', { uuid: userUuid }) }}" target="_blank" class="eco-small-text h-100 d-flex flex-column align-items-center justify-content-between">
+        {% include('partials/_user_img.html.twig') with {
+                username: username,
+                avatar: avatar
+        } %}
+        
+        <div class="profile-info">
+            <p class="m-0 text-center">{{ username | decrypt }}</p>
+
+            <div class="rating d-flex justify-content-center">
+                {% if userRating > 0 %}
+                    {{ ux_icon('ion:star', {class: 'icon h-12'}) }}
+                    <p class="m-0">{{ userRating }}</p>
+                {% else %}
+                    <p class="m-0">.</p>
+                {% endif %}
+            </div>
+            
+        </div>
+    </a>
+</article>

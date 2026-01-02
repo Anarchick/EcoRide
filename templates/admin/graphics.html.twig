@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}EcoRide - Administration{% endblock %}
+
+{% block importmap %}
+    {{ importmap(['app', 'scripts/specific/admin']) }}
+{% endblock %}
+
+{% block main %}
+{% include 'partials/_profile_nav.html.twig' %}
+
+<div class="eco-container-main d-flex flex-column gap-3">
+    <article>
+        <h5>Covoiturages par jour (30 derniers jours)</h5>
+        <canvas id="dailyTravelChart" aria-label="Graphique des voyages" role="img" 
+                data-chart="line" 
+                data-chart-data='{
+                    "labels": {{ chartTravels|map(label => label.period)|json_encode }},
+                    "datasets": [{
+                        "label": "Covoiturages",
+                        "data": {{ chartTravels|map(data => data.count)|json_encode }},
+                        {# TODO get color from css #}
+                        "borderColor": "#198754",
+                        "backgroundColor": "#85c26666",
+                        "fill": true
+                    }]
+                }'>
+        </canvas>
+    </article>
+
+    <article>
+        <h5>Crédits gagnés par jour (30 derniers jours)</h5>
+        <p class='eco-normal-text eco-bold-text'> Total période : {{ totalCreditsPeriod }}</p>
+        <p class='eco-normal-text eco-bold-text'>Total: {{ totalCredits }}</p>
+        <canvas id="dailyCreditsChart" aria-label="Graphique des crédits gagnés" role="img" 
+                data-chart="line" 
+                data-chart-data='{
+                    "labels": {{ creditsEarned|map(label => label.date)|json_encode }},
+                    "datasets": [{
+                        "label": "Crédits gagnés",
+                        "data": {{ creditsEarned|map(data => data.credits)|json_encode }},
+                        {# TODO get color from css #}
+                        "borderColor": "#198754",
+                        "backgroundColor": "#85c26666",
+                        "fill": true
+                    }]
+                }'>
+        </canvas>
+    </article>
+
+</div>
+{% endblock %}

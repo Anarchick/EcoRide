@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\User;
-use App\Repository\Trait\UuidFinderTrait;
+use App\Enum\RoleEnum;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -20,7 +20,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         parent::__construct($registry, User::class);
     }
 
-    use UuidFinderTrait;
 
     /**
      * Find a User by their email (plain text).
@@ -30,6 +29,21 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     {
         $emailHash = hash('sha256', $email);
         return $this->findOneBy(['emailHash' => $emailHash]);
+    }
+
+    /**
+     * Find Users by their role.
+     * @return array<User> Returns an array of User objects
+     */
+    public function findByRole(RoleEnum $role): array
+    {
+        return $this->createQueryBuilder('u')
+            ->innerJoin('u.roles', 'r')
+            ->where('r.role = :role')
+            ->setParameter('role', $role)
+            ->orderBy('u.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
     }
 
     /**
@@ -44,5 +58,38 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $user->setPassword($newHashedPassword);
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
+    }
+
+    /**
+     * Find banned users with their ban information
+     * @return array<int, array{uuid: string, username: string, createAt: \DateTimeImmutable, reason: string}>
+     */
+    public function findBannedUsers(int $page): array
+    {
+        $firstResult = max($page - 1, 0) * 10;
+        return $this->createQueryBuilder('u')
+            ->select('u.uuid', 'u.username', 'u.avatarUrl', 'ub.createAt AS bannedAt', 'ub.reason')
+            ->innerJoin('u.userBan', 'ub')
+            ->innerJoin('u.roles', 'r')
+            ->where('r.role = :role')
+            ->setParameter('role', RoleEnum::BANNED)
+            ->orderBy('ub.createAt', 'DESC')
+            ->setMaxResults(10)
+            ->setFirstResult($firstResult)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function countBannedUsers(): int
+    {
+        return (int) $this->createQueryBuilder('u')
+            ->select('COUNT(u.uuid)')
+            ->innerJoin('u.roles', 'r')
+            ->where('r.role = :role')
+            ->setParameter('role', RoleEnum::BANNED)
+            ->getQuery()
+            ->getSingleScalarResult()
+        ;
     }
 }
