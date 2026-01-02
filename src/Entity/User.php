@@ -57,7 +57,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Encrypted]
     #[Assert\NotBlank()]
     #[Assert\Length(min:3, max: 20)]
-    #[Assert\Regex(pattern: '/^[a-zA-ZÀ-ÿ\d _\-]+$/', message: 'Votre pseudonyme ne doit contenir que des lettres, des chiffres, des tirets ou des underscores.')]
+    #[Assert\Regex(pattern: '/^[a-zA-ZÀ-ÿ\d \._\-]+$/', message: 'Votre pseudonyme ne doit contenir que des lettres, chiffres, tirets, points ou des underscores.')]
     #[ORM\Column(length: 255)]
     private ?string $username = null;
 
@@ -134,6 +134,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\OneToMany(targetEntity: Carpooler::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $carpoolers;
+
+    #[ORM\OneToOne(targetEntity: UserBan::class, mappedBy: 'user', cascade: ['persist'])]
+    private ?UserBan $userBan = null;
 
     public function __construct()
     {
@@ -601,6 +604,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->hasRole(RoleEnum::DRIVER);
     }
 
+    public function isBanned(): bool
+    {
+        return $this->hasRole(RoleEnum::BANNED);
+    }
+
     /**
      * @return Collection<int, Carpooler>
      */
@@ -627,6 +635,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $carpooler->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getUserBan(): ?UserBan
+    {
+        return $this->userBan;
+    }
+
+    public function setUserBan(?UserBan $userBan): static
+    {
+        if ($userBan !== null && $userBan->getUser() !== $this) {
+            $userBan->setUser($this);
+        }
+
+        $this->userBan = $userBan;
 
         return $this;
     }

@@ -32,19 +32,8 @@ class RegistrationType extends AbstractType
             ->add('lastName', TextType::class, [
                 'attr' => ['autocomplete' => 'family-name'],
             ])
-            ->add('username', TextType::class, [
-                'attr' => ['autocomplete' => 'off'],
-            ])
-            ->add('phone', TelType::class, [ // TelType can adapt keyboard on mobile
-                'attr' => ['autocomplete' => 'tel-country-code'],
-                // French phone number format validation
-                'constraints' => new Regex(
-                    pattern:'/^(?:(?:\+|00)?33[\s\.-]|0)?((?:6|7)(?:[\s\.-]?\d{2}){4})\s*$/',
-                    message: 'Votre numéro de téléphone portable est invalide.'
-                )
-            ])
             ->add('email', EmailType::class, [
-                'attr' => ['autocomplete' => 'email'],
+                'attr' => ['autocomplete' => 'email username'],
                 'constraints' => [
                     new Email(message: 'Saisissez une adresse email valide'),
                     new Length(
@@ -52,6 +41,17 @@ class RegistrationType extends AbstractType
                         maxMessage: 'Votre adresse email ne peut pas dépasser {{ limit }} caractères'
                     ),
                 ],
+            ])
+            ->add('username', TextType::class, [
+                'attr' => ['autocomplete' => 'nickname'],
+            ])
+            ->add('phone', TelType::class, [ // TelType can adapt keyboard on mobile
+                'attr' => ['autocomplete' => 'tel'],
+                // French phone number format validation
+                'constraints' => new Regex(
+                    pattern:'/^(?:(?:\+|00)?33[\s\.-]|0)?((?:6|7)(?:[\s\.-]?\d{2}){4})\s*$/',
+                    message: 'Votre numéro de téléphone portable est invalide.'
+                )
             ])
             // Not in User, constraints are added here
             ->add('plainPassword', RepeatedType::class, [

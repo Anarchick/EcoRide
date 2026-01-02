@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Enum\RoleEnum;
 use App\Enum\TravelStateEnum;
 use App\Repository\TravelRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -81,10 +80,17 @@ class Travel
     #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'travel', orphanRemoval: true)]
     private Collection $reviews;
 
+    /**
+     * @var Collection<int, PlatformCommission>
+     */
+    #[ORM\OneToMany(targetEntity: PlatformCommission::class, mappedBy: 'travel')]
+    private Collection $platformCommission;
+
     public function __construct()
     {
         $this->carpoolers = new ArrayCollection();
         $this->reviews = new ArrayCollection();
+        $this->platformCommission = new ArrayCollection();
     }
 
     public function getUuid(): ?Uuid
@@ -251,6 +257,36 @@ class Travel
             $carpooler->setTravel($this);
         }
         
+        return $this;
+    }
+
+        /**
+     * @return Collection<int, PlatformCommission>
+     */
+    public function getPlatformCommission(): Collection
+    {
+        return $this->platformCommission;
+    }
+
+    public function addPlatformCommission(PlatformCommission $platformCommission): static
+    {
+        if (!$this->platformCommission->contains($platformCommission)) {
+            $this->platformCommission->add($platformCommission);
+            $platformCommission->setTravel($this);
+        }
+
+        return $this;
+    }
+
+    public function removePlatformCommission(PlatformCommission $platformCommission): static
+    {
+        if ($this->platformCommission->removeElement($platformCommission)) {
+            // set the owning side to null (unless already changed)
+            if ($platformCommission->getTravel() === $this) {
+                $platformCommission->setTravel(null);
+            }
+        }
+
         return $this;
     }
 

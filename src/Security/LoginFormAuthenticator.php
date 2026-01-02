@@ -2,12 +2,14 @@
 
 namespace App\Security;
 
+use App\Repository\UserBanRepository;
 use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\AbstractLoginFormAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
@@ -15,7 +17,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
-use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
 /**
  * @see https://symfony.com/doc/current/security/custom_authenticator.html
@@ -23,10 +24,10 @@ use Symfony\Component\Security\Http\Util\TargetPathTrait;
 class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 {
 
-    use TargetPathTrait;
 
     public function __construct(
         private UserRepository $userRepository,
+        private UserBanRepository $userBanRepository,
         private RouterInterface $router
     ) {
     }
@@ -52,7 +53,18 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 
         $passport = new Passport(
             new UserBadge($email, function ($userIdentifier) {
-                return $this->userRepository->findOneByEmail($userIdentifier);
+                $user = $this->userRepository->findOneByEmail($userIdentifier);
+
+                if ($user && $user->isBanned()) {
+                    $reason = $this->userBanRepository->findOneBy(['user' => $user])?->getReason();
+                    throw new CustomUserMessageAuthenticationException(
+                        'Votre compte a été banni.' . PHP_EOL .
+                        'Veuillez contacter le support pour plus d\'informations.' . PHP_EOL .
+                        'Raison du bannissement : ' . ($reason ?? 'Non spécifiée.')
+                    );
+                }
+
+                return $user;
             }),
             new PasswordCredentials($password),
             [new CsrfTokenBadge('authenticate', $csrfToken)]
@@ -67,8 +79,10 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
-        if ($target = $this->getTargetPath($request->getSession(), $firewallName)) {
-            return new RedirectResponse($target);
+        $targetPath = $request->getSession()->get('_security.' . $firewallName . '.target_path');
+    
+        if ($targetPath) {
+            return new RedirectResponse($targetPath);
         }
 
         return new RedirectResponse($this->router->generate('app_travel_index'));

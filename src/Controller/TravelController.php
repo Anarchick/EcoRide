@@ -396,7 +396,7 @@ final class TravelController extends AbstractController
         ]);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid())  {
+        if ($form->isSubmitted() && $form->isValid()) {
             $slot = $form->get('slots')->getData();
             $cost = $slot * $travel->getCost();
 
