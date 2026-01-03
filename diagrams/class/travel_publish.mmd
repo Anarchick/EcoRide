@@ -1,27 +1,22 @@
 classDiagram
     Driver "1" *-- "0..*" Car : owns
     Driver "1" *-- "0..*" Travel : driver
-    User "0..*" -- "0..*" Travel : passenger
     Car "0..*" o-- "1" Brand : has
     Car "0..*" o-- "1" Model : has
     Car "1" -- "0..*" Travel : has
     Brand "1" *-- "1..*" Model : has
     Travel "1" *-- "1" TravelPreference : has
-    Driver <|-- User
+    Driver --|> User : &ltextends&gt
 
     class Driver {
         +addCar(Car)
         +getCars()
-        +addRole(RoleEnum)
         +canPublishTravel()
-        +joinTravel(Travel)
-        +leaveTravel(Travel)
     }
     class User {
         +string[] roles
         +getUuid()
-        +getUsername()
-        +getRatingAverage()
+        +getRoles()
         +addRole(RoleEnum)
     }
     class Car {
@@ -60,7 +55,7 @@ classDiagram
         +getState()
         +getTravelPreference()
         +setCar(Car)
-        +setDriver(User)
+        +setDriver(Driver)
         +setDeparture(string)
         +setArrival(string)
         +setDate(DateTimeImmutable)
