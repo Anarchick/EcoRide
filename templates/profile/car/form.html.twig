@@ -8,7 +8,7 @@
 
 {% block main %}
 {% include 'partials/_profile_nav.html.twig' %}
-<div class="text-center bg-success text-white p-3 mb-4">
+<div class="form-header eco-page-text text-center">
     <h1>{{ car is defined and car.uuid ? 'Modifier' : 'Ajouter' }} une voiture</h1>
 </div>
 
@@ -54,6 +54,12 @@
         {{ form_label(form.totalSeats, null, {'label_attr': {'class': 'eco-bold-text'}}) }}
         {{ form_widget(form.totalSeats) }}
         {{ form_errors(form.totalSeats) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.firstRegistrationDate, null, {'label_attr': {'class': 'eco-bold-text'}}) }}
+        {{ form_widget(form.firstRegistrationDate) }}
+        {{ form_errors(form.firstRegistrationDate) }}
     </div>
 
     <div class="text-center">
