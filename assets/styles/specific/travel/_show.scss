@@ -52,14 +52,31 @@
     width: 100%;
     display: grid;
     column-gap: 20px;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: 0.8fr 2.6fr;
     grid-template-rows: 18px auto;
-    grid-template-areas:"user-img user-resume user-resume user-resume"
-                        "user-img user-bio user-bio user-bio";
+    grid-template-areas:"user-img user-resume"
+                        "user-img user-bio";
+}
+
+@media (min-width: 768px) {
+    .user-card {
+        grid-template-columns: 0.8fr 6.7fr;
+        grid-template-areas:"user-img user-resume"
+                            "user-img user-bio";
+    }
 }
 
 .ga-user-img {
     grid-area: user-img;
+    width: 60px;
+    height: auto;
+    aspect-ratio: 1;
+    justify-self: center;
+
+    > .profile-picture {
+        width: 100% !important;
+        height: 100% !important;
+    }
 }
 
 .ga-user-resume {
