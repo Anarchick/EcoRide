@@ -43,21 +43,9 @@
     </article>
 
     {% if driverReviews %}
-    <article id="reviews">
-        <h2 class="h2 eco-normal-text eco-bold-text" type="button" data-bs-toggle="collapse" data-bs-target="#reviews-collapse" aria-expanded="false" aria-controls="reviews-collapse">Derniers avis {{ ux_icon('ion:chevron-down', {class: 'icon'}) }}</h2>
-        <section id="reviews-collapse" class="collapse">
-            <div class="d-flex flex-column gap-2 p-3">
-                {% for review in driverReviews %}
-                <div class="border-bottom pb-2">
-                    <p class="eco-normal-text eco-bold-text"> {{ ux_icon('ion:star', {class: 'icon h-16'}) }} {{ review.rate }} Le {{ review.createdAt | date('d/m/Y') }} par <a href="{{ path('app_member_show', { uuid: review.author.uuid }) }}" target="_blank">{{ review.author.username }}</a></p>
-                    <p>{{ review.content }}</p>
-                </div>
-                {% endfor %}
-
-                <a href="#">voir plus</a>
-            </div>
-        </section>
-    </article>
+    {% include 'partials/_reviews.html.twig' with {
+        reviews: driverReviews
+    } %}
     {% endif %}
 
     <article id="car">

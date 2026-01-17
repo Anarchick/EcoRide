@@ -25,7 +25,6 @@
     </div>
 
     <p>Pseudo : {{ user.username }}</p>
-    <p>Roles : [{{ user.roles|join(', ') }}]</p>
 
     {% if travelReadyToStart %}
     <section id="readyToStart">
@@ -48,7 +47,7 @@
     {% endif %}
 
     {% if travelInProgress %}
-    <section id="completed">
+    <section id="progress">
         <div class="d-flex justify-content-between align-items-center">
             <h2>Trajets en cours</h2>
             <a href="{{ path('app_travel_complete', { 'uuid': travelInProgress.uuid }) }}" class="eco-btn">Arrivée à destination</a>
@@ -60,7 +59,7 @@
     {% endif %}
 
     {% if travelsWithPendingReviews %}
-    <section id="completed">
+    <section id="pendingReviews">
         <h2>Trajets en attente d'avis</h2>
             {% for travel in travelsWithPendingReviews %}
                 {% include 'travel/partials/_travel_card_show.html.twig' with {
@@ -68,6 +67,23 @@
                 } %}
             {% endfor %}
     </section>
+    {% endif %}
+
+    {% if travelsPending %}
+    <section id="pending">
+        <h2>Trajets en attente</h2>
+            {% for travel in travelsPending %}
+                {% include 'travel/partials/_travel_card_show.html.twig' with {
+                    travel: travel,
+                } %}
+            {% endfor %}
+    </section>
+    {% endif %}
+
+    {% if reviews %}
+    {% include 'partials/_reviews.html.twig' with {
+        reviews: reviews
+    } %}
     {% endif %}
     
 </div>
