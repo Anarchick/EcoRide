@@ -315,6 +315,28 @@ class TravelRepository extends ServiceEntityRepository
     }
 
     /**
+     * Find all Travels involving a specific User as driver or carpooler
+     * Ordered by date descending
+     * @param User $user
+     * @return array<Travel> Returns an array of Travel objects
+     */
+    public function findPendingTravel(User $user): array
+    {
+        return $this->createQueryBuilder('t')
+            ->leftJoin('t.carpoolers', 'cp')
+            ->where('t.driver = :user')
+            ->orWhere('cp.user = :user')
+            ->andWhere('t.state IN (:states)')
+            ->setParameter('states', [TravelStateEnum::PENDING, TravelStateEnum::FULL])
+            ->setParameter('user', $user)
+            ->orderBy('t.date', 'ASC')
+            ->setMaxResults(5)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    /**
      * Find a Travel ready to start for a specific driver
      * (state PENDING or FULL, date within +/- 2 hours from now)
      */
@@ -365,6 +387,21 @@ class TravelRepository extends ServiceEntityRepository
             ->orderBy('t.date', 'DESC')
             ->getQuery()
             ->getResult()
+        ;
+    }
+
+    public function cancelOldPendingTravels(\DateTimeImmutable $beforeDate = new \DateTimeImmutable()): int
+    {
+        return $this->createQueryBuilder('t')
+            ->update()
+            ->set('t.state', ':cancelledState')
+            ->where('t.state IN (:states)')
+            ->andWhere('t.date < :beforeDate')
+            ->setParameter('cancelledState', TravelStateEnum::CANCELLED)
+            ->setParameter('states', [TravelStateEnum::PENDING, TravelStateEnum::FULL])
+            ->setParameter('beforeDate', $beforeDate)
+            ->getQuery()
+            ->execute()
         ;
     }
 
